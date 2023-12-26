@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:14.6-alpine
+    command: postgres -c shared_preload_libraries=pg_stat_statements
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: rust_pg_extras
+      POSTGRES_PASSWORD: secret
+    ports:
+      - '5432:5432'

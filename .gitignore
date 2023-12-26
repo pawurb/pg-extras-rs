@@ -1,0 +1,5 @@
+.tool-versions
+docker-compose.yml
+Cargo.lock
+target/
+.envrc

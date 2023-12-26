@@ -1,0 +1,25 @@
+[package]
+name = "pg-extras"
+version = "0.0.1"
+edition = "2021"
+authors = ["Pawel Urbanek <contact@pawelurbanek.com>"]
+readme = "README.md"
+categories = ["database"]
+license = "MIT"
+repository = "https://github.com/pawurb/rust-pg-extras"
+description = "PostgreSQL performance database insights"
+
+exclude = [
+    "docker-compose.yml.sample",
+    "live_tests.sh"
+]
+
+[dependencies]
+postgres = "0.19.7"
+rust_decimal = { version = "1.32", features = ["db-postgres"] }
+rust_decimal_macros = "1.33"
+prettytable-rs = "^0.10"
+pg_interval = "0.4.2"
+
+
+

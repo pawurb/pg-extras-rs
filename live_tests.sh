@@ -1,0 +1,1 @@
+fswatch -or src | xargs -n1 -I{} sh -c "cargo test -- --nocapture"
