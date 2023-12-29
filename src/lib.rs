@@ -96,10 +96,7 @@ pub fn indexes() -> Vec<Indexes> {
 
 pub fn index_size() -> Vec<IndexSize> {
     let query = read_file(IndexSize::FILE_NAME);
-    let rows: Vec<Row> = connection()
-        .query(&query, &[])
-        .unwrap_or_else(|_| Vec::new());
-    rows.iter().map(IndexSize::new).collect()
+    get_rows(&query).iter().map(IndexSize::new).collect()
 }
 
 pub fn index_usage(schema: Option<String>) -> Vec<IndexUsage> {
