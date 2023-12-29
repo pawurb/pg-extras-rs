@@ -1,4 +1,4 @@
-use crate::Tabular;
+use crate::structs::shared::Tabular;
 use postgres::Row;
 
 pub struct IndexSize {

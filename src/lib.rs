@@ -1,6 +1,6 @@
 use postgres::{Client, NoTls, Row};
-use std::{env, fs};
-mod structs;
+use std::env;
+pub mod structs;
 use structs::all_locks::AllLocks;
 use structs::bloat::Bloat;
 use structs::blocking::Blocking;
@@ -52,7 +52,7 @@ pub fn render_table<T: Tabular>(items: Vec<T>) {
 
 pub fn bloat() -> Vec<Bloat> {
     let query = read_file(Bloat::FILE_NAME);
-    get_rows(&query).iter().map(Bloat::new).collect()
+    get_rows(query).iter().map(Bloat::new).collect()
 }
 
 pub fn blocking(limit: Option<String>) -> Vec<Blocking> {
@@ -69,12 +69,12 @@ pub fn calls(limit: Option<String>) -> Vec<Calls> {
 
 pub fn extensions() -> Vec<Extensions> {
     let query = read_file(Extensions::FILE_NAME);
-    get_rows(&query).iter().map(Extensions::new).collect()
+    get_rows(query).iter().map(Extensions::new).collect()
 }
 
 pub fn table_cache_hit() -> Vec<TableCacheHit> {
     let query = read_file(TableCacheHit::FILE_NAME);
-    get_rows(&query).iter().map(TableCacheHit::new).collect()
+    get_rows(query).iter().map(TableCacheHit::new).collect()
 }
 
 pub fn tables(schema: Option<String>) -> Vec<Tables> {
@@ -91,12 +91,12 @@ pub fn index_cache_hit(schema: Option<String>) -> Vec<IndexCacheHit> {
 
 pub fn indexes() -> Vec<Indexes> {
     let query = read_file(Indexes::FILE_NAME);
-    get_rows(&query).iter().map(Indexes::new).collect()
+    get_rows(query).iter().map(Indexes::new).collect()
 }
 
 pub fn index_size() -> Vec<IndexSize> {
     let query = read_file(IndexSize::FILE_NAME);
-    get_rows(&query).iter().map(IndexSize::new).collect()
+    get_rows(query).iter().map(IndexSize::new).collect()
 }
 
 pub fn index_usage(schema: Option<String>) -> Vec<IndexUsage> {
@@ -120,17 +120,17 @@ pub fn null_indexes(min_relation_size_mb: Option<String>) -> Vec<NullIndexes> {
 
 pub fn locks() -> Vec<Locks> {
     let query = read_file(Locks::FILE_NAME);
-    get_rows(&query).iter().map(Locks::new).collect()
+    get_rows(query).iter().map(Locks::new).collect()
 }
 
 pub fn all_locks() -> Vec<AllLocks> {
     let query = read_file(AllLocks::FILE_NAME);
-    get_rows(&query).iter().map(AllLocks::new).collect()
+    get_rows(query).iter().map(AllLocks::new).collect()
 }
 
 pub fn long_running_queries() -> Vec<LongRunningQueries> {
     let query = read_file(LongRunningQueries::FILE_NAME);
-    get_rows(&query)
+    get_rows(query)
         .iter()
         .map(LongRunningQueries::new)
         .collect()
@@ -138,12 +138,12 @@ pub fn long_running_queries() -> Vec<LongRunningQueries> {
 
 pub fn mandelbrot() -> Vec<Mandelbrot> {
     let query = read_file(Mandelbrot::FILE_NAME);
-    get_rows(&query).iter().map(Mandelbrot::new).collect()
+    get_rows(query).iter().map(Mandelbrot::new).collect()
 }
 
 pub fn outliers() -> Vec<Outliers> {
     let query = read_file(Outliers::FILE_NAME);
-    get_rows(&query).iter().map(Outliers::new).collect()
+    get_rows(query).iter().map(Outliers::new).collect()
 }
 
 pub fn records_rank(schema: Option<String>) -> Vec<RecordsRank> {
@@ -172,17 +172,17 @@ pub fn table_indexes_size(schema: Option<String>) -> Vec<TableIndexesSize> {
 
 pub fn table_size() -> Vec<TableSize> {
     let query = read_file(TableSize::FILE_NAME);
-    get_rows(&query).iter().map(TableSize::new).collect()
+    get_rows(query).iter().map(TableSize::new).collect()
 }
 
 pub fn total_index_size() -> Vec<TotalIndexSize> {
     let query = read_file(TotalIndexSize::FILE_NAME);
-    get_rows(&query).iter().map(TotalIndexSize::new).collect()
+    get_rows(query).iter().map(TotalIndexSize::new).collect()
 }
 
 pub fn total_table_size() -> Vec<TotalTableSize> {
     let query = read_file(TotalTableSize::FILE_NAME);
-    get_rows(&query).iter().map(TotalTableSize::new).collect()
+    get_rows(query).iter().map(TotalTableSize::new).collect()
 }
 
 pub fn unused_indexes(schema: Option<String>) -> Vec<UnusedIndexes> {
@@ -193,32 +193,32 @@ pub fn unused_indexes(schema: Option<String>) -> Vec<UnusedIndexes> {
 
 pub fn duplicate_indexes() -> Vec<DuplicateIndexes> {
     let query = read_file(DuplicateIndexes::FILE_NAME);
-    get_rows(&query).iter().map(DuplicateIndexes::new).collect()
+    get_rows(query).iter().map(DuplicateIndexes::new).collect()
 }
 
 pub fn vacuum_stats() -> Vec<VacuumStats> {
     let query = read_file(VacuumStats::FILE_NAME);
-    get_rows(&query).iter().map(VacuumStats::new).collect()
+    get_rows(query).iter().map(VacuumStats::new).collect()
 }
 
 pub fn buffercache_stats() -> Vec<BuffercacheStats> {
     let query = read_file(BuffercacheStats::FILE_NAME);
-    get_rows(&query).iter().map(BuffercacheStats::new).collect()
+    get_rows(query).iter().map(BuffercacheStats::new).collect()
 }
 
 pub fn buffercache_usage() -> Vec<BuffercacheUsage> {
     let query = read_file(BuffercacheUsage::FILE_NAME);
-    get_rows(&query).iter().map(BuffercacheUsage::new).collect()
+    get_rows(query).iter().map(BuffercacheUsage::new).collect()
 }
 
 pub fn ssl_used() -> Vec<SslUsed> {
     let query = read_file(SslUsed::FILE_NAME);
-    get_rows(&query).iter().map(SslUsed::new).collect()
+    get_rows(query).iter().map(SslUsed::new).collect()
 }
 
 pub fn connections() -> Vec<Connections> {
     let query = read_file(Connections::FILE_NAME);
-    get_rows(&query).iter().map(Connections::new).collect()
+    get_rows(query).iter().map(Connections::new).collect()
 }
 
 pub fn cache_hit(schema: Option<String>) -> Vec<CacheHit> {
@@ -229,12 +229,45 @@ pub fn cache_hit(schema: Option<String>) -> Vec<CacheHit> {
 
 pub fn db_settings() -> Vec<DbSetting> {
     let query = read_file("db_settings");
-    get_rows(&query).iter().map(DbSetting::new).collect()
+    get_rows(query).iter().map(DbSetting::new).collect()
 }
 
-fn read_file(filename: &str) -> String {
-    fs::read_to_string(format!("src/queries/{}.sql", filename))
-        .unwrap_or_else(|_| panic!("Error reading the '{}' file", filename))
+pub fn read_file(filename: &str) -> &'static str {
+    match filename {
+        "cache_hit" => include_str!("queries/cache_hit.sql"),
+        "bloat" => include_str!("queries/bloat.sql"),
+        "blocking" => include_str!("queries/blocking.sql"),
+        "calls" => include_str!("queries/calls.sql"),
+        "extensions" => include_str!("queries/extensions.sql"),
+        "table_cache_hit" => include_str!("queries/table_cache_hit.sql"),
+        "tables" => include_str!("queries/tables.sql"),
+        "index_cache_hit" => include_str!("queries/index_cache_hit.sql"),
+        "indexes" => include_str!("queries/indexes.sql"),
+        "index_size" => include_str!("queries/index_size.sql"),
+        "index_usage" => include_str!("queries/index_usage.sql"),
+        "index_scans" => include_str!("queries/index_scans.sql"),
+        "null_indexes" => include_str!("queries/null_indexes.sql"),
+        "locks" => include_str!("queries/locks.sql"),
+        "all_locks" => include_str!("queries/all_locks.sql"),
+        "long_running_queries" => include_str!("queries/long_running_queries.sql"),
+        "mandelbrot" => include_str!("queries/mandelbrot.sql"),
+        "outliers" => include_str!("queries/outliers.sql"),
+        "records_rank" => include_str!("queries/records_rank.sql"),
+        "seq_scans" => include_str!("queries/seq_scans.sql"),
+        "table_index_scans" => include_str!("queries/table_index_scans.sql"),
+        "table_indexes_size" => include_str!("queries/table_indexes_size.sql"),
+        "table_size" => include_str!("queries/table_size.sql"),
+        "total_index_size" => include_str!("queries/total_index_size.sql"),
+        "total_table_size" => include_str!("queries/total_table_size.sql"),
+        "unused_indexes" => include_str!("queries/unused_indexes.sql"),
+        "duplicate_indexes" => include_str!("queries/duplicate_indexes.sql"),
+        "vacuum_stats" => include_str!("queries/vacuum_stats.sql"),
+        "buffercache_stats" => include_str!("queries/buffercache_stats.sql"),
+        "buffercache_usage" => include_str!("queries/buffercache_usage.sql"),
+        "ssl_used" => include_str!("queries/ssl_used.sql"),
+        "connections" => include_str!("queries/connections.sql"),
+        _ => panic!("Unknown file: {}", filename),
+    }
 }
 
 fn get_rows(query: &str) -> Vec<Row> {

@@ -1,4 +1,4 @@
-use crate::Tabular;
+use crate::structs::shared::Tabular;
 use postgres::Row;
 use rust_decimal::prelude::*;
 use rust_decimal_macros::dec;
