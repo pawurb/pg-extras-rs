@@ -233,7 +233,6 @@ pub fn db_settings() -> Vec<DbSetting> {
 }
 
 fn read_file(filename: &str) -> String {
-    
     fs::read_to_string(format!("src/queries/{}.sql", filename))
         .unwrap_or_else(|_| panic!("Error reading the '{}' file", filename))
 }
