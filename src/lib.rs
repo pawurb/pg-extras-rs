@@ -233,9 +233,9 @@ pub fn db_settings() -> Vec<DbSetting> {
 }
 
 fn read_file(filename: &str) -> String {
-    let contents = fs::read_to_string(format!("src/queries/{}.sql", filename))
-        .expect(format!("Error reading the '{}' file", filename.to_string()).as_str());
-    contents
+    
+    fs::read_to_string(format!("src/queries/{}.sql", filename))
+        .unwrap_or_else(|_| panic!("Error reading the '{}' file", filename))
 }
 
 fn get_rows(query: &str) -> Vec<Row> {

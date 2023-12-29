@@ -1,4 +1,4 @@
-name: Rust
+name: Rust CI
 
 on:
   push:
@@ -8,30 +8,29 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
-    steps:
     steps:
       - uses: actions/checkout@v3
       - name: Run PostgreSQL 14
         run: |
           docker run --env POSTGRES_USER=postgres \
-            --env POSTGRES_DB=ruby-pg-extras-test \
+            --env POSTGRES_DB=rust_pg_extras \
             --env POSTGRES_PASSWORD=secret \
             -d -p 5432:5432 postgres:14.6-alpine \
             postgres -c shared_preload_libraries=pg_stat_statements
-    - uses: actions/checkout@v2
-    - name: Setup Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
-    - name: Check
-      uses: actions-rs/cargo@v1
-      with:
-        command: check
-    - name: Test
-      uses: actions-rs/cargo@v1
-      with:
-        command: test
+      - uses: actions/checkout@v2
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - name: Check
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+      - name: Test
+        env:
+          DATABASE_URL: postgresql://postgres:secret@localhost:5432/rust_pg_extras
+        uses: actions-rs/cargo@v1
+        with:
+          command: test

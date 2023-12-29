@@ -1,4 +1,4 @@
-# rust-pg-extras [![Latest Version](https://img.shields.io/crates/v/pg-extras.svg)](https://crates.io/crates/pg-extras)
+# rust-pg-extras [![Latest Version](https://img.shields.io/crates/v/pg-extras.svg)](https://crates.io/crates/pg-extras) [![GH Actions](https://github.com/pawurb/rust-pg-extras/actions/workflows/ci.yml/badge.svg)](https://github.com/pawurb/rust-pg-extras/actions)
 
 Rust port of [Heroku PG Extras](https://github.com/heroku/heroku-pg-extras) with several additions and improvements. The goal of this project is to provide powerful insights into the PostgreSQL database for Rust apps that are not using the Heroku PostgreSQL plugin.
 
