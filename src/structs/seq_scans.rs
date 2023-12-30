@@ -1,6 +1,7 @@
 use crate::structs::shared::Tabular;
 use postgres::Row;
 
+#[derive(Debug)]
 pub struct SeqScans {
     name: String,
     count: i64,

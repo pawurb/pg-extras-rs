@@ -1,6 +1,7 @@
 use crate::structs::shared::Tabular;
 use postgres::Row;
 
+#[derive(Debug)]
 pub struct RecordsRank {
     name: String,
     esiimated_count: i64,

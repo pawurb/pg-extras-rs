@@ -1,6 +1,7 @@
 use crate::structs::shared::Tabular;
 use postgres::Row;
 
+#[derive(Debug)]
 pub struct IndexUsage {
     relname: String,
     percent_of_times_index_used: String,

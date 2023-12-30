@@ -2,6 +2,7 @@ use crate::structs::shared::{get_default_interval, Tabular};
 use pg_interval::Interval;
 use postgres::Row;
 
+#[derive(Debug)]
 pub struct Calls {
     qry: String,
     exec_time: Interval,

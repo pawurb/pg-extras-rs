@@ -1,40 +1,40 @@
 use postgres::{Client, NoTls, Row};
 use std::env;
 pub mod structs;
-use structs::all_locks::AllLocks;
-use structs::bloat::Bloat;
-use structs::blocking::Blocking;
-use structs::buffercache_stats::BuffercacheStats;
-use structs::buffercache_usage::BuffercacheUsage;
-use structs::cache_hit::CacheHit;
-use structs::calls::Calls;
-use structs::connections::Connections;
-use structs::db_settings::DbSetting;
-use structs::duplicate_indexes::DuplicateIndexes;
-use structs::extensions::Extensions;
-use structs::index_cache_hit::IndexCacheHit;
-use structs::index_scans::IndexScans;
-use structs::index_size::IndexSize;
-use structs::index_usage::IndexUsage;
-use structs::indexes::Indexes;
-use structs::locks::Locks;
-use structs::long_running_queries::LongRunningQueries;
-use structs::mandelbrot::Mandelbrot;
-use structs::null_indexes::NullIndexes;
-use structs::outliers::Outliers;
-use structs::records_rank::RecordsRank;
-use structs::seq_scans::SeqScans;
-use structs::shared::{get_default_schema, Tabular};
-use structs::ssl_used::SslUsed;
-use structs::table_cache_hit::TableCacheHit;
-use structs::table_index_scans::TableIndexScans;
-use structs::table_indexes_size::TableIndexesSize;
-use structs::table_size::TableSize;
-use structs::tables::Tables;
-use structs::total_index_size::TotalIndexSize;
-use structs::total_table_size::TotalTableSize;
-use structs::unused_indexes::UnusedIndexes;
-use structs::vacuum_stats::VacuumStats;
+pub use structs::all_locks::AllLocks;
+pub use structs::bloat::Bloat;
+pub use structs::blocking::Blocking;
+pub use structs::buffercache_stats::BuffercacheStats;
+pub use structs::buffercache_usage::BuffercacheUsage;
+pub use structs::cache_hit::CacheHit;
+pub use structs::calls::Calls;
+pub use structs::connections::Connections;
+pub use structs::db_settings::DbSetting;
+pub use structs::duplicate_indexes::DuplicateIndexes;
+pub use structs::extensions::Extensions;
+pub use structs::index_cache_hit::IndexCacheHit;
+pub use structs::index_scans::IndexScans;
+pub use structs::index_size::IndexSize;
+pub use structs::index_usage::IndexUsage;
+pub use structs::indexes::Indexes;
+pub use structs::locks::Locks;
+pub use structs::long_running_queries::LongRunningQueries;
+pub use structs::mandelbrot::Mandelbrot;
+pub use structs::null_indexes::NullIndexes;
+pub use structs::outliers::Outliers;
+pub use structs::records_rank::RecordsRank;
+pub use structs::seq_scans::SeqScans;
+pub use structs::shared::{get_default_schema, Tabular};
+pub use structs::ssl_used::SslUsed;
+pub use structs::table_cache_hit::TableCacheHit;
+pub use structs::table_index_scans::TableIndexScans;
+pub use structs::table_indexes_size::TableIndexesSize;
+pub use structs::table_size::TableSize;
+pub use structs::tables::Tables;
+pub use structs::total_index_size::TotalIndexSize;
+pub use structs::total_table_size::TotalTableSize;
+pub use structs::unused_indexes::UnusedIndexes;
+pub use structs::vacuum_stats::VacuumStats;
 
 #[macro_use]
 extern crate prettytable;
@@ -277,7 +277,12 @@ fn get_rows(query: &str) -> Vec<Row> {
 }
 
 fn connection() -> Client {
-    let database_url = env::var("DATABASE_URL").expect("$DATABASE_URL is not set");
+    let database_url = env::var("PG_EXTRAS_DATABASE_URL").unwrap_or_else(|_| {
+        env::var("DATABASE_URL").expect(
+            "Both $DATABASE_URL and $PG_EXTRAS_DATABASE_URL are not set",
+        )
+    });
+
     Client::connect(&database_url, NoTls).unwrap()
 }
 
