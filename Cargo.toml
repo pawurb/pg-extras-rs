@@ -1,6 +1,6 @@
 [package]
 name = "pg-extras"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 authors = ["Pawel Urbanek <contact@pawelurbanek.com>"]
 readme = "README.md"
