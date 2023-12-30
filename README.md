@@ -102,7 +102,6 @@ You can customize the default `public` schema by setting `ENV['PG_EXTRAS_SCHEMA'
 ### `cache_hit`
 
 ```rust
-
 struct CacheHit {
     name: String,
     ratio: Decimal,
@@ -124,7 +123,6 @@ This command provides information on the efficiency of the buffer cache, for bot
 ### `index_cache_hit`
 
 ```rust
-
 struct IndexCacheHit {
     name: String,
     buffer_hits: i64,
@@ -150,7 +148,6 @@ The same as `cache_hit` with each table's indexes cache hit info displayed separ
 ### `table_cache_hit`
 
 ```rust
-
 struct TableCacheHit {
     name: String,
     buffer_hits: i64,
@@ -176,7 +173,6 @@ The same as `cache_hit` with each table's cache hit info displayed seperately.
 ### `db_settings`
 
 ```rust
-
 struct DbSetting {
     name: String,
     setting: String,
@@ -203,7 +199,6 @@ This method displays values for selected PostgreSQL settings. You can compare th
 ### `ssl_used`
 
 ```rust
-
 struct SslUsed {
     ssl_used: bool,
 }
@@ -221,7 +216,6 @@ Returns boolean indicating if an encrypted SSL is currently used. Connecting to 
 ### `index_usage`
 
 ```rust
-
 struct IndexUsage {
     relname: String,
     percent_of_times_index_used: String,
@@ -245,7 +239,6 @@ This command provides information on the efficiency of indexes, represented as w
 ### `locks`
 
 ```rust
-
 struct Locks {
     pid: String,
     relname: String,
@@ -277,7 +270,6 @@ This command displays queries that have taken out an exclusive lock on a relatio
 ### `all_locks`
 
 ```rust
-
 struct AllLocks {
     pid: String,
     relname: String,
@@ -298,7 +290,6 @@ This command displays all the current locks, regardless of their type.
 ### `outliers`
 
 ```rust
-
 struct Outliers {
     total_exec_time: Interval,
     prop_exec_time: String,
@@ -330,7 +321,6 @@ Typically, an efficient query will have an appropriate ratio of calls to total e
 ### `calls`
 
 ```rust
-
 struct Calls {
     qry: String,
     exec_time: Interval,
@@ -360,7 +350,6 @@ This command is much like `pg:outliers`, but ordered by the number of times a st
 ### `blocking`
 
 ```rust
-
 struct Blocking {
     blocked_pid: i32,
     blocking_statement: String,
@@ -387,7 +376,6 @@ This command displays statements that are currently holding locks that other sta
 ### `total_index_size`
 
 ```rust
-
 struct TotalIndexSize {
     size: String,
 }
@@ -405,7 +393,6 @@ This command displays the total size of all indexes on the database, in MB. It i
 ### `index_size`
 
 ```rust
-
  struct IndexSize {
     name: String,
     size: String,
@@ -434,7 +421,6 @@ This command displays the size of each each index in the database, in MB. It is 
 ### `table_size`
 
 ```rust
-
 struct TableSize {
     name: String,
     size: String,
@@ -458,7 +444,6 @@ This command displays the size of each table and materialized view in the databa
 ### `table_indexes_size`
 
 ```rust
-
 TableIndexesSize {
     table: String,
     index_size: String,
@@ -481,7 +466,6 @@ This command displays the total size of indexes for each table and materialized 
 ### `total_table_size`
 
 ```rust
-
 struct TotalTableSize {
     name: String,
     size: String,
@@ -504,7 +488,6 @@ This command displays the total size of each table and materialized view in the 
 ### `unused_indexes`
 
 ```rust
-
 struct UnusedIndexes {
     table: String,
     index: String,
@@ -529,7 +512,6 @@ This command displays indexes that have < 50 scans recorded against them, and ar
 ### `duplicate_indexes`
 
 ```rust
-
 struct DuplicateIndexes {
     size: String,
     idx1: String,
@@ -550,7 +532,6 @@ This command displays multiple indexes that have the same set of columns, same o
 ### `null_indexes`
 
 ```rust
-
 struct NullIndexes {
     oid: String,
     index: String,
@@ -580,7 +561,6 @@ This command displays indexes that contain `NULL` values. A high ratio of `NULL`
 ### `seq_scans`
 
 ```rust
-
 struct SeqScans {
     name: String,
     count: i64,
@@ -608,7 +588,6 @@ This command displays the number of sequential scans recorded against all tables
 ### `long_running_queries`
 
 ```rust
-
 struct LongRunningQueries {
     pid: String,
     duration: String,
@@ -630,7 +609,6 @@ This command displays currently running queries, that have been running for long
 ### `records_rank`
 
 ```rust
-
 struct RecordsRank {
     name: String,
     esiimated_count: i64,
@@ -654,7 +632,6 @@ This command displays an estimated count of rows per table, descending by estima
 ### `bloat`
 
 ```rust
-
 struct Bloat {
     typefield: String,
     schemaname: String,
@@ -682,7 +659,6 @@ This command displays an estimation of table "bloat" – space allocated to a re
 ### `vacuum_stats`
 
 ```rust
-
 struct VacuumStats {
     schema: String,
     table: String,
@@ -726,12 +702,12 @@ This command shows the relations buffered in database share buffer, ordered by p
 ### `buffercache_usage`
 
 ```rust
-buffercache_usage() -> Vec<BuffercacheUsage> 
-
 struct BuffercacheUsage {
     relname: String,
     buffers: i64,
 }
+
+buffercache_usage() -> Vec<BuffercacheUsage> 
 ```
 
 This command calculates how many blocks from which table are currently cached.
@@ -739,7 +715,6 @@ This command calculates how many blocks from which table are currently cached.
 ### `extensions`
 
 ```rust
-
 struct Extensions {
     name: String,
     default_version: String,
@@ -780,7 +755,6 @@ This command returns the list of all active database connections.
 ### `mandelbrot`
 
 ```rust
-
 struct Mandelbrot {
     array_to_string: String,
 }
