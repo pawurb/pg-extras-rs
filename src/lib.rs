@@ -278,9 +278,8 @@ fn get_rows(query: &str) -> Vec<Row> {
 
 fn connection() -> Client {
     let database_url = env::var("PG_EXTRAS_DATABASE_URL").unwrap_or_else(|_| {
-        env::var("DATABASE_URL").expect(
-            "Both $DATABASE_URL and $PG_EXTRAS_DATABASE_URL are not set",
-        )
+        env::var("DATABASE_URL")
+            .expect("Both $DATABASE_URL and $PG_EXTRAS_DATABASE_URL are not set")
     });
 
     Client::connect(&database_url, NoTls).unwrap()
