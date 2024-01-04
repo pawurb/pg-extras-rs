@@ -29,7 +29,7 @@ jobs:
         with:
           command: check
       - name: Lint
-        run: cargo clippy -- -D warnings 
+        run: cargo clippy --all --all-features -- -D warnings
       - name: Test
         env:
           DATABASE_URL: postgresql://postgres:secret@localhost:5432/rust_pg_extras
