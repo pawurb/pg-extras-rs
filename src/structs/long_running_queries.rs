@@ -2,7 +2,7 @@ use crate::structs::shared::{get_default_interval, Tabular};
 use pg_interval::Interval;
 use postgres::Row;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LongRunningQueries {
     pid: String,
     duration: String,

@@ -3,7 +3,7 @@ use postgres::Row;
 use rust_decimal::prelude::*;
 use rust_decimal_macros::dec;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CacheHit {
     name: String,
     ratio: Decimal,

@@ -1,7 +1,7 @@
 use crate::structs::shared::Tabular;
 use postgres::Row;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DuplicateIndexes {
     size: String,
     idx1: String,

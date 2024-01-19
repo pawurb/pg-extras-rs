@@ -1,7 +1,7 @@
 use crate::structs::shared::Tabular;
 use postgres::Row;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BuffercacheUsage {
     relname: String,
     buffers: i64,
