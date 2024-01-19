@@ -13,7 +13,7 @@ impl Tabular for DbSetting {
     const FILE_NAME: &'static str = "db_settings";
 
     fn new(row: &Row) -> Self {
-        DbSetting {
+        Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),
             setting: row.get::<_, Option<String>>(1).unwrap_or_default(),
             unit: row.get::<_, Option<String>>(2).unwrap_or_default(),

@@ -15,7 +15,7 @@ impl Tabular for Outliers {
     const FILE_NAME: &'static str = "outliers";
 
     fn new(row: &Row) -> Self {
-        Outliers {
+        Self {
             total_exec_time: row
                 .get::<_, Option<Interval>>(0)
                 .unwrap_or(get_default_interval()),

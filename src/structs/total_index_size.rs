@@ -10,7 +10,7 @@ impl Tabular for TotalIndexSize {
     const FILE_NAME: &'static str = "total_index_size";
 
     fn new(row: &Row) -> Self {
-        TotalIndexSize {
+        Self {
             size: row.get::<_, Option<String>>(0).unwrap_or_default(),
         }
     }

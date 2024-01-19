@@ -13,7 +13,7 @@ impl Tabular for LongRunningQueries {
     const FILE_NAME: &'static str = "long_running_queries";
 
     fn new(row: &Row) -> Self {
-        LongRunningQueries {
+        Self {
             pid: row.get::<_, Option<i32>>(0).unwrap_or_default().to_string(),
             duration: row
                 .get::<_, Option<Interval>>(1)

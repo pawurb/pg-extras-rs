@@ -17,7 +17,7 @@ impl Tabular for VacuumStats {
     const FILE_NAME: &'static str = "vacuum_stats";
 
     fn new(row: &Row) -> Self {
-        VacuumStats {
+        Self {
             schema: row.get::<_, Option<String>>(0).unwrap_or_default(),
             table: row.get::<_, Option<String>>(1).unwrap_or_default(),
             last_vacuum: row.get::<_, Option<String>>(2).unwrap_or_default(),

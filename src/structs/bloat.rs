@@ -16,7 +16,7 @@ impl Tabular for Bloat {
     const FILE_NAME: &'static str = "bloat";
 
     fn new(row: &Row) -> Self {
-        Bloat {
+        Self {
             typefield: row.get::<_, Option<String>>(0).unwrap_or_default(),
             schemaname: row.get::<_, Option<String>>(1).unwrap_or_default(),
             object_name: row.get::<_, Option<String>>(2).unwrap_or_default(),

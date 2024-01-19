@@ -11,7 +11,7 @@ impl Tabular for TableIndexesSize {
     const FILE_NAME: &'static str = "table_indexes_size";
 
     fn new(row: &Row) -> Self {
-        TableIndexesSize {
+        Self {
             table: row.get::<_, Option<String>>(0).unwrap_or_default(),
             index_size: row.get::<_, Option<String>>(1).unwrap_or_default(),
         }

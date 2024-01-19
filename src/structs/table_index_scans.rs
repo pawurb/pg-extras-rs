@@ -11,7 +11,7 @@ impl Tabular for TableIndexScans {
     const FILE_NAME: &'static str = "table_index_scans";
 
     fn new(row: &Row) -> Self {
-        TableIndexScans {
+        Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),
             count: row.get::<_, Option<i64>>(1).unwrap_or_default(),
         }

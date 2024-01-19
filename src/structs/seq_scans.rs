@@ -11,7 +11,7 @@ impl Tabular for SeqScans {
     const FILE_NAME: &'static str = "seq_scans";
 
     fn new(row: &Row) -> Self {
-        SeqScans {
+        Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),
             count: row.get::<_, Option<i64>>(1).unwrap_or_default(),
         }

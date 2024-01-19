@@ -14,7 +14,7 @@ impl Tabular for DuplicateIndexes {
     const FILE_NAME: &'static str = "duplicate_indexes";
 
     fn new(row: &Row) -> Self {
-        DuplicateIndexes {
+        Self {
             size: row.get::<_, Option<String>>(0).unwrap_or_default(),
             idx1: row.get::<_, Option<String>>(1).unwrap_or_default(),
             idx2: row.get::<_, Option<String>>(2).unwrap_or_default(),

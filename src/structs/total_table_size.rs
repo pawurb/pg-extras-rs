@@ -11,7 +11,7 @@ impl Tabular for TotalTableSize {
     const FILE_NAME: &'static str = "total_table_size";
 
     fn new(row: &Row) -> Self {
-        TotalTableSize {
+        Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),
             size: row.get::<_, Option<String>>(1).unwrap_or_default(),
         }

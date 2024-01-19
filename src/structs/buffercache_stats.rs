@@ -15,7 +15,7 @@ impl Tabular for BuffercacheStats {
     const FILE_NAME: &'static str = "buffercache_stats";
 
     fn new(row: &Row) -> Self {
-        BuffercacheStats {
+        Self {
             relname: row.get::<_, Option<String>>(0).unwrap_or_default(),
             buffered: row.get::<_, Option<String>>(1).unwrap_or_default(),
             buffer_percent: row.get::<_, Option<Decimal>>(2).unwrap_or(dec!(0)),

@@ -12,7 +12,7 @@ impl Tabular for TableSize {
     const FILE_NAME: &'static str = "table_size";
 
     fn new(row: &Row) -> Self {
-        TableSize {
+        Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),
             size: row.get::<_, Option<String>>(1).unwrap_or_default(),
             schema: row.get::<_, Option<String>>(2).unwrap_or_default(),

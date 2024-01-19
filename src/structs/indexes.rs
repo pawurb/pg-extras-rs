@@ -13,7 +13,7 @@ impl Tabular for Indexes {
     const FILE_NAME: &'static str = "indexes";
 
     fn new(row: &Row) -> Self {
-        Indexes {
+        Self {
             schemaname: row.get::<_, Option<String>>(0).unwrap_or_default(),
             indexname: row.get::<_, Option<String>>(1).unwrap_or_default(),
             tablename: row.get::<_, Option<String>>(2).unwrap_or_default(),

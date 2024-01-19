@@ -12,7 +12,7 @@ impl Tabular for IndexUsage {
     const FILE_NAME: &'static str = "index_usage";
 
     fn new(row: &Row) -> Self {
-        IndexUsage {
+        Self {
             relname: row.get::<_, Option<String>>(0).unwrap_or_default(),
             percent_of_times_index_used: row.get::<_, Option<String>>(1).unwrap_or_default(),
             rows_in_table: row.get::<_, Option<i64>>(2).unwrap_or_default(),

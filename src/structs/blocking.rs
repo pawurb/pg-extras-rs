@@ -18,7 +18,7 @@ impl Tabular for Blocking {
     const FILE_NAME: &'static str = "blocking";
 
     fn new(row: &Row) -> Self {
-        Blocking {
+        Self {
             blocked_pid: row.get::<_, Option<i32>>(0).unwrap_or_default(),
             blocking_statement: row.get::<_, Option<String>>(1).unwrap_or_default(),
             blocking_duration: row

@@ -15,7 +15,7 @@ impl Tabular for Calls {
     const FILE_NAME: &'static str = "calls";
 
     fn new(row: &Row) -> Self {
-        Calls {
+        Self {
             qry: row.get::<_, Option<String>>(0).unwrap_or_default(),
             exec_time: row
                 .get::<_, Option<Interval>>(1)

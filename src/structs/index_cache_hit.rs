@@ -14,7 +14,7 @@ impl Tabular for IndexCacheHit {
     const FILE_NAME: &'static str = "index_cache_hit";
 
     fn new(row: &Row) -> Self {
-        IndexCacheHit {
+        Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),
             buffer_hits: row.get::<_, Option<i64>>(1).unwrap_or_default(),
             block_reads: row.get::<_, Option<i64>>(2).unwrap_or_default(),

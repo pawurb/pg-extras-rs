@@ -18,7 +18,7 @@ impl Tabular for NullIndexes {
     const FILE_NAME: &'static str = "null_indexes";
 
     fn new(row: &Row) -> Self {
-        NullIndexes {
+        Self {
             oid: row.get::<_, Option<u32>>(0).unwrap_or_default().to_string(),
             index: row.get::<_, Option<String>>(1).unwrap_or_default(),
             index_size: row.get::<_, Option<String>>(2).unwrap_or_default(),

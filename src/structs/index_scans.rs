@@ -14,7 +14,7 @@ impl Tabular for IndexScans {
     const FILE_NAME: &'static str = "index_scans";
 
     fn new(row: &Row) -> Self {
-        IndexScans {
+        Self {
             schemaname: row.get::<_, Option<String>>(0).unwrap_or_default(),
             tablename: row.get::<_, Option<String>>(1).unwrap_or_default(),
             indexname: row.get::<_, Option<String>>(2).unwrap_or_default(),

@@ -13,7 +13,7 @@ impl Tabular for Extensions {
     const FILE_NAME: &'static str = "extensions";
 
     fn new(row: &Row) -> Self {
-        Extensions {
+        Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),
             default_version: row.get::<_, Option<String>>(1).unwrap_or_default(),
             installed_version: row.get::<_, Option<String>>(2).unwrap_or_default(),

@@ -13,7 +13,7 @@ impl Tabular for CacheHit {
     const FILE_NAME: &'static str = "cache_hit";
 
     fn new(row: &Row) -> Self {
-        CacheHit {
+        Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),
             ratio: row.get::<_, Option<Decimal>>(1).unwrap_or(dec!(0)),
         }

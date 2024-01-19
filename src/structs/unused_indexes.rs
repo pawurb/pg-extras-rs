@@ -13,7 +13,7 @@ impl Tabular for UnusedIndexes {
     const FILE_NAME: &'static str = "unused_indexes";
 
     fn new(row: &Row) -> Self {
-        UnusedIndexes {
+        Self {
             table: row.get::<_, Option<String>>(0).unwrap_or_default(),
             index: row.get::<_, Option<String>>(1).unwrap_or_default(),
             index_size: row.get::<_, Option<String>>(2).unwrap_or_default(),
