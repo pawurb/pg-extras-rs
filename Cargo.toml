@@ -7,7 +7,7 @@ license = "MIT"
 name = "pg-extras"
 readme = "README.md"
 repository = "https://github.com/pawurb/rust-pg-extras"
-version = "0.0.2"
+version = "0.0.3"
 
 exclude = [
   "docker-compose.yml.sample",
