@@ -1,4 +1,4 @@
-use postgres::{Client, NoTls, Row};
+use postgres::{Client, NoTls};
 use std::env;
 pub mod structs;
 pub use structs::all_locks::AllLocks;
@@ -53,63 +53,63 @@ pub fn render_table<T: Tabular>(items: Vec<T>) {
 
 pub fn bloat() -> Result<Vec<Bloat>, PgExtrasError> {
     let query = Query::read_file(Query::Bloat);
-    Ok(get_rows(query)?.iter().map(Bloat::new).collect())
+    get_rows::<Bloat>(query)
 }
 
 pub fn blocking(limit: Option<String>) -> Result<Vec<Blocking>, PgExtrasError> {
     let limit = limit.unwrap_or("10".to_string());
     let query = Query::read_file(Query::Blocking).replace("%{limit}", limit.as_str());
-    Ok(get_rows(&query)?.iter().map(Blocking::new).collect())
+    get_rows::<Blocking>(&query)
 }
 
 pub fn calls(limit: Option<String>) -> Result<Vec<Calls>, PgExtrasError> {
     let limit = limit.unwrap_or("10".to_string());
     let query = Query::read_file(Query::Calls).replace("%{limit}", limit.as_str());
-    Ok(get_rows(&query)?.iter().map(Calls::new).collect())
+    get_rows::<Calls>(&query)
 }
 
 pub fn extensions() -> Result<Vec<Extensions>, PgExtrasError> {
     let query = Query::read_file(Query::Extensions);
-    Ok(get_rows(query)?.iter().map(Extensions::new).collect())
+    get_rows::<Extensions>(query)
 }
 
 pub fn table_cache_hit() -> Result<Vec<TableCacheHit>, PgExtrasError> {
     let query = Query::read_file(Query::TableCacheHit);
-    Ok(get_rows(query)?.iter().map(TableCacheHit::new).collect())
+    get_rows::<TableCacheHit>(query)
 }
 
 pub fn tables(schema: Option<String>) -> Result<Vec<Tables>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::Tables).replace("%{schema}", &schema_name);
-    Ok(get_rows(&query)?.iter().map(Tables::new).collect())
+    get_rows::<Tables>(&query)
 }
 
 pub fn index_cache_hit(schema: Option<String>) -> Result<Vec<IndexCacheHit>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::IndexCacheHit).replace("%{schema}", &schema_name);
-    Ok(get_rows(&query)?.iter().map(IndexCacheHit::new).collect())
+    get_rows::<IndexCacheHit>(&query)
 }
 
 pub fn indexes() -> Result<Vec<Indexes>, PgExtrasError> {
     let query = Query::read_file(Query::Indexes);
-    Ok(get_rows(query)?.iter().map(Indexes::new).collect())
+    get_rows::<Indexes>(query)
 }
 
 pub fn index_size() -> Result<Vec<IndexSize>, PgExtrasError> {
     let query = Query::read_file(Query::IndexSize);
-    Ok(get_rows(query)?.iter().map(IndexSize::new).collect())
+    get_rows::<IndexSize>(query)
 }
 
 pub fn index_usage(schema: Option<String>) -> Result<Vec<IndexUsage>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::IndexUsage).replace("%{schema}", &schema_name);
-    Ok(get_rows(&query)?.iter().map(IndexUsage::new).collect())
+    get_rows::<IndexUsage>(&query)
 }
 
 pub fn index_scans(schema: Option<String>) -> Result<Vec<IndexScans>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::IndexScans).replace("%{schema}", &schema_name);
-    Ok(get_rows(&query)?.iter().map(IndexScans::new).collect())
+    get_rows::<IndexScans>(&query)
 }
 
 pub fn null_indexes(
@@ -118,125 +118,119 @@ pub fn null_indexes(
     let min_relation_size_mb = min_relation_size_mb.unwrap_or("0".to_string());
     let query = Query::read_file(Query::NullIndexes)
         .replace("%{min_relation_size_mb}", &min_relation_size_mb);
-    Ok(get_rows(&query)?.iter().map(NullIndexes::new).collect())
+    get_rows::<NullIndexes>(&query)
 }
 
 pub fn locks() -> Result<Vec<Locks>, PgExtrasError> {
     let query = Query::read_file(Query::Locks);
-    Ok(get_rows(query)?.iter().map(Locks::new).collect())
+    get_rows::<Locks>(query)
 }
 
 pub fn all_locks() -> Result<Vec<AllLocks>, PgExtrasError> {
     let query = Query::read_file(Query::AllLocks);
-    Ok(get_rows(query)?.iter().map(AllLocks::new).collect())
+    get_rows::<AllLocks>(query)
 }
 
 pub fn long_running_queries() -> Result<Vec<LongRunningQueries>, PgExtrasError> {
     let query = Query::read_file(Query::LongRunningQueries);
-    Ok(get_rows(query)?
-        .iter()
-        .map(LongRunningQueries::new)
-        .collect())
+    get_rows::<LongRunningQueries>(query)
 }
 
 pub fn mandelbrot() -> Result<Vec<Mandelbrot>, PgExtrasError> {
     let query = Query::read_file(Query::Mandelbrot);
-    Ok(get_rows(query)?.iter().map(Mandelbrot::new).collect())
+    get_rows::<Mandelbrot>(query)
 }
 
 pub fn outliers() -> Result<Vec<Outliers>, PgExtrasError> {
     let query = Query::read_file(Query::Outliers);
-    Ok(get_rows(query)?.iter().map(Outliers::new).collect())
+    get_rows::<Outliers>(query)
 }
 
 pub fn records_rank(schema: Option<String>) -> Result<Vec<RecordsRank>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::RecordsRank).replace("%{schema}", schema_name.as_str());
-    Ok(get_rows(&query)?.iter().map(RecordsRank::new).collect())
+    get_rows::<RecordsRank>(&query)
 }
 
 pub fn seq_scans(schema: Option<String>) -> Result<Vec<SeqScans>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::SeqScans).replace("%{schema}", schema_name.as_str());
-    Ok(get_rows(&query)?.iter().map(SeqScans::new).collect())
+    get_rows::<SeqScans>(&query)
 }
 
 pub fn table_index_scans(schema: Option<String>) -> Result<Vec<TableIndexScans>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::TableIndexScans).replace("%{schema}", schema_name.as_str());
-    Ok(get_rows(&query)?.iter().map(TableIndexScans::new).collect())
+    get_rows::<TableIndexScans>(&query)
 }
 
 pub fn table_indexes_size(schema: Option<String>) -> Result<Vec<TableIndexesSize>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query =
         Query::read_file(Query::TableIndexesSize).replace("%{schema}", schema_name.as_str());
-    Ok(get_rows(&query)?
-        .iter()
-        .map(TableIndexesSize::new)
-        .collect())
+    get_rows::<TableIndexesSize>(&query)
 }
 
 pub fn table_size() -> Result<Vec<TableSize>, PgExtrasError> {
     let query = Query::read_file(Query::TableSize);
-    Ok(get_rows(query)?.iter().map(TableSize::new).collect())
+    get_rows::<TableSize>(query)
 }
 
 pub fn total_index_size() -> Result<Vec<TotalIndexSize>, PgExtrasError> {
     let query = Query::read_file(Query::TotalIndexSize);
-    Ok(get_rows(query)?.iter().map(TotalIndexSize::new).collect())
+    get_rows::<TotalIndexSize>(query)
 }
 
 pub fn total_table_size() -> Result<Vec<TotalTableSize>, PgExtrasError> {
     let query = Query::read_file(Query::TotalTableSize);
-    Ok(get_rows(query)?.iter().map(TotalTableSize::new).collect())
+    get_rows::<TotalTableSize>(query)
 }
 
 pub fn unused_indexes(schema: Option<String>) -> Result<Vec<UnusedIndexes>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::UnusedIndexes).replace("%{schema}", schema_name.as_str());
-    Ok(get_rows(&query)?.iter().map(UnusedIndexes::new).collect())
+    get_rows::<UnusedIndexes>(&query)
 }
 
 pub fn duplicate_indexes() -> Result<Vec<DuplicateIndexes>, PgExtrasError> {
     let query = Query::read_file(Query::DuplicateIndexes);
-    Ok(get_rows(query)?.iter().map(DuplicateIndexes::new).collect())
+    get_rows::<DuplicateIndexes>(query)
 }
 
 pub fn vacuum_stats() -> Result<Vec<VacuumStats>, PgExtrasError> {
     let query = Query::read_file(Query::VacuumStats);
-    Ok(get_rows(query)?.iter().map(VacuumStats::new).collect())
+    get_rows::<VacuumStats>(query)
 }
 
 pub fn buffercache_stats() -> Result<Vec<BuffercacheStats>, PgExtrasError> {
     let query = Query::read_file(Query::BuffercacheStats);
-    Ok(get_rows(query)?.iter().map(BuffercacheStats::new).collect())
+    get_rows::<BuffercacheStats>(query)
 }
 
 pub fn buffercache_usage() -> Result<Vec<BuffercacheUsage>, PgExtrasError> {
     let query = Query::read_file(Query::BuffercacheUsage);
-    Ok(get_rows(query)?.iter().map(BuffercacheUsage::new).collect())
+    get_rows::<BuffercacheUsage>(query)
 }
 
 pub fn ssl_used() -> Result<Vec<SslUsed>, PgExtrasError> {
     let query = Query::read_file(Query::SslUsed);
-    Ok(get_rows(query)?.iter().map(SslUsed::new).collect())
+    get_rows::<SslUsed>(query)
 }
 
 pub fn connections() -> Result<Vec<Connections>, PgExtrasError> {
     let query = Query::read_file(Query::Connections);
-    Ok(get_rows(query)?.iter().map(Connections::new).collect())
+    get_rows::<Connections>(query)
 }
 
 pub fn cache_hit(schema: Option<String>) -> Result<Vec<CacheHit>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::CacheHit).replace("%{schema}", schema_name.as_str());
-    Ok(get_rows(&query)?.iter().map(CacheHit::new).collect())
+    get_rows::<CacheHit>(&query)
 }
 
 pub fn db_settings() -> Result<Vec<DbSetting>, PgExtrasError> {
     let query = Query::read_file(Query::DbSettings);
-    Ok(get_rows(query)?.iter().map(DbSetting::new).collect())
+    get_rows::<DbSetting>(query)
 }
 
 enum Query {
@@ -325,10 +319,13 @@ pub enum PgExtrasError {
     Unknown,
 }
 
-fn get_rows(query: &str) -> Result<Vec<Row>, PgExtrasError> {
+fn get_rows<T: Tabular>(query: &str) -> Result<Vec<T>, PgExtrasError> {
     Ok(connection()?
         .query(query, &[])
-        .unwrap_or_else(|_| Vec::new()))
+        .unwrap_or_else(|_| Vec::new())
+        .iter()
+        .map(T::new)
+        .collect())
 }
 
 fn connection() -> Result<Client, PgExtrasError> {
