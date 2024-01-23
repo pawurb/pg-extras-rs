@@ -8,8 +8,6 @@ pub struct TableIndexesSize {
 }
 
 impl Tabular for TableIndexesSize {
-    const FILE_NAME: &'static str = "table_indexes_size";
-
     fn new(row: &Row) -> Self {
         Self {
             table: row.get::<_, Option<String>>(0).unwrap_or_default(),

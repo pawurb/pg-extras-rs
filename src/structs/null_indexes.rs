@@ -15,8 +15,6 @@ pub struct NullIndexes {
 }
 
 impl Tabular for NullIndexes {
-    const FILE_NAME: &'static str = "null_indexes";
-
     fn new(row: &Row) -> Self {
         Self {
             oid: row.get::<_, Option<u32>>(0).unwrap_or_default().to_string(),

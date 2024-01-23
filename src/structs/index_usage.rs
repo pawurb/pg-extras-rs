@@ -9,8 +9,6 @@ pub struct IndexUsage {
 }
 
 impl Tabular for IndexUsage {
-    const FILE_NAME: &'static str = "index_usage";
-
     fn new(row: &Row) -> Self {
         Self {
             relname: row.get::<_, Option<String>>(0).unwrap_or_default(),

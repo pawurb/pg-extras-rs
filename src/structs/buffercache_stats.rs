@@ -12,8 +12,6 @@ pub struct BuffercacheStats {
 }
 
 impl Tabular for BuffercacheStats {
-    const FILE_NAME: &'static str = "buffercache_stats";
-
     fn new(row: &Row) -> Self {
         Self {
             relname: row.get::<_, Option<String>>(0).unwrap_or_default(),

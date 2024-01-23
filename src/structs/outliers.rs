@@ -12,8 +12,6 @@ pub struct Outliers {
 }
 
 impl Tabular for Outliers {
-    const FILE_NAME: &'static str = "outliers";
-
     fn new(row: &Row) -> Self {
         Self {
             total_exec_time: row

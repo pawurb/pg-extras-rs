@@ -14,8 +14,6 @@ pub struct VacuumStats {
 }
 
 impl Tabular for VacuumStats {
-    const FILE_NAME: &'static str = "vacuum_stats";
-
     fn new(row: &Row) -> Self {
         Self {
             schema: row.get::<_, Option<String>>(0).unwrap_or_default(),

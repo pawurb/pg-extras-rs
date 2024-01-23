@@ -7,8 +7,6 @@ pub struct Mandelbrot {
 }
 
 impl Tabular for Mandelbrot {
-    const FILE_NAME: &'static str = "mandelbrot";
-
     fn new(row: &Row) -> Self {
         Self {
             array_to_string: row.get::<_, Option<String>>(0).unwrap_or_default(),

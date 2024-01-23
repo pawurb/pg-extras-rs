@@ -11,8 +11,6 @@ pub struct IndexScans {
 }
 
 impl Tabular for IndexScans {
-    const FILE_NAME: &'static str = "index_scans";
-
     fn new(row: &Row) -> Self {
         Self {
             schemaname: row.get::<_, Option<String>>(0).unwrap_or_default(),

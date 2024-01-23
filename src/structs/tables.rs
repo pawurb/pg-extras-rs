@@ -8,8 +8,6 @@ pub struct Tables {
 }
 
 impl Tabular for Tables {
-    const FILE_NAME: &'static str = "tables";
-
     fn new(row: &Row) -> Self {
         Self {
             tablename: row.get::<_, Option<String>>(0).unwrap_or_default(),

@@ -11,8 +11,6 @@ pub struct DuplicateIndexes {
 }
 
 impl Tabular for DuplicateIndexes {
-    const FILE_NAME: &'static str = "duplicate_indexes";
-
     fn new(row: &Row) -> Self {
         Self {
             size: row.get::<_, Option<String>>(0).unwrap_or_default(),

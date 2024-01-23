@@ -4,7 +4,6 @@ use std::env;
 
 pub trait Tabular {
     fn new(row: &Row) -> Self;
-    const FILE_NAME: &'static str;
     fn to_row(&self) -> prettytable::Row;
     fn headers() -> prettytable::Row;
 }

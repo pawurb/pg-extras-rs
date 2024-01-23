@@ -8,8 +8,6 @@ pub struct BuffercacheUsage {
 }
 
 impl Tabular for BuffercacheUsage {
-    const FILE_NAME: &'static str = "buffercache_usage";
-
     fn new(row: &Row) -> Self {
         Self {
             relname: row.get::<_, Option<String>>(0).unwrap_or_default(),

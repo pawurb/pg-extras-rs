@@ -7,8 +7,6 @@ pub struct SslUsed {
 }
 
 impl Tabular for SslUsed {
-    const FILE_NAME: &'static str = "ssl_used";
-
     fn new(row: &Row) -> Self {
         Self {
             ssl_used: row.get::<_, Option<bool>>(0).unwrap_or_default(),

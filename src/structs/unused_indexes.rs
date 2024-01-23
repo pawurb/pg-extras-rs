@@ -10,8 +10,6 @@ pub struct UnusedIndexes {
 }
 
 impl Tabular for UnusedIndexes {
-    const FILE_NAME: &'static str = "unused_indexes";
-
     fn new(row: &Row) -> Self {
         Self {
             table: row.get::<_, Option<String>>(0).unwrap_or_default(),

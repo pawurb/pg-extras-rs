@@ -15,8 +15,6 @@ pub struct AllLocks {
 }
 
 impl Tabular for AllLocks {
-    const FILE_NAME: &'static str = "all_locks";
-
     fn new(row: &Row) -> Self {
         Self {
             pid: row.get::<_, Option<i32>>(0).unwrap_or_default().to_string(),

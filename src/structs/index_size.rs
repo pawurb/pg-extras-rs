@@ -9,8 +9,6 @@ pub struct IndexSize {
 }
 
 impl Tabular for IndexSize {
-    const FILE_NAME: &'static str = "index_size";
-
     fn new(row: &Row) -> Self {
         Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),

@@ -11,8 +11,6 @@ pub struct IndexCacheHit {
 }
 
 impl Tabular for IndexCacheHit {
-    const FILE_NAME: &'static str = "index_cache_hit";
-
     fn new(row: &Row) -> Self {
         Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),

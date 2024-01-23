@@ -8,8 +8,6 @@ pub struct SeqScans {
 }
 
 impl Tabular for SeqScans {
-    const FILE_NAME: &'static str = "seq_scans";
-
     fn new(row: &Row) -> Self {
         Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),

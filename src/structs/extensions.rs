@@ -10,8 +10,6 @@ pub struct Extensions {
 }
 
 impl Tabular for Extensions {
-    const FILE_NAME: &'static str = "extensions";
-
     fn new(row: &Row) -> Self {
         Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),

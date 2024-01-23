@@ -8,8 +8,6 @@ pub struct RecordsRank {
 }
 
 impl Tabular for RecordsRank {
-    const FILE_NAME: &'static str = "records_rank";
-
     fn new(row: &Row) -> Self {
         Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),

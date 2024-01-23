@@ -10,8 +10,6 @@ pub struct Indexes {
 }
 
 impl Tabular for Indexes {
-    const FILE_NAME: &'static str = "indexes";
-
     fn new(row: &Row) -> Self {
         Self {
             schemaname: row.get::<_, Option<String>>(0).unwrap_or_default(),

@@ -10,8 +10,6 @@ pub struct DbSetting {
 }
 
 impl Tabular for DbSetting {
-    const FILE_NAME: &'static str = "db_settings";
-
     fn new(row: &Row) -> Self {
         Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),

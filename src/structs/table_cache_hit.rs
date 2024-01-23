@@ -11,8 +11,6 @@ pub struct TableCacheHit {
 }
 
 impl Tabular for TableCacheHit {
-    const FILE_NAME: &'static str = "table_cache_hit";
-
     fn new(row: &Row) -> Self {
         Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),

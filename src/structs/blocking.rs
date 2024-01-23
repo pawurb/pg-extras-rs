@@ -15,8 +15,6 @@ pub struct Blocking {
 }
 
 impl Tabular for Blocking {
-    const FILE_NAME: &'static str = "blocking";
-
     fn new(row: &Row) -> Self {
         Self {
             blocked_pid: row.get::<_, Option<i32>>(0).unwrap_or_default(),

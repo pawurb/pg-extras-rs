@@ -8,8 +8,6 @@ pub struct TotalTableSize {
 }
 
 impl Tabular for TotalTableSize {
-    const FILE_NAME: &'static str = "total_table_size";
-
     fn new(row: &Row) -> Self {
         Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),

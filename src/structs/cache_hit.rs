@@ -10,8 +10,6 @@ pub struct CacheHit {
 }
 
 impl Tabular for CacheHit {
-    const FILE_NAME: &'static str = "cache_hit";
-
     fn new(row: &Row) -> Self {
         Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),

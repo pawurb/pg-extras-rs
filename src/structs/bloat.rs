@@ -13,8 +13,6 @@ pub struct Bloat {
 }
 
 impl Tabular for Bloat {
-    const FILE_NAME: &'static str = "bloat";
-
     fn new(row: &Row) -> Self {
         Self {
             typefield: row.get::<_, Option<String>>(0).unwrap_or_default(),

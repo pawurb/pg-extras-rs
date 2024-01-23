@@ -9,8 +9,6 @@ pub struct Connections {
 }
 
 impl Tabular for Connections {
-    const FILE_NAME: &'static str = "connections";
-
     fn new(row: &Row) -> Self {
         Self {
             username: row.get::<_, Option<String>>(0).unwrap_or_default(),

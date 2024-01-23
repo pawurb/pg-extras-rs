@@ -9,8 +9,6 @@ pub struct TableSize {
 }
 
 impl Tabular for TableSize {
-    const FILE_NAME: &'static str = "table_size";
-
     fn new(row: &Row) -> Self {
         Self {
             name: row.get::<_, Option<String>>(0).unwrap_or_default(),
