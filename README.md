@@ -33,7 +33,7 @@ You can check if it is enabled in your database by running:
 ```rust
 use pg_extras::{render_table, extensions}
 
-render_table(extensions());
+render_table(extensions()?);
 ```
 
 You should see the similar line in the output:
@@ -63,7 +63,7 @@ You can run queries using a Rust API to display an ASCCI table with results:
 ```rust
 use pg_extras::{render_table, cache_hit}
 
-render_table(cache_hit(None));
+render_table(cache_hit(None)?);
 
 ```
 ```bash
@@ -82,7 +82,7 @@ Alternatively you can work directly with returned structs:
 ```rust
 use pg_extras::{render_table, cache_hit, CacheHit}
 
-let cache_hit_res: Vec<CacheHit> = cache_hit(None);
+let cache_hit_res: Vec<CacheHit> = cache_hit(None)?;
 println!("{:?}", cache_hit_res);
 
 // [CacheHit { name: "index hit rate", ratio:  0.9779... }, CacheHit { name: "table hit rate", ratio: 0.9672... }]
@@ -92,7 +92,7 @@ println!("{:?}", cache_hit_res);
 Some methods accept params allowing you to customize queries:
 
 ```rust
-cache_hit(Some("other_schema".to_string));
+cache_hit(Some("other_schema".to_string))?;
 ```
 
 You can customize the default `public` schema by setting `ENV['PG_EXTRAS_SCHEMA']` value.
@@ -107,7 +107,7 @@ struct CacheHit {
     ratio: Decimal,
 }
 
-cache_hit(schema: Option<String>) -> Vec<CacheHit>
+cache_hit(schema: Option<String>) -> Result<Vec<CacheHit>, PgExtrasError>
 
       name      |         ratio
 ----------------+------------------------
@@ -131,7 +131,7 @@ struct IndexCacheHit {
     ratio: String,
 }
 
-index_cache_hit(schema: Option<String>) -> Vec<IndexCacheHit>
+index_cache_hit(schema: Option<String>) -> Result<Vec<IndexCacheHit>, PgExtrasError>
 
 | name                  | buffer_hits | block_reads | total_read | ratio             |
 +-----------------------+-------------+-------------+------------+-------------------+
@@ -156,7 +156,7 @@ struct TableCacheHit {
     ratio: String,
 }
 
-table_cache_hit() -> Vec<TableCacheHit>
+table_cache_hit() -> Result<Vec<TableCacheHit>, PgExtrasError>
 
 | name                  | buffer_hits | block_reads | total_read | ratio             |
 +-----------------------+-------------+-------------+------------+-------------------+
@@ -180,7 +180,7 @@ struct DbSetting {
     short_desc: String,
 }
 
-db_settings() -> Vec<DbSetting> 
+db_settings() -> Result<Vec<DbSetting>, PgExtrasError>
 
              name             | setting | unit |
 ------------------------------+---------+------+
@@ -203,7 +203,7 @@ struct SslUsed {
     ssl_used: bool,
 }
 
-ssl_used() -> Vec<SslUsed> 
+ssl_used() -> Result<Vec<SslUsed>, PgExtrasError>
 
 | ssl_is_used                     |
 +---------------------------------+
@@ -222,7 +222,7 @@ struct IndexUsage {
     rows_in_table: i64,
 }
 
-index_usage(schema: Option<String>) -> Vec<IndexUsage>
+index_usage(schema: Option<String>) -> Result<Vec<IndexUsage>, PgExtrasError>
 
        relname       | percent_of_times_index_used | rows_in_table
 ---------------------+-----------------------------+---------------
@@ -250,7 +250,7 @@ struct Locks {
     application: String,
 }
 
-locks() -> Vec<Locks> 
+locks() -> Result<Vec<Locks>, PgExtrasError>
 
  procpid | relname | transactionid | granted |     query_snippet     | mode             |       age        |   application |
 ---------+---------+---------------+---------+-----------------------+------------------------------------------------------
@@ -281,7 +281,7 @@ struct AllLocks {
     application: String,
 }
 
-all_locks() -> Vec<AllLocks>
+all_locks() -> Result<Vec<AllLocks>, PgExtrasError> 
 
 ```
 
@@ -298,7 +298,7 @@ struct Outliers {
     query: String,
 }
 
-outliers() -> Vec<Outliers>
+outliers() -> Result<Vec<Outliers>, PgExtrasError>
 
                    query                 |    exec_time     | prop_exec_time |   ncalls    | sync_io_time
 -----------------------------------------+------------------+----------------+-------------+--------------
@@ -329,7 +329,7 @@ struct Calls {
     sync_io_time: Interval,
 }
 
-calls(limit: Option<String>) -> Vec<Calls>
+calls(limit: Option<String>) -> Result<Vec<Calls>, PgExtrasError>
 
                    qry                   |    exec_time     | prop_exec_time |   ncalls    | sync_io_time
 -----------------------------------------+------------------+----------------+-------------+--------------
@@ -361,7 +361,7 @@ struct Blocking {
     blocking_sql_app: String,
 }
 
-blocking(limit: Option<String>) -> Vec<Blocking>
+blocking(limit: Option<String>) -> Result<Vec<Blocking>, PgExtrasError>
 
  blocked_pid |    blocking_statement    | blocking_duration | blocking_pid |                                        blocked_statement                           | blocked_duration
 -------------+--------------------------+-------------------+--------------+------------------------------------------------------------------------------------+------------------
@@ -380,7 +380,7 @@ struct TotalIndexSize {
     size: String,
 }
 
-total_index_size() -> Vec<TotalIndexSize> 
+total_index_size() -> Result<Vec<TotalIndexSize>, PgExtrasError>
 
   size
 -------
@@ -399,7 +399,7 @@ This command displays the total size of all indexes on the database, in MB. It i
     schema: String,
 }
 
-index_size() -> Vec<IndexSize> 
+index_size() -> Result<Vec<IndexSize>, PgExtrasError> 
 
                              name                              |  size   | schema |
 ---------------------------------------------------------------+-------------------
@@ -427,7 +427,7 @@ struct TableSize {
     schema: String,
 }
 
-table_size() -> Vec<TableSize> 
+table_size() -> Result<Vec<TableSize>, PgExtrasError> 
 
                              name                              |  size   | schema |
 ---------------------------------------------------------------+-------------------
@@ -449,7 +449,7 @@ TableIndexesSize {
     index_size: String,
 }
 
-table_indexes_size(schema: Option<String>) -> Vec<TableIndexesSize> 
+table_indexes_size(schema: Option<String>) -> Result<Vec<TableIndexesSize>, PgExtrasError> 
 
                              table                             | indexes_size
 ---------------------------------------------------------------+--------------
@@ -471,7 +471,7 @@ struct TotalTableSize {
     size: String,
 }
 
-total_table_size() -> Vec<TotalTableSize> 
+total_table_size() -> Result<Vec<TotalTableSize>, PgExtrasError>
 
                              name                              |  size
 ---------------------------------------------------------------+---------
@@ -495,7 +495,7 @@ struct UnusedIndexes {
     index_scans: i64,
 }
 
-unused_indexes(schema: Option<String>) -> Vec<UnusedIndexes> 
+unused_indexes(schema: Option<String>) -> Result<Vec<UnusedIndexes>, PgExtrasError> 
 
           table      |                       index                | index_size | index_scans
 ---------------------+--------------------------------------------+------------+-------------
@@ -520,7 +520,7 @@ struct DuplicateIndexes {
     idx4: String,
 }
 
-duplicate_indexes() -> Vec<DuplicateIndexes> 
+duplicate_indexes() -> Result<Vec<DuplicateIndexes>, PgExtrasError> 
 
 | size       |  idx1        |  idx2          |  idx3    |  idx4     |
 +------------+--------------+----------------+----------+-----------+
@@ -544,7 +544,7 @@ struct NullIndexes {
     schema: String,
 }
 
-null_indexes(min_relation_size_mb: Option<String>) -> Vec<NullIndexes> 
+null_indexes(min_relation_size_mb: Option<String>) -> Result<Vec<NullIndexes>, PgExtrasError> 
 
    oid   |         index      | index_size | unique | indexed_column | null_frac | expected_saving
 ---------+--------------------+------------+--------+----------------+-----------+-----------------
@@ -566,7 +566,7 @@ struct SeqScans {
     count: i64,
 }
 
-seq_scans(schema: Option<String>) -> Vec<SeqScans> 
+seq_scans(schema: Option<String>) -> Result<Vec<SeqScans>, PgExtrasError>
 
                name                |  count
 -----------------------------------+----------
@@ -594,7 +594,7 @@ struct LongRunningQueries {
     query: String,
 }
 
-long_running_queries() -> Vec<LongRunningQueries> 
+long_running_queries() -> Result<Vec<LongRunningQueries>, PgExtrasError> 
 
   pid  |    duration     |                                      query
 -------+-----------------+---------------------------------------------------------------------------------------
@@ -614,7 +614,7 @@ struct RecordsRank {
     esiimated_count: i64,
 }
 
-records_rank(schema: Option<String>) -> Vec<RecordsRank> 
+records_rank(schema: Option<String>) -> Result<Vec<RecordsRank>, PgExtrasError> 
 
                name                | estimated_count
 -----------------------------------+-----------------
@@ -640,7 +640,7 @@ struct Bloat {
     waste: String,
 }
 
-bloat() -> Vec<Bloat> 
+bloat() -> Result<Vec<Bloat>, PgExtrasError> 
 
  type  | schemaname |           object_name         | bloat |   waste
 -------+------------+-------------------------------+-------+----------
@@ -670,7 +670,7 @@ struct VacuumStats {
     expect_autovacuum: String,
 }
 
-vacuum_stats() -> Vec<VacuumStats> 
+vacuum_stats() -> Result<Vec<VacuumStats>, PgExtrasError> 
 
  schema |         table         | last_vacuum | last_autovacuum  |    rowcount    | dead_rowcount  | autovacuum_threshold | expect_autovacuum
 --------+-----------------------+-------------+------------------+----------------+----------------+----------------------+-------------------
@@ -694,7 +694,7 @@ struct BuffercacheStats {
     percent_of_relation: Decimal,
 }
 
-buffercache_stats() -> Vec<BuffercacheStats> 
+buffercache_stats() -> Result<Vec<BuffercacheStats>, PgExtrasError> 
 ```
 
 This command shows the relations buffered in database share buffer, ordered by percentage taken. It also shows that how much of the whole relation is buffered.
@@ -707,7 +707,7 @@ struct BuffercacheUsage {
     buffers: i64,
 }
 
-buffercache_usage() -> Vec<BuffercacheUsage> 
+buffercache_usage() -> Result<Vec<BuffercacheUsage>, PgExtrasError> 
 ```
 
 This command calculates how many blocks from which table are currently cached.
@@ -722,7 +722,7 @@ struct Extensions {
     comment: String,
 }
 
-extensions() -> Vec<Extensions> 
+extensions() -> Result<Vec<Extensions>, PgExtrasError> 
 
 ```
 
@@ -737,7 +737,7 @@ struct Connections {
     client_addr: String,
 }
 
-connections() -> Vec<Connections> 
+connections() -> Result<Vec<Connections>, PgExtrasError> 
 
 +----------------------------------------------------------------+
 |      Returns the list of all active database connections       |
@@ -759,7 +759,7 @@ struct Mandelbrot {
     array_to_string: String,
 }
 
-mandelbrot() -> Vec<Mandelbrot> 
+mandelbrot() -> Result<Vec<Mandelbrot>, PgExtrasError>
 
 ```
 

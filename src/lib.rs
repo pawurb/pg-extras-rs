@@ -35,6 +35,7 @@ pub use structs::total_index_size::TotalIndexSize;
 pub use structs::total_table_size::TotalTableSize;
 pub use structs::unused_indexes::UnusedIndexes;
 pub use structs::vacuum_stats::VacuumStats;
+use thiserror::Error;
 
 #[macro_use]
 extern crate prettytable;
@@ -50,186 +51,191 @@ pub fn render_table<T: Tabular>(items: Vec<T>) {
     table.printstd();
 }
 
-pub fn bloat() -> Vec<Bloat> {
+pub fn bloat() -> Result<Vec<Bloat>, PgExtrasError> {
     let query = read_file(Bloat::FILE_NAME);
-    get_rows(query).iter().map(Bloat::new).collect()
+    Ok(get_rows(query)?.iter().map(Bloat::new).collect())
 }
 
-pub fn blocking(limit: Option<String>) -> Vec<Blocking> {
+pub fn blocking(limit: Option<String>) -> Result<Vec<Blocking>, PgExtrasError> {
     let limit = limit.unwrap_or("10".to_string());
     let query = read_file(Blocking::FILE_NAME).replace("%{limit}", limit.as_str());
-    get_rows(&query).iter().map(Blocking::new).collect()
+    Ok(get_rows(&query)?.iter().map(Blocking::new).collect())
 }
 
-pub fn calls(limit: Option<String>) -> Vec<Calls> {
+pub fn calls(limit: Option<String>) -> Result<Vec<Calls>, PgExtrasError> {
     let limit = limit.unwrap_or("10".to_string());
     let query = read_file("calls").replace("%{limit}", limit.as_str());
-    get_rows(&query).iter().map(Calls::new).collect()
+    Ok(get_rows(&query)?.iter().map(Calls::new).collect())
 }
 
-pub fn extensions() -> Vec<Extensions> {
+pub fn extensions() -> Result<Vec<Extensions>, PgExtrasError> {
     let query = read_file(Extensions::FILE_NAME);
-    get_rows(query).iter().map(Extensions::new).collect()
+    Ok(get_rows(query)?.iter().map(Extensions::new).collect())
 }
 
-pub fn table_cache_hit() -> Vec<TableCacheHit> {
+pub fn table_cache_hit() -> Result<Vec<TableCacheHit>, PgExtrasError> {
     let query = read_file(TableCacheHit::FILE_NAME);
-    get_rows(query).iter().map(TableCacheHit::new).collect()
+    Ok(get_rows(query)?.iter().map(TableCacheHit::new).collect())
 }
 
-pub fn tables(schema: Option<String>) -> Vec<Tables> {
+pub fn tables(schema: Option<String>) -> Result<Vec<Tables>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = read_file(Tables::FILE_NAME).replace("%{schema}", &schema_name);
-    get_rows(&query).iter().map(Tables::new).collect()
+    Ok(get_rows(&query)?.iter().map(Tables::new).collect())
 }
 
-pub fn index_cache_hit(schema: Option<String>) -> Vec<IndexCacheHit> {
+pub fn index_cache_hit(schema: Option<String>) -> Result<Vec<IndexCacheHit>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = read_file(IndexCacheHit::FILE_NAME).replace("%{schema}", &schema_name);
-    get_rows(&query).iter().map(IndexCacheHit::new).collect()
+    Ok(get_rows(&query)?.iter().map(IndexCacheHit::new).collect())
 }
 
-pub fn indexes() -> Vec<Indexes> {
+pub fn indexes() -> Result<Vec<Indexes>, PgExtrasError> {
     let query = read_file(Indexes::FILE_NAME);
-    get_rows(query).iter().map(Indexes::new).collect()
+    Ok(get_rows(query)?.iter().map(Indexes::new).collect())
 }
 
-pub fn index_size() -> Vec<IndexSize> {
+pub fn index_size() -> Result<Vec<IndexSize>, PgExtrasError> {
     let query = read_file(IndexSize::FILE_NAME);
-    get_rows(query).iter().map(IndexSize::new).collect()
+    Ok(get_rows(query)?.iter().map(IndexSize::new).collect())
 }
 
-pub fn index_usage(schema: Option<String>) -> Vec<IndexUsage> {
+pub fn index_usage(schema: Option<String>) -> Result<Vec<IndexUsage>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = read_file(IndexUsage::FILE_NAME).replace("%{schema}", &schema_name);
-    get_rows(&query).iter().map(IndexUsage::new).collect()
+    Ok(get_rows(&query)?.iter().map(IndexUsage::new).collect())
 }
 
-pub fn index_scans(schema: Option<String>) -> Vec<IndexScans> {
+pub fn index_scans(schema: Option<String>) -> Result<Vec<IndexScans>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = read_file(IndexScans::FILE_NAME).replace("%{schema}", &schema_name);
-    get_rows(&query).iter().map(IndexScans::new).collect()
+    Ok(get_rows(&query)?.iter().map(IndexScans::new).collect())
 }
 
-pub fn null_indexes(min_relation_size_mb: Option<String>) -> Vec<NullIndexes> {
+pub fn null_indexes(
+    min_relation_size_mb: Option<String>,
+) -> Result<Vec<NullIndexes>, PgExtrasError> {
     let min_relation_size_mb = min_relation_size_mb.unwrap_or("0".to_string());
     let query =
         read_file(NullIndexes::FILE_NAME).replace("%{min_relation_size_mb}", &min_relation_size_mb);
-    get_rows(&query).iter().map(NullIndexes::new).collect()
+    Ok(get_rows(&query)?.iter().map(NullIndexes::new).collect())
 }
 
-pub fn locks() -> Vec<Locks> {
+pub fn locks() -> Result<Vec<Locks>, PgExtrasError> {
     let query = read_file(Locks::FILE_NAME);
-    get_rows(query).iter().map(Locks::new).collect()
+    Ok(get_rows(query)?.iter().map(Locks::new).collect())
 }
 
-pub fn all_locks() -> Vec<AllLocks> {
+pub fn all_locks() -> Result<Vec<AllLocks>, PgExtrasError> {
     let query = read_file(AllLocks::FILE_NAME);
-    get_rows(query).iter().map(AllLocks::new).collect()
+    Ok(get_rows(query)?.iter().map(AllLocks::new).collect())
 }
 
-pub fn long_running_queries() -> Vec<LongRunningQueries> {
+pub fn long_running_queries() -> Result<Vec<LongRunningQueries>, PgExtrasError> {
     let query = read_file(LongRunningQueries::FILE_NAME);
-    get_rows(query)
+    Ok(get_rows(query)?
         .iter()
         .map(LongRunningQueries::new)
-        .collect()
+        .collect())
 }
 
-pub fn mandelbrot() -> Vec<Mandelbrot> {
+pub fn mandelbrot() -> Result<Vec<Mandelbrot>, PgExtrasError> {
     let query = read_file(Mandelbrot::FILE_NAME);
-    get_rows(query).iter().map(Mandelbrot::new).collect()
+    Ok(get_rows(query)?.iter().map(Mandelbrot::new).collect())
 }
 
-pub fn outliers() -> Vec<Outliers> {
+pub fn outliers() -> Result<Vec<Outliers>, PgExtrasError> {
     let query = read_file(Outliers::FILE_NAME);
-    get_rows(query).iter().map(Outliers::new).collect()
+    Ok(get_rows(query)?.iter().map(Outliers::new).collect())
 }
 
-pub fn records_rank(schema: Option<String>) -> Vec<RecordsRank> {
+pub fn records_rank(schema: Option<String>) -> Result<Vec<RecordsRank>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = read_file(RecordsRank::FILE_NAME).replace("%{schema}", schema_name.as_str());
-    get_rows(&query).iter().map(RecordsRank::new).collect()
+    Ok(get_rows(&query)?.iter().map(RecordsRank::new).collect())
 }
 
-pub fn seq_scans(schema: Option<String>) -> Vec<SeqScans> {
+pub fn seq_scans(schema: Option<String>) -> Result<Vec<SeqScans>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = read_file(SeqScans::FILE_NAME).replace("%{schema}", schema_name.as_str());
-    get_rows(&query).iter().map(SeqScans::new).collect()
+    Ok(get_rows(&query)?.iter().map(SeqScans::new).collect())
 }
 
-pub fn table_index_scans(schema: Option<String>) -> Vec<TableIndexScans> {
+pub fn table_index_scans(schema: Option<String>) -> Result<Vec<TableIndexScans>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = read_file(TableIndexScans::FILE_NAME).replace("%{schema}", schema_name.as_str());
-    get_rows(&query).iter().map(TableIndexScans::new).collect()
+    Ok(get_rows(&query)?.iter().map(TableIndexScans::new).collect())
 }
 
-pub fn table_indexes_size(schema: Option<String>) -> Vec<TableIndexesSize> {
+pub fn table_indexes_size(schema: Option<String>) -> Result<Vec<TableIndexesSize>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = read_file(TableIndexesSize::FILE_NAME).replace("%{schema}", schema_name.as_str());
-    get_rows(&query).iter().map(TableIndexesSize::new).collect()
+    Ok(get_rows(&query)?
+        .iter()
+        .map(TableIndexesSize::new)
+        .collect())
 }
 
-pub fn table_size() -> Vec<TableSize> {
+pub fn table_size() -> Result<Vec<TableSize>, PgExtrasError> {
     let query = read_file(TableSize::FILE_NAME);
-    get_rows(query).iter().map(TableSize::new).collect()
+    Ok(get_rows(query)?.iter().map(TableSize::new).collect())
 }
 
-pub fn total_index_size() -> Vec<TotalIndexSize> {
+pub fn total_index_size() -> Result<Vec<TotalIndexSize>, PgExtrasError> {
     let query = read_file(TotalIndexSize::FILE_NAME);
-    get_rows(query).iter().map(TotalIndexSize::new).collect()
+    Ok(get_rows(query)?.iter().map(TotalIndexSize::new).collect())
 }
 
-pub fn total_table_size() -> Vec<TotalTableSize> {
+pub fn total_table_size() -> Result<Vec<TotalTableSize>, PgExtrasError> {
     let query = read_file(TotalTableSize::FILE_NAME);
-    get_rows(query).iter().map(TotalTableSize::new).collect()
+    Ok(get_rows(query)?.iter().map(TotalTableSize::new).collect())
 }
 
-pub fn unused_indexes(schema: Option<String>) -> Vec<UnusedIndexes> {
+pub fn unused_indexes(schema: Option<String>) -> Result<Vec<UnusedIndexes>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = read_file(UnusedIndexes::FILE_NAME).replace("%{schema}", schema_name.as_str());
-    get_rows(&query).iter().map(UnusedIndexes::new).collect()
+    Ok(get_rows(&query)?.iter().map(UnusedIndexes::new).collect())
 }
 
-pub fn duplicate_indexes() -> Vec<DuplicateIndexes> {
+pub fn duplicate_indexes() -> Result<Vec<DuplicateIndexes>, PgExtrasError> {
     let query = read_file(DuplicateIndexes::FILE_NAME);
-    get_rows(query).iter().map(DuplicateIndexes::new).collect()
+    Ok(get_rows(query)?.iter().map(DuplicateIndexes::new).collect())
 }
 
-pub fn vacuum_stats() -> Vec<VacuumStats> {
+pub fn vacuum_stats() -> Result<Vec<VacuumStats>, PgExtrasError> {
     let query = read_file(VacuumStats::FILE_NAME);
-    get_rows(query).iter().map(VacuumStats::new).collect()
+    Ok(get_rows(query)?.iter().map(VacuumStats::new).collect())
 }
 
-pub fn buffercache_stats() -> Vec<BuffercacheStats> {
+pub fn buffercache_stats() -> Result<Vec<BuffercacheStats>, PgExtrasError> {
     let query = read_file(BuffercacheStats::FILE_NAME);
-    get_rows(query).iter().map(BuffercacheStats::new).collect()
+    Ok(get_rows(query)?.iter().map(BuffercacheStats::new).collect())
 }
 
-pub fn buffercache_usage() -> Vec<BuffercacheUsage> {
+pub fn buffercache_usage() -> Result<Vec<BuffercacheUsage>, PgExtrasError> {
     let query = read_file(BuffercacheUsage::FILE_NAME);
-    get_rows(query).iter().map(BuffercacheUsage::new).collect()
+    Ok(get_rows(query)?.iter().map(BuffercacheUsage::new).collect())
 }
 
-pub fn ssl_used() -> Vec<SslUsed> {
+pub fn ssl_used() -> Result<Vec<SslUsed>, PgExtrasError> {
     let query = read_file(SslUsed::FILE_NAME);
-    get_rows(query).iter().map(SslUsed::new).collect()
+    Ok(get_rows(query)?.iter().map(SslUsed::new).collect())
 }
 
-pub fn connections() -> Vec<Connections> {
+pub fn connections() -> Result<Vec<Connections>, PgExtrasError> {
     let query = read_file(Connections::FILE_NAME);
-    get_rows(query).iter().map(Connections::new).collect()
+    Ok(get_rows(query)?.iter().map(Connections::new).collect())
 }
 
-pub fn cache_hit(schema: Option<String>) -> Vec<CacheHit> {
+pub fn cache_hit(schema: Option<String>) -> Result<Vec<CacheHit>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = read_file(CacheHit::FILE_NAME).replace("%{schema}", schema_name.as_str());
-    get_rows(&query).iter().map(CacheHit::new).collect()
+    Ok(get_rows(&query)?.iter().map(CacheHit::new).collect())
 }
 
-pub fn db_settings() -> Vec<DbSetting> {
+pub fn db_settings() -> Result<Vec<DbSetting>, PgExtrasError> {
     let query = read_file("db_settings");
-    get_rows(query).iter().map(DbSetting::new).collect()
+    Ok(get_rows(query)?.iter().map(DbSetting::new).collect())
 }
 
 pub fn read_file(filename: &str) -> &'static str {
@@ -270,19 +276,33 @@ pub fn read_file(filename: &str) -> &'static str {
     }
 }
 
-fn get_rows(query: &str) -> Vec<Row> {
-    connection()
-        .query(query, &[])
-        .unwrap_or_else(|_| Vec::new())
+#[derive(Error, Debug)]
+pub enum PgExtrasError {
+    #[error("Both $DATABASE_URL and $PG_EXTRAS_DATABASE_URL are not set")]
+    MissingConfigVars(),
+    #[error("Cannot connect to database")]
+    ConnectionError(),
+    #[error("Unknown pg-extras error")]
+    Unknown,
 }
 
-fn connection() -> Client {
-    let database_url = env::var("PG_EXTRAS_DATABASE_URL").unwrap_or_else(|_| {
-        env::var("DATABASE_URL")
-            .expect("Both $DATABASE_URL and $PG_EXTRAS_DATABASE_URL are not set")
-    });
+fn get_rows(query: &str) -> Result<Vec<Row>, PgExtrasError> {
+    Ok(connection()?
+        .query(query, &[])
+        .unwrap_or_else(|_| Vec::new()))
+}
 
-    Client::connect(&database_url, NoTls).unwrap()
+fn connection() -> Result<Client, PgExtrasError> {
+    let database_url =
+        match env::var("PG_EXTRAS_DATABASE_URL").or_else(|_| env::var("DATABASE_URL")) {
+            Ok(url) => url,
+            Err(_) => return Err(PgExtrasError::MissingConfigVars()),
+        };
+
+    match Client::connect(&database_url, NoTls) {
+        Ok(client) => Ok(client),
+        Err(_) => Err(PgExtrasError::ConnectionError()),
+    }
 }
 
 #[cfg(test)]
@@ -290,38 +310,39 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
-        render_table(cache_hit(None));
-        render_table(bloat());
-        render_table(blocking(None));
-        render_table(calls(None));
-        render_table(extensions());
-        render_table(table_cache_hit());
-        render_table(tables(None));
-        render_table(index_cache_hit(None));
-        render_table(indexes());
-        render_table(index_size());
-        render_table(index_usage(None));
-        render_table(index_scans(None));
-        render_table(null_indexes(None));
-        render_table(locks());
-        render_table(all_locks());
-        render_table(long_running_queries());
-        render_table(mandelbrot());
-        render_table(outliers());
-        render_table(records_rank(None));
-        render_table(seq_scans(None));
-        render_table(table_index_scans(None));
-        render_table(table_indexes_size(None));
-        render_table(table_size());
-        render_table(total_index_size());
-        render_table(total_table_size());
-        render_table(unused_indexes(None));
-        render_table(duplicate_indexes());
-        render_table(vacuum_stats());
-        render_table(buffercache_stats());
-        render_table(buffercache_usage());
-        render_table(ssl_used());
-        render_table(connections());
+    fn it_works() -> Result<(), PgExtrasError> {
+        render_table(cache_hit(None)?);
+        render_table(bloat()?);
+        render_table(blocking(None)?);
+        render_table(calls(None)?);
+        render_table(extensions()?);
+        render_table(table_cache_hit()?);
+        render_table(tables(None)?);
+        render_table(index_cache_hit(None)?);
+        render_table(indexes()?);
+        render_table(index_size()?);
+        render_table(index_usage(None)?);
+        render_table(index_scans(None)?);
+        render_table(null_indexes(None)?);
+        render_table(locks()?);
+        render_table(all_locks()?);
+        render_table(long_running_queries()?);
+        render_table(mandelbrot()?);
+        render_table(outliers()?);
+        render_table(records_rank(None)?);
+        render_table(seq_scans(None)?);
+        render_table(table_index_scans(None)?);
+        render_table(table_indexes_size(None)?);
+        render_table(table_size()?);
+        render_table(total_index_size()?);
+        render_table(total_table_size()?);
+        render_table(unused_indexes(None)?);
+        render_table(duplicate_indexes()?);
+        render_table(vacuum_stats()?);
+        render_table(buffercache_stats()?);
+        render_table(buffercache_usage()?);
+        render_table(ssl_used()?);
+        render_table(connections()?);
+        Ok(())
     }
 }

@@ -7,7 +7,7 @@ license = "MIT"
 name = "pg-extras"
 readme = "README.md"
 repository = "https://github.com/pawurb/rust-pg-extras"
-version = "0.0.3"
+version = "0.1.0"
 
 exclude = [
   "docker-compose.yml.sample",
@@ -20,3 +20,4 @@ postgres = "0.19.7"
 prettytable-rs = "^0.10"
 rust_decimal = {version = "1.32", features = ["db-postgres"]}
 rust_decimal_macros = "1.33"
+thiserror = "1.0"
