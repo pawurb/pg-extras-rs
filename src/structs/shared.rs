@@ -1,5 +1,5 @@
 use pg_interval::Interval;
-use postgres::{Client, NoTls, Row};
+use postgres::Row;
 use std::env;
 
 pub trait Tabular {
@@ -14,15 +14,4 @@ pub fn get_default_interval() -> Interval {
 
 pub fn get_default_schema() -> String {
     env::var("PG_EXTRAS_SCHEMA").unwrap_or("public".to_string())
-}
-
-pub fn get_rows(query: &str) -> Vec<Row> {
-    connection()
-        .query(query, &[])
-        .unwrap_or_else(|_| Vec::new())
-}
-
-fn connection() -> Client {
-    let database_url = env::var("DATABASE_URL").expect("$DATABASE_URL is not set");
-    Client::connect(&database_url, NoTls).unwrap()
 }
