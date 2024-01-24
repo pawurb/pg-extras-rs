@@ -314,6 +314,7 @@ impl Query {
 }
 
 #[derive(Error, Debug)]
+#[non_exhaustive]
 pub enum PgExtrasError {
     #[error("Both $DATABASE_URL and $PG_EXTRAS_DATABASE_URL are not set")]
     MissingConfigVars(),

@@ -7,7 +7,7 @@ license = "MIT"
 name = "pg-extras"
 readme = "README.md"
 repository = "https://github.com/pawurb/rust-pg-extras"
-version = "0.1.0"
+version = "0.2.0"
 
 exclude = [
   "docker-compose.yml.sample",
@@ -15,7 +15,7 @@ exclude = [
 ]
 
 [dependencies]
-prettytable-rs = "^0.10"
+prettytable-rs = "0.10"
 sqlx = {version = "0.6", features = ["runtime-tokio-rustls", "postgres", "macros", "bigdecimal"]}
 thiserror = "1.0"
 tokio = {version = "1", features = ["full"]}
