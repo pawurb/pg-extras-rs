@@ -1,5 +1,6 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct TableCacheHit {
@@ -11,13 +12,13 @@ pub struct TableCacheHit {
 }
 
 impl Tabular for TableCacheHit {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            name: row.get::<_, Option<String>>(0).unwrap_or_default(),
-            buffer_hits: row.get::<_, Option<i64>>(1).unwrap_or_default(),
-            block_reads: row.get::<_, Option<i64>>(2).unwrap_or_default(),
-            total_read: row.get::<_, Option<i64>>(3).unwrap_or_default(),
-            ratio: row.get::<_, Option<String>>(4).unwrap_or_default(),
+            name: row.try_get("name").unwrap_or_default(),
+            buffer_hits: row.try_get("buffer_hits").unwrap_or_default(),
+            block_reads: row.try_get("block_reads").unwrap_or_default(),
+            total_read: row.try_get("total_read").unwrap_or_default(),
+            ratio: row.try_get("ratio").unwrap_or_default(),
         }
     }
 

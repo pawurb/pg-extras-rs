@@ -1,15 +1,19 @@
-use pg_interval::Interval;
-use postgres::Row;
+use sqlx::postgres::types::PgInterval;
+use sqlx::postgres::PgRow;
 use std::env;
 
 pub trait Tabular {
-    fn new(row: &Row) -> Self;
+    fn new(row: &PgRow) -> Self;
     fn to_row(&self) -> prettytable::Row;
     fn headers() -> prettytable::Row;
 }
 
-pub fn get_default_interval() -> Interval {
-    Interval::from_postgres("0 seconds").unwrap()
+pub fn get_default_interval() -> PgInterval {
+    PgInterval {
+        microseconds: 0,
+        days: 0,
+        months: 0,
+    }
 }
 
 pub fn get_default_schema() -> String {

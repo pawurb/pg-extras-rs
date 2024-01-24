@@ -1,36 +1,31 @@
 use crate::structs::shared::{get_default_interval, Tabular};
-use pg_interval::Interval;
-use postgres::Row;
+use sqlx::postgres::types::PgInterval;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct Locks {
-    pid: String,
+    pid: i32,
     relname: String,
     transactionid: String,
-    granted: String,
+    granted: bool,
     mode: String,
     query_snippet: String,
-    age: String,
+    age: PgInterval,
     application: String,
 }
 
 impl Tabular for Locks {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            pid: row.get::<_, Option<i32>>(0).unwrap_or_default().to_string(),
-            relname: row.get::<_, Option<String>>(1).unwrap_or_default(),
-            transactionid: row.get::<_, Option<String>>(2).unwrap_or_default(),
-            granted: row
-                .get::<_, Option<bool>>(3)
-                .unwrap_or_default()
-                .to_string(),
-            mode: row.get::<_, Option<String>>(4).unwrap_or_default(),
-            query_snippet: row.get::<_, Option<String>>(5).unwrap_or_default(),
-            age: row
-                .get::<_, Option<Interval>>(6)
-                .unwrap_or(get_default_interval())
-                .to_iso_8601(),
-            application: row.get::<_, Option<String>>(7).unwrap_or_default(),
+            pid: row.try_get("pid").unwrap_or_default(),
+            relname: row.try_get("relname").unwrap_or_default(),
+            transactionid: row.try_get("transactionid").unwrap_or_default(),
+            granted: row.try_get("granted").unwrap_or_default(),
+            mode: row.try_get("mode").unwrap_or_default(),
+            query_snippet: row.try_get("query_snippet").unwrap_or_default(),
+            age: row.try_get("age").unwrap_or(get_default_interval()),
+            application: row.try_get("application").unwrap_or_default(),
         }
     }
 
@@ -42,7 +37,7 @@ impl Tabular for Locks {
             self.granted,
             self.mode,
             self.query_snippet,
-            self.age,
+            format!("{:?}", self.age),
             self.application
         ]
     }

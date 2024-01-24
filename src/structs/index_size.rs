@@ -1,5 +1,6 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct IndexSize {
@@ -9,11 +10,11 @@ pub struct IndexSize {
 }
 
 impl Tabular for IndexSize {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            name: row.get::<_, Option<String>>(0).unwrap_or_default(),
-            size: row.get::<_, Option<String>>(1).unwrap_or_default(),
-            schema: row.get::<_, Option<String>>(2).unwrap_or_default(),
+            name: row.try_get("name").unwrap_or_default(),
+            size: row.try_get("size").unwrap_or_default(),
+            schema: row.try_get("schema").unwrap_or_default(),
         }
     }
 

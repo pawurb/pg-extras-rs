@@ -1,5 +1,6 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct Mandelbrot {
@@ -7,9 +8,9 @@ pub struct Mandelbrot {
 }
 
 impl Tabular for Mandelbrot {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            array_to_string: row.get::<_, Option<String>>(0).unwrap_or_default(),
+            array_to_string: row.try_get("array_to_string").unwrap_or_default(),
         }
     }
 

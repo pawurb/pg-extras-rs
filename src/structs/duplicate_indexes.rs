@@ -1,5 +1,6 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct DuplicateIndexes {
@@ -11,13 +12,13 @@ pub struct DuplicateIndexes {
 }
 
 impl Tabular for DuplicateIndexes {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            size: row.get::<_, Option<String>>(0).unwrap_or_default(),
-            idx1: row.get::<_, Option<String>>(1).unwrap_or_default(),
-            idx2: row.get::<_, Option<String>>(2).unwrap_or_default(),
-            idx3: row.get::<_, Option<String>>(3).unwrap_or_default(),
-            idx4: row.get::<_, Option<String>>(4).unwrap_or_default(),
+            size: row.try_get("size").unwrap_or_default(),
+            idx1: row.try_get("idx1").unwrap_or_default(),
+            idx2: row.try_get("idx2").unwrap_or_default(),
+            idx3: row.try_get("idx3").unwrap_or_default(),
+            idx4: row.try_get("idx4").unwrap_or_default(),
         }
     }
 

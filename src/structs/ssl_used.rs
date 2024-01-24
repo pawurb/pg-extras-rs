@@ -1,5 +1,6 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct SslUsed {
@@ -7,9 +8,9 @@ pub struct SslUsed {
 }
 
 impl Tabular for SslUsed {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            ssl_used: row.get::<_, Option<bool>>(0).unwrap_or_default(),
+            ssl_used: row.try_get("ssl_used").unwrap_or(false),
         }
     }
 

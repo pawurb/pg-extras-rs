@@ -1,5 +1,6 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct Connections {
@@ -9,11 +10,11 @@ pub struct Connections {
 }
 
 impl Tabular for Connections {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            username: row.get::<_, Option<String>>(0).unwrap_or_default(),
-            pid: row.get::<_, Option<i32>>(1).unwrap_or_default(),
-            client_addr: row.get::<_, Option<String>>(2).unwrap_or_default(),
+            username: row.try_get("username").unwrap_or_default(),
+            pid: row.try_get("pid").unwrap_or_default(),
+            client_addr: row.try_get("client_addr").unwrap_or_default(),
         }
     }
 

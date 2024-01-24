@@ -1,5 +1,6 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct Indexes {
@@ -10,12 +11,12 @@ pub struct Indexes {
 }
 
 impl Tabular for Indexes {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            schemaname: row.get::<_, Option<String>>(0).unwrap_or_default(),
-            indexname: row.get::<_, Option<String>>(1).unwrap_or_default(),
-            tablename: row.get::<_, Option<String>>(2).unwrap_or_default(),
-            columns: row.get::<_, Option<String>>(3).unwrap_or_default(),
+            schemaname: row.try_get("schemaname").unwrap_or_default(),
+            indexname: row.try_get("indexname").unwrap_or_default(),
+            tablename: row.try_get("tablename").unwrap_or_default(),
+            columns: row.try_get("columns").unwrap_or_default(),
         }
     }
 

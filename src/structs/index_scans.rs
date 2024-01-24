@@ -1,43 +1,38 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct IndexScans {
     schemaname: String,
-    tablename: String,
-    indexname: String,
+    table: String,
+    index: String,
     index_size: String,
     index_scans: i64,
 }
 
 impl Tabular for IndexScans {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            schemaname: row.get::<_, Option<String>>(0).unwrap_or_default(),
-            tablename: row.get::<_, Option<String>>(1).unwrap_or_default(),
-            indexname: row.get::<_, Option<String>>(2).unwrap_or_default(),
-            index_size: row.get::<_, Option<String>>(3).unwrap_or_default(),
-            index_scans: row.get::<_, Option<i64>>(4).unwrap_or_default(),
+            schemaname: row.try_get("schemaname").unwrap_or_default(),
+            table: row.try_get("table").unwrap_or_default(),
+            index: row.try_get("index").unwrap_or_default(),
+            index_size: row.try_get("index_size").unwrap_or_default(),
+            index_scans: row.try_get("index_scans").unwrap_or_default(),
         }
     }
 
     fn to_row(&self) -> prettytable::Row {
         row![
             self.schemaname,
-            self.tablename,
-            self.indexname,
+            self.table,
+            self.index,
             self.index_size,
             self.index_scans.to_string()
         ]
     }
 
     fn headers() -> prettytable::Row {
-        row![
-            "schemaname",
-            "tablename",
-            "indexname",
-            "index_size",
-            "index_scans"
-        ]
+        row!["schemaname", "table", "index", "index_size", "index_scans"]
     }
 }

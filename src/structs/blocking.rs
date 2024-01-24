@@ -1,34 +1,35 @@
 use crate::structs::shared::{get_default_interval, Tabular};
-use pg_interval::Interval;
-use postgres::Row;
+use sqlx::postgres::types::PgInterval;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct Blocking {
     blocked_pid: i32,
     blocking_statement: String,
-    blocking_duration: Interval,
+    blocking_duration: PgInterval,
     blocking_pid: i32,
     blocked_statement: String,
-    blocked_duration: Interval,
+    blocked_duration: PgInterval,
     blocked_sql_app: String,
     blocking_sql_app: String,
 }
 
 impl Tabular for Blocking {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            blocked_pid: row.get::<_, Option<i32>>(0).unwrap_or_default(),
-            blocking_statement: row.get::<_, Option<String>>(1).unwrap_or_default(),
+            blocked_pid: row.try_get("blocked_pid").unwrap_or_default(),
+            blocking_statement: row.try_get("blocking_statement").unwrap_or_default(),
             blocking_duration: row
-                .get::<_, Option<Interval>>(2)
+                .try_get("blocking_duration")
                 .unwrap_or(get_default_interval()),
-            blocking_pid: row.get::<_, Option<i32>>(3).unwrap_or_default(),
-            blocked_statement: row.get::<_, Option<String>>(4).unwrap_or_default(),
+            blocking_pid: row.try_get("blocking_pid").unwrap_or_default(),
+            blocked_statement: row.try_get("blocked_statement").unwrap_or_default(),
             blocked_duration: row
-                .get::<_, Option<Interval>>(5)
+                .try_get("blocked_duration")
                 .unwrap_or(get_default_interval()),
-            blocked_sql_app: row.get::<_, Option<String>>(6).unwrap_or_default(),
-            blocking_sql_app: row.get::<_, Option<String>>(7).unwrap_or_default(),
+            blocked_sql_app: row.try_get("blocked_sql_app").unwrap_or_default(),
+            blocking_sql_app: row.try_get("blocking_sql_app").unwrap_or_default(),
         }
     }
 
@@ -36,10 +37,10 @@ impl Tabular for Blocking {
         row![
             self.blocked_pid,
             self.blocking_statement,
-            self.blocking_duration.to_iso_8601(),
+            format!("{:?}", self.blocking_duration),
             self.blocking_pid,
             self.blocked_statement,
-            self.blocked_duration.to_iso_8601(),
+            format!("{:?}", self.blocked_duration),
             self.blocked_sql_app,
             self.blocking_sql_app
         ]

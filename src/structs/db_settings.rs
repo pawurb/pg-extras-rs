@@ -1,5 +1,6 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct DbSetting {
@@ -10,12 +11,12 @@ pub struct DbSetting {
 }
 
 impl Tabular for DbSetting {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            name: row.get::<_, Option<String>>(0).unwrap_or_default(),
-            setting: row.get::<_, Option<String>>(1).unwrap_or_default(),
-            unit: row.get::<_, Option<String>>(2).unwrap_or_default(),
-            short_desc: row.get::<_, Option<String>>(3).unwrap_or_default(),
+            name: row.try_get("name").unwrap_or_default(),
+            setting: row.try_get("setting").unwrap_or_default(),
+            unit: row.try_get("unit").unwrap_or_default(),
+            short_desc: row.try_get("short_desc").unwrap_or_default(),
         }
     }
 

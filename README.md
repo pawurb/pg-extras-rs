@@ -63,7 +63,7 @@ You can run queries using a Rust API to display an ASCCI table with results:
 ```rust
 use pg_extras::{render_table, cache_hit}
 
-render_table(cache_hit(None)?);
+render_table(cache_hit(None).await?);
 
 ```
 ```bash
@@ -82,7 +82,7 @@ Alternatively you can work directly with returned structs:
 ```rust
 use pg_extras::{render_table, cache_hit, CacheHit}
 
-let cache_hit_res: Vec<CacheHit> = cache_hit(None)?;
+let cache_hit_res: Vec<CacheHit> = cache_hit(None).await?;
 println!("{:?}", cache_hit_res);
 
 // [CacheHit { name: "index hit rate", ratio:  0.9779... }, CacheHit { name: "table hit rate", ratio: 0.9672... }]
@@ -92,7 +92,7 @@ println!("{:?}", cache_hit_res);
 Some methods accept params allowing you to customize queries:
 
 ```rust
-cache_hit(Some("other_schema".to_string))?;
+cache_hit(Some("other_schema".to_string)).await?;
 ```
 
 You can customize the default `public` schema by setting `ENV['PG_EXTRAS_SCHEMA']` value.
@@ -240,10 +240,10 @@ This command provides information on the efficiency of indexes, represented as w
 
 ```rust
 struct Locks {
-    pid: String,
+    pid: i32,
     relname: String,
     transactionid: String,
-    granted: String,
+    granted: bool,
     mode: String,
     query_snippet: String,
     age: String,
@@ -291,10 +291,10 @@ This command displays all the current locks, regardless of their type.
 
 ```rust
 struct Outliers {
-    total_exec_time: Interval,
+    total_exec_time: PgInterval,
     prop_exec_time: String,
     ncalls: String,
-    sync_io_time: Interval,
+    sync_io_time: PgInterval,
     query: String,
 }
 
@@ -323,10 +323,10 @@ Typically, an efficient query will have an appropriate ratio of calls to total e
 ```rust
 struct Calls {
     qry: String,
-    exec_time: Interval,
+    exec_time: PgInterval,
     prop_exec_time: String,
     ncalls: String,
-    sync_io_time: Interval,
+    sync_io_time: PgInterval,
 }
 
 calls(limit: Option<String>) -> Result<Vec<Calls>, PgExtrasError>
@@ -353,10 +353,10 @@ This command is much like `pg:outliers`, but ordered by the number of times a st
 struct Blocking {
     blocked_pid: i32,
     blocking_statement: String,
-    blocking_duration: Interval,
+    blocking_duration: PgInterval,
     blocking_pid: i32,
     blocked_statement: String,
-    blocked_duration: Interval,
+    blocked_duration: PgInterval,
     blocked_sql_app: String,
     blocking_sql_app: String,
 }
@@ -536,7 +536,7 @@ struct NullIndexes {
     oid: String,
     index: String,
     index_size: String,
-    unique: String,
+    unique: bool,
     indexed_column: String,
     table: String,
     null_frac: String,

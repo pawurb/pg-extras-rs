@@ -1,19 +1,19 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
-use rust_decimal::prelude::Decimal;
-use rust_decimal_macros::dec;
+use sqlx::postgres::PgRow;
+use sqlx::types::BigDecimal;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct CacheHit {
     name: String,
-    ratio: Decimal,
+    ratio: BigDecimal,
 }
 
 impl Tabular for CacheHit {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            name: row.get::<_, Option<String>>(0).unwrap_or_default(),
-            ratio: row.get::<_, Option<Decimal>>(1).unwrap_or(dec!(0)),
+            name: row.try_get("name").unwrap_or_default(),
+            ratio: row.try_get("ratio").unwrap_or_default(),
         }
     }
 

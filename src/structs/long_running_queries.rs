@@ -1,28 +1,26 @@
 use crate::structs::shared::{get_default_interval, Tabular};
-use pg_interval::Interval;
-use postgres::Row;
+use sqlx::postgres::types::PgInterval;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct LongRunningQueries {
-    pid: String,
-    duration: String,
+    pid: i32,
+    duration: PgInterval,
     query: String,
 }
 
 impl Tabular for LongRunningQueries {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            pid: row.get::<_, Option<i32>>(0).unwrap_or_default().to_string(),
-            duration: row
-                .get::<_, Option<Interval>>(1)
-                .unwrap_or(get_default_interval())
-                .to_iso_8601(),
-            query: row.get::<_, Option<String>>(2).unwrap_or_default(),
+            pid: row.try_get("pid").unwrap_or_default(),
+            duration: row.try_get("duration").unwrap_or(get_default_interval()),
+            query: row.try_get("query").unwrap_or_default(),
         }
     }
 
     fn to_row(&self) -> prettytable::Row {
-        row![self.pid, self.duration, self.query]
+        row![self.pid, format!("{:?}", self.duration), self.query]
     }
 
     fn headers() -> prettytable::Row {

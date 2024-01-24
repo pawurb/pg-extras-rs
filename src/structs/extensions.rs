@@ -1,5 +1,6 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct Extensions {
@@ -10,12 +11,12 @@ pub struct Extensions {
 }
 
 impl Tabular for Extensions {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            name: row.get::<_, Option<String>>(0).unwrap_or_default(),
-            default_version: row.get::<_, Option<String>>(1).unwrap_or_default(),
-            installed_version: row.get::<_, Option<String>>(2).unwrap_or_default(),
-            comment: row.get::<_, Option<String>>(3).unwrap_or_default(),
+            name: row.try_get("name").unwrap_or_default(),
+            default_version: row.try_get("default_version").unwrap_or_default(),
+            installed_version: row.try_get("installed_version").unwrap_or_default(),
+            comment: row.try_get("comment").unwrap_or_default(),
         }
     }
 

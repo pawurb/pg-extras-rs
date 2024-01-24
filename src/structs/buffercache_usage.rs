@@ -1,5 +1,6 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct BuffercacheUsage {
@@ -8,10 +9,10 @@ pub struct BuffercacheUsage {
 }
 
 impl Tabular for BuffercacheUsage {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            relname: row.get::<_, Option<String>>(0).unwrap_or_default(),
-            buffers: row.get::<_, Option<i64>>(1).unwrap_or_default(),
+            relname: row.try_get("relname").unwrap_or_default(),
+            buffers: row.try_get("buffers").unwrap_or_default(),
         }
     }
 

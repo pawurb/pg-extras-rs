@@ -1,5 +1,6 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct IndexUsage {
@@ -9,11 +10,13 @@ pub struct IndexUsage {
 }
 
 impl Tabular for IndexUsage {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            relname: row.get::<_, Option<String>>(0).unwrap_or_default(),
-            percent_of_times_index_used: row.get::<_, Option<String>>(1).unwrap_or_default(),
-            rows_in_table: row.get::<_, Option<i64>>(2).unwrap_or_default(),
+            relname: row.try_get("relname").unwrap_or_default(),
+            percent_of_times_index_used: row
+                .try_get("percent_of_times_index_used")
+                .unwrap_or_default(),
+            rows_in_table: row.try_get("rows_in_table").unwrap_or_default(),
         }
     }
 

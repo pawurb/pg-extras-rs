@@ -1,5 +1,6 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct UnusedIndexes {
@@ -10,12 +11,12 @@ pub struct UnusedIndexes {
 }
 
 impl Tabular for UnusedIndexes {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            table: row.get::<_, Option<String>>(0).unwrap_or_default(),
-            index: row.get::<_, Option<String>>(1).unwrap_or_default(),
-            index_size: row.get::<_, Option<String>>(2).unwrap_or_default(),
-            index_scans: row.get::<_, Option<i64>>(3).unwrap_or_default(),
+            table: row.try_get("table").unwrap_or_default(),
+            index: row.try_get("index").unwrap_or_default(),
+            index_size: row.try_get("index_size").unwrap_or_default(),
+            index_scans: row.try_get("index_scans").unwrap_or_default(),
         }
     }
 

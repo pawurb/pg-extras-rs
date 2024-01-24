@@ -1,5 +1,6 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct TotalIndexSize {
@@ -7,9 +8,9 @@ pub struct TotalIndexSize {
 }
 
 impl Tabular for TotalIndexSize {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            size: row.get::<_, Option<String>>(0).unwrap_or_default(),
+            size: row.try_get("size").unwrap_or_default(),
         }
     }
 

@@ -1,5 +1,6 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct VacuumStats {
@@ -14,16 +15,16 @@ pub struct VacuumStats {
 }
 
 impl Tabular for VacuumStats {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            schema: row.get::<_, Option<String>>(0).unwrap_or_default(),
-            table: row.get::<_, Option<String>>(1).unwrap_or_default(),
-            last_vacuum: row.get::<_, Option<String>>(2).unwrap_or_default(),
-            last_autovacuum: row.get::<_, Option<String>>(3).unwrap_or_default(),
-            rowcount: row.get::<_, Option<String>>(4).unwrap_or_default(),
-            dead_rowcount: row.get::<_, Option<String>>(4).unwrap_or_default(),
-            autovacuum_threshold: row.get::<_, Option<String>>(4).unwrap_or_default(),
-            expect_autovacuum: row.get::<_, Option<String>>(7).unwrap_or_default(),
+            schema: row.try_get("schema").unwrap_or_default(),
+            table: row.try_get("table").unwrap_or_default(),
+            last_vacuum: row.try_get("last_vacuum").unwrap_or_default(),
+            last_autovacuum: row.try_get("last_autovacuum").unwrap_or_default(),
+            rowcount: row.try_get("rowcount").unwrap_or_default(),
+            dead_rowcount: row.try_get("dead_rowcount").unwrap_or_default(),
+            autovacuum_threshold: row.try_get("autovacuum_threshold").unwrap_or_default(),
+            expect_autovacuum: row.try_get("expect_autovacuum").unwrap_or_default(),
         }
     }
 

@@ -1,23 +1,22 @@
 use crate::structs::shared::Tabular;
-use postgres::Row;
-use rust_decimal::prelude::Decimal;
-use rust_decimal_macros::dec;
+use sqlx::postgres::PgRow;
+use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct BuffercacheStats {
     relname: String,
     buffered: String,
-    buffer_percent: Decimal,
-    percent_of_relation: Decimal,
+    buffer_percent: f64,
+    percent_of_relation: f64,
 }
 
 impl Tabular for BuffercacheStats {
-    fn new(row: &Row) -> Self {
+    fn new(row: &PgRow) -> Self {
         Self {
-            relname: row.get::<_, Option<String>>(0).unwrap_or_default(),
-            buffered: row.get::<_, Option<String>>(1).unwrap_or_default(),
-            buffer_percent: row.get::<_, Option<Decimal>>(2).unwrap_or(dec!(0)),
-            percent_of_relation: row.get::<_, Option<Decimal>>(2).unwrap_or(dec!(0)),
+            relname: row.try_get("relname").unwrap_or_default(),
+            buffered: row.try_get("buffered").unwrap_or_default(),
+            buffer_percent: row.try_get("buffer_percent").unwrap_or_default(),
+            percent_of_relation: row.try_get("percent_of_relation").unwrap_or_default(),
         }
     }
 
