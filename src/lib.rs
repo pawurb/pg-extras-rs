@@ -318,7 +318,7 @@ pub enum PgExtrasError {
     #[error("Both $DATABASE_URL and $PG_EXTRAS_DATABASE_URL are not set")]
     MissingConfigVars(),
     #[error("Cannot connect to database")]
-    DbConnectionError(),
+    DbConnectionError(String),
     #[error("Unknown pg-extras error")]
     Unknown(String),
 }
@@ -330,12 +330,12 @@ async fn get_rows<T: Tabular>(query: &str) -> Result<Vec<T>, PgExtrasError> {
         .await
     {
         Ok(pool) => pool,
-        Err(_) => return Err(PgExtrasError::DbConnectionError()),
+        Err(e) => return Err(PgExtrasError::DbConnectionError(format!("{}", e))),
     };
 
     Ok(match sqlx::query(query).fetch_all(&pool).await {
         Ok(rows) => rows.iter().map(T::new).collect(),
-        Err(e) => return Err(PgExtrasError::Unknown(format!("An error occurred: {}", e))),
+        Err(e) => return Err(PgExtrasError::Unknown(format!("{}", e))),
     })
 }
 
