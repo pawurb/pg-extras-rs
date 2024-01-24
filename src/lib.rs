@@ -318,7 +318,7 @@ pub enum PgExtrasError {
     #[error("Both $DATABASE_URL and $PG_EXTRAS_DATABASE_URL are not set")]
     MissingConfigVars(),
     #[error("Cannot connect to database")]
-    ConnectionError(),
+    DbConnectionError(),
     #[error("Unknown pg-extras error")]
     Unknown(String),
 }
@@ -330,7 +330,7 @@ async fn get_rows<T: Tabular>(query: &str) -> Result<Vec<T>, PgExtrasError> {
         .await
     {
         Ok(pool) => pool,
-        Err(_) => return Err(PgExtrasError::ConnectionError()),
+        Err(_) => return Err(PgExtrasError::DbConnectionError()),
     };
 
     Ok(match sqlx::query(query).fetch_all(&pool).await {
@@ -349,8 +349,24 @@ fn db_url() -> Result<String, PgExtrasError> {
 mod tests {
     use super::*;
 
+    async fn setup() -> Result<(), Box<dyn std::error::Error>> {
+        let pool = PgPoolOptions::new()
+            .max_connections(5)
+            .connect(db_url()?.as_str())
+            .await?;
+
+        for extension in ["sslinfo", "pg_stat_statements", "pg_buffercache"] {
+            let query = format!("CREATE EXTENSION IF NOT EXISTS {};", extension);
+            sqlx::query(&query).execute(&pool).await?;
+        }
+
+        Ok(())
+    }
+
     #[tokio::test]
-    async fn it_works() -> Result<(), PgExtrasError> {
+    async fn it_works() -> Result<(), Box<dyn std::error::Error>> {
+        setup().await?;
+
         render_table(cache_hit(None).await?);
         render_table(bloat().await?);
         render_table(blocking(None).await?);
@@ -384,6 +400,7 @@ mod tests {
         render_table(ssl_used().await?);
         render_table(connections().await?);
         render_table(db_settings().await?);
+
         Ok(())
     }
 }
