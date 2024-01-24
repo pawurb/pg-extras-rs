@@ -1,5 +1,6 @@
 use std::env;
 pub mod structs;
+use sqlx::postgres::PgPoolOptions;
 pub use structs::all_locks::AllLocks;
 pub use structs::bloat::Bloat;
 pub use structs::blocking::Blocking;
@@ -319,11 +320,10 @@ pub enum PgExtrasError {
     #[error("Cannot connect to database")]
     ConnectionError(),
     #[error("Unknown pg-extras error")]
-    Unknown,
+    Unknown(String),
 }
 
 async fn get_rows<T: Tabular>(query: &str) -> Result<Vec<T>, PgExtrasError> {
-    use sqlx::postgres::PgPoolOptions;
     let pool = match PgPoolOptions::new()
         .max_connections(5)
         .connect(db_url()?.as_str())
@@ -335,7 +335,7 @@ async fn get_rows<T: Tabular>(query: &str) -> Result<Vec<T>, PgExtrasError> {
 
     Ok(match sqlx::query(query).fetch_all(&pool).await {
         Ok(rows) => rows.iter().map(T::new).collect(),
-        Err(_) => return Err(PgExtrasError::Unknown),
+        Err(e) => return Err(PgExtrasError::Unknown(format!("An error occurred: {}", e))),
     })
 }
 
@@ -347,8 +347,6 @@ fn db_url() -> Result<String, PgExtrasError> {
 
 #[cfg(test)]
 mod tests {
-    use crate::structs::db_settings;
-
     use super::*;
 
     #[tokio::test]
@@ -385,7 +383,7 @@ mod tests {
         render_table(buffercache_usage().await?);
         render_table(ssl_used().await?);
         render_table(connections().await?);
-        // render_table(db_settings().await?);
+        render_table(db_settings().await?);
         Ok(())
     }
 }

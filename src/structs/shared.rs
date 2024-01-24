@@ -1,5 +1,4 @@
-use sqlx::postgres::types::PgInterval;
-use sqlx::postgres::PgRow;
+use sqlx::postgres::{types::PgInterval, PgRow};
 use std::env;
 
 pub trait Tabular {

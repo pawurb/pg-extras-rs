@@ -1,6 +1,5 @@
 use crate::structs::shared::{get_default_interval, Tabular};
-use sqlx::postgres::types::PgInterval;
-use sqlx::postgres::PgRow;
+use sqlx::postgres::{types::PgInterval, PgRow};
 use sqlx::Row;
 
 #[derive(Debug, Clone)]
