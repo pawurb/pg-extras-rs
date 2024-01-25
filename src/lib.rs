@@ -53,63 +53,63 @@ pub fn render_table<T: Tabular>(items: Vec<T>) {
 
 pub async fn bloat() -> Result<Vec<Bloat>, PgExtrasError> {
     let query = Query::read_file(Query::Bloat);
-    get_rows::<Bloat>(query).await
+    get_rows(query).await
 }
 
 pub async fn blocking(limit: Option<String>) -> Result<Vec<Blocking>, PgExtrasError> {
     let limit = limit.unwrap_or("10".to_string());
     let query = Query::read_file(Query::Blocking).replace("%{limit}", limit.as_str());
-    get_rows::<Blocking>(&query).await
+    get_rows(&query).await
 }
 
 pub async fn calls(limit: Option<String>) -> Result<Vec<Calls>, PgExtrasError> {
     let limit = limit.unwrap_or("10".to_string());
     let query = Query::read_file(Query::Calls).replace("%{limit}", limit.as_str());
-    get_rows::<Calls>(&query).await
+    get_rows(&query).await
 }
 
 pub async fn extensions() -> Result<Vec<Extensions>, PgExtrasError> {
     let query = Query::read_file(Query::Extensions);
-    get_rows::<Extensions>(query).await
+    get_rows(query).await
 }
 
 pub async fn table_cache_hit() -> Result<Vec<TableCacheHit>, PgExtrasError> {
     let query = Query::read_file(Query::TableCacheHit);
-    get_rows::<TableCacheHit>(query).await
+    get_rows(query).await
 }
 
 pub async fn tables(schema: Option<String>) -> Result<Vec<Tables>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::Tables).replace("%{schema}", &schema_name);
-    get_rows::<Tables>(&query).await
+    get_rows(&query).await
 }
 
 pub async fn index_cache_hit(schema: Option<String>) -> Result<Vec<IndexCacheHit>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::IndexCacheHit).replace("%{schema}", &schema_name);
-    get_rows::<IndexCacheHit>(&query).await
+    get_rows(&query).await
 }
 
 pub async fn indexes() -> Result<Vec<Indexes>, PgExtrasError> {
     let query = Query::read_file(Query::Indexes);
-    get_rows::<Indexes>(query).await
+    get_rows(query).await
 }
 
 pub async fn index_size() -> Result<Vec<IndexSize>, PgExtrasError> {
     let query = Query::read_file(Query::IndexSize);
-    get_rows::<IndexSize>(query).await
+    get_rows(query).await
 }
 
 pub async fn index_usage(schema: Option<String>) -> Result<Vec<IndexUsage>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::IndexUsage).replace("%{schema}", &schema_name);
-    get_rows::<IndexUsage>(&query).await
+    get_rows(&query).await
 }
 
 pub async fn index_scans(schema: Option<String>) -> Result<Vec<IndexScans>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::IndexScans).replace("%{schema}", &schema_name);
-    get_rows::<IndexScans>(&query).await
+    get_rows(&query).await
 }
 
 pub async fn null_indexes(
@@ -118,44 +118,44 @@ pub async fn null_indexes(
     let min_relation_size_mb = min_relation_size_mb.unwrap_or("0".to_string());
     let query = Query::read_file(Query::NullIndexes)
         .replace("%{min_relation_size_mb}", &min_relation_size_mb);
-    get_rows::<NullIndexes>(&query).await
+    get_rows(&query).await
 }
 
 pub async fn locks() -> Result<Vec<Locks>, PgExtrasError> {
     let query = Query::read_file(Query::Locks);
-    get_rows::<Locks>(query).await
+    get_rows(query).await
 }
 
 pub async fn all_locks() -> Result<Vec<AllLocks>, PgExtrasError> {
     let query = Query::read_file(Query::AllLocks);
-    get_rows::<AllLocks>(query).await
+    get_rows(query).await
 }
 
 pub async fn long_running_queries() -> Result<Vec<LongRunningQueries>, PgExtrasError> {
     let query = Query::read_file(Query::LongRunningQueries);
-    get_rows::<LongRunningQueries>(query).await
+    get_rows(query).await
 }
 
 pub async fn mandelbrot() -> Result<Vec<Mandelbrot>, PgExtrasError> {
     let query = Query::read_file(Query::Mandelbrot);
-    get_rows::<Mandelbrot>(query).await
+    get_rows(query).await
 }
 
 pub async fn outliers() -> Result<Vec<Outliers>, PgExtrasError> {
     let query = Query::read_file(Query::Outliers);
-    get_rows::<Outliers>(query).await
+    get_rows(query).await
 }
 
 pub async fn records_rank(schema: Option<String>) -> Result<Vec<RecordsRank>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::RecordsRank).replace("%{schema}", schema_name.as_str());
-    get_rows::<RecordsRank>(&query).await
+    get_rows(&query).await
 }
 
 pub async fn seq_scans(schema: Option<String>) -> Result<Vec<SeqScans>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::SeqScans).replace("%{schema}", schema_name.as_str());
-    get_rows::<SeqScans>(&query).await
+    get_rows(&query).await
 }
 
 pub async fn table_index_scans(
@@ -163,7 +163,7 @@ pub async fn table_index_scans(
 ) -> Result<Vec<TableIndexScans>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::TableIndexScans).replace("%{schema}", schema_name.as_str());
-    get_rows::<TableIndexScans>(&query).await
+    get_rows(&query).await
 }
 
 pub async fn table_indexes_size(
@@ -172,69 +172,69 @@ pub async fn table_indexes_size(
     let schema_name = schema.unwrap_or(get_default_schema());
     let query =
         Query::read_file(Query::TableIndexesSize).replace("%{schema}", schema_name.as_str());
-    get_rows::<TableIndexesSize>(&query).await
+    get_rows(&query).await
 }
 
 pub async fn table_size() -> Result<Vec<TableSize>, PgExtrasError> {
     let query = Query::read_file(Query::TableSize);
-    get_rows::<TableSize>(query).await
+    get_rows(query).await
 }
 
 pub async fn total_index_size() -> Result<Vec<TotalIndexSize>, PgExtrasError> {
     let query = Query::read_file(Query::TotalIndexSize);
-    get_rows::<TotalIndexSize>(query).await
+    get_rows(query).await
 }
 
 pub async fn total_table_size() -> Result<Vec<TotalTableSize>, PgExtrasError> {
     let query = Query::read_file(Query::TotalTableSize);
-    get_rows::<TotalTableSize>(query).await
+    get_rows(query).await
 }
 
 pub async fn unused_indexes(schema: Option<String>) -> Result<Vec<UnusedIndexes>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::UnusedIndexes).replace("%{schema}", schema_name.as_str());
-    get_rows::<UnusedIndexes>(&query).await
+    get_rows(&query).await
 }
 
 pub async fn duplicate_indexes() -> Result<Vec<DuplicateIndexes>, PgExtrasError> {
     let query = Query::read_file(Query::DuplicateIndexes);
-    get_rows::<DuplicateIndexes>(query).await
+    get_rows(query).await
 }
 
 pub async fn vacuum_stats() -> Result<Vec<VacuumStats>, PgExtrasError> {
     let query = Query::read_file(Query::VacuumStats);
-    get_rows::<VacuumStats>(query).await
+    get_rows(query).await
 }
 
 pub async fn buffercache_stats() -> Result<Vec<BuffercacheStats>, PgExtrasError> {
     let query = Query::read_file(Query::BuffercacheStats);
-    get_rows::<BuffercacheStats>(query).await
+    get_rows(query).await
 }
 
 pub async fn buffercache_usage() -> Result<Vec<BuffercacheUsage>, PgExtrasError> {
     let query = Query::read_file(Query::BuffercacheUsage);
-    get_rows::<BuffercacheUsage>(query).await
+    get_rows(query).await
 }
 
 pub async fn ssl_used() -> Result<Vec<SslUsed>, PgExtrasError> {
     let query = Query::read_file(Query::SslUsed);
-    get_rows::<SslUsed>(query).await
+    get_rows(query).await
 }
 
 pub async fn connections() -> Result<Vec<Connections>, PgExtrasError> {
     let query = Query::read_file(Query::Connections);
-    get_rows::<Connections>(query).await
+    get_rows(query).await
 }
 
 pub async fn cache_hit(schema: Option<String>) -> Result<Vec<CacheHit>, PgExtrasError> {
     let schema_name = schema.unwrap_or(get_default_schema());
     let query = Query::read_file(Query::CacheHit).replace("%{schema}", schema_name.as_str());
-    get_rows::<CacheHit>(&query).await
+    get_rows(&query).await
 }
 
 pub async fn db_settings() -> Result<Vec<DbSetting>, PgExtrasError> {
     let query = Query::read_file(Query::DbSettings);
-    get_rows::<DbSetting>(query).await
+    get_rows(query).await
 }
 
 enum Query {
