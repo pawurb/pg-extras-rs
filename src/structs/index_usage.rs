@@ -1,4 +1,4 @@
-use crate::structs::shared::{Query, Tabular};
+use crate::structs::shared::Tabular;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -10,8 +10,6 @@ pub struct IndexUsage {
 }
 
 impl Tabular for IndexUsage {
-    const FILE_NAME: Query = Query::IndexUsage;
-
     fn new(row: &PgRow) -> Self {
         Self {
             relname: row.try_get("relname").unwrap_or_default(),
@@ -32,5 +30,9 @@ impl Tabular for IndexUsage {
 
     fn headers() -> prettytable::Row {
         row!["relname", "percent_of_times_index_used", "rows_in_table"]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/index_usage.sql")
     }
 }

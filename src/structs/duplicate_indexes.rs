@@ -1,4 +1,4 @@
-use crate::structs::shared::{Query, Tabular};
+use crate::structs::shared::Tabular;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -12,8 +12,6 @@ pub struct DuplicateIndexes {
 }
 
 impl Tabular for DuplicateIndexes {
-    const FILE_NAME: Query = Query::DuplicateIndexes;
-
     fn new(row: &PgRow) -> Self {
         Self {
             size: row.try_get("size").unwrap_or_default(),
@@ -30,5 +28,9 @@ impl Tabular for DuplicateIndexes {
 
     fn headers() -> prettytable::Row {
         row!["size", "idx1", "idx2", "idx3", "idx4"]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/duplicate_indexes.sql")
     }
 }

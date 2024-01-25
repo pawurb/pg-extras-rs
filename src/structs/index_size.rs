@@ -1,4 +1,4 @@
-use crate::structs::shared::{Query, Tabular};
+use crate::structs::shared::Tabular;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -10,8 +10,6 @@ pub struct IndexSize {
 }
 
 impl Tabular for IndexSize {
-    const FILE_NAME: Query = Query::IndexSize;
-
     fn new(row: &PgRow) -> Self {
         Self {
             name: row.try_get("name").unwrap_or_default(),
@@ -26,5 +24,9 @@ impl Tabular for IndexSize {
 
     fn headers() -> prettytable::Row {
         row!["name", "size", "schema"]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/index_size.sql")
     }
 }

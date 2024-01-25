@@ -1,4 +1,4 @@
-use crate::structs::shared::{get_default_interval, Query, Tabular};
+use crate::structs::shared::{get_default_interval, Tabular};
 use sqlx::postgres::{types::PgInterval, PgRow};
 use sqlx::Row;
 
@@ -12,8 +12,6 @@ pub struct Outliers {
 }
 
 impl Tabular for Outliers {
-    const FILE_NAME: Query = Query::Outliers;
-
     fn new(row: &PgRow) -> Self {
         Self {
             total_exec_time: row
@@ -46,5 +44,9 @@ impl Tabular for Outliers {
             "ncalls",
             "sync_io_time"
         ]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/outliers.sql")
     }
 }

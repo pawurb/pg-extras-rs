@@ -1,4 +1,4 @@
-use crate::structs::shared::{Query, Tabular};
+use crate::structs::shared::Tabular;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -11,8 +11,6 @@ pub struct DbSettings {
 }
 
 impl Tabular for DbSettings {
-    const FILE_NAME: Query = Query::DbSettings;
-
     fn new(row: &PgRow) -> Self {
         Self {
             name: row.try_get("name").unwrap_or_default(),
@@ -28,5 +26,9 @@ impl Tabular for DbSettings {
 
     fn headers() -> prettytable::Row {
         row!["name", "setting", "unit", "short_desc"]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/db_settings.sql")
     }
 }

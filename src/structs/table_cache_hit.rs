@@ -1,4 +1,4 @@
-use crate::structs::shared::{Query, Tabular};
+use crate::structs::shared::Tabular;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -12,8 +12,6 @@ pub struct TableCacheHit {
 }
 
 impl Tabular for TableCacheHit {
-    const FILE_NAME: Query = Query::TableCacheHit;
-
     fn new(row: &PgRow) -> Self {
         Self {
             name: row.try_get("name").unwrap_or_default(),
@@ -36,5 +34,9 @@ impl Tabular for TableCacheHit {
 
     fn headers() -> prettytable::Row {
         row!["name", "buffer_hits", "block_reads", "total_read", "ratio"]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/table_cache_hit.sql")
     }
 }

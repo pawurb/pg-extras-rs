@@ -1,4 +1,4 @@
-use crate::structs::shared::{Query, Tabular};
+use crate::structs::shared::Tabular;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -11,8 +11,6 @@ pub struct UnusedIndexes {
 }
 
 impl Tabular for UnusedIndexes {
-    const FILE_NAME: Query = Query::UnusedIndexes;
-
     fn new(row: &PgRow) -> Self {
         Self {
             table: row.try_get("table").unwrap_or_default(),
@@ -28,5 +26,9 @@ impl Tabular for UnusedIndexes {
 
     fn headers() -> prettytable::Row {
         row!["table", "index", "index_size", "index_scans"]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/unused_indexes.sql")
     }
 }

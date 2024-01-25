@@ -1,4 +1,4 @@
-use crate::structs::shared::{Query, Tabular};
+use crate::structs::shared::Tabular;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -9,8 +9,6 @@ pub struct RecordsRank {
 }
 
 impl Tabular for RecordsRank {
-    const FILE_NAME: Query = Query::RecordsRank;
-
     fn new(row: &PgRow) -> Self {
         Self {
             name: row.try_get("name").unwrap_or_default(),
@@ -24,5 +22,9 @@ impl Tabular for RecordsRank {
 
     fn headers() -> prettytable::Row {
         row!["name", "estimated_count"]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/records_rank.sql")
     }
 }

@@ -1,4 +1,4 @@
-use crate::structs::shared::{get_default_interval, Query, Tabular};
+use crate::structs::shared::{get_default_interval, Tabular};
 use sqlx::postgres::{types::PgInterval, PgRow};
 use sqlx::Row;
 
@@ -10,8 +10,6 @@ pub struct LongRunningQueries {
 }
 
 impl Tabular for LongRunningQueries {
-    const FILE_NAME: Query = Query::LongRunningQueries;
-
     fn new(row: &PgRow) -> Self {
         Self {
             pid: row.try_get("pid").unwrap_or_default(),
@@ -26,5 +24,9 @@ impl Tabular for LongRunningQueries {
 
     fn headers() -> prettytable::Row {
         row!["pid", "duration", "query"]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/long_running_queries.sql")
     }
 }

@@ -1,4 +1,4 @@
-use crate::structs::shared::{get_default_interval, Query, Tabular};
+use crate::structs::shared::{get_default_interval, Tabular};
 use sqlx::postgres::{types::PgInterval, PgRow};
 use sqlx::Row;
 
@@ -15,8 +15,6 @@ pub struct Locks {
 }
 
 impl Tabular for Locks {
-    const FILE_NAME: Query = Query::Locks;
-
     fn new(row: &PgRow) -> Self {
         Self {
             pid: row.try_get("pid").unwrap_or_default(),
@@ -54,5 +52,9 @@ impl Tabular for Locks {
             "age",
             "application"
         ]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/locks.sql")
     }
 }

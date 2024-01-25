@@ -1,4 +1,4 @@
-use crate::structs::shared::{Query, Tabular};
+use crate::structs::shared::Tabular;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -8,8 +8,6 @@ pub struct SslUsed {
 }
 
 impl Tabular for SslUsed {
-    const FILE_NAME: Query = Query::SslUsed;
-
     fn new(row: &PgRow) -> Self {
         Self {
             ssl_used: row.try_get("ssl_used").unwrap_or(false),
@@ -22,5 +20,9 @@ impl Tabular for SslUsed {
 
     fn headers() -> prettytable::Row {
         row!["ssl_used"]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/ssl_used.sql")
     }
 }

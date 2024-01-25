@@ -1,4 +1,4 @@
-use crate::structs::shared::{Query, Tabular};
+use crate::structs::shared::Tabular;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -11,8 +11,6 @@ pub struct BuffercacheStats {
 }
 
 impl Tabular for BuffercacheStats {
-    const FILE_NAME: Query = Query::BuffercacheStats;
-
     fn new(row: &PgRow) -> Self {
         Self {
             relname: row.try_get("relname").unwrap_or_default(),
@@ -38,5 +36,9 @@ impl Tabular for BuffercacheStats {
             "buffer_percent",
             "percent_of_relation"
         ]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/buffercache_stats.sql")
     }
 }

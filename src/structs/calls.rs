@@ -1,4 +1,4 @@
-use crate::structs::shared::{get_default_interval, Query, Tabular};
+use crate::structs::shared::{get_default_interval, Tabular};
 use sqlx::postgres::{types::PgInterval, PgRow};
 use sqlx::Row;
 
@@ -12,8 +12,6 @@ pub struct Calls {
 }
 
 impl Tabular for Calls {
-    const FILE_NAME: Query = Query::Calls;
-
     fn new(row: &PgRow) -> Self {
         Self {
             qry: row.try_get("qry").unwrap_or_default(),
@@ -44,5 +42,9 @@ impl Tabular for Calls {
             "ncalls",
             "sync_io_time"
         ]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/calls.sql")
     }
 }

@@ -1,4 +1,4 @@
-use crate::structs::shared::{Query, Tabular};
+use crate::structs::shared::Tabular;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -12,8 +12,6 @@ pub struct IndexScans {
 }
 
 impl Tabular for IndexScans {
-    const FILE_NAME: Query = Query::IndexScans;
-
     fn new(row: &PgRow) -> Self {
         Self {
             schemaname: row.try_get("schemaname").unwrap_or_default(),
@@ -36,5 +34,9 @@ impl Tabular for IndexScans {
 
     fn headers() -> prettytable::Row {
         row!["schemaname", "table", "index", "index_size", "index_scans"]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/index_scans.sql")
     }
 }

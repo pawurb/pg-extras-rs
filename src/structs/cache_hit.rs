@@ -1,4 +1,4 @@
-use crate::structs::shared::{Query, Tabular};
+use crate::structs::shared::Tabular;
 use sqlx::postgres::PgRow;
 use sqlx::types::BigDecimal;
 use sqlx::Row;
@@ -10,8 +10,6 @@ pub struct CacheHit {
 }
 
 impl Tabular for CacheHit {
-    const FILE_NAME: Query = Query::CacheHit;
-
     fn new(row: &PgRow) -> Self {
         Self {
             name: row.try_get("name").unwrap_or_default(),
@@ -25,5 +23,9 @@ impl Tabular for CacheHit {
 
     fn headers() -> prettytable::Row {
         row!["name", "ratio"]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/cache_hit.sql")
     }
 }

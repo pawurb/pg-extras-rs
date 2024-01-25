@@ -1,4 +1,4 @@
-use crate::structs::shared::{Query, Tabular};
+use crate::structs::shared::Tabular;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -11,8 +11,6 @@ pub struct Extensions {
 }
 
 impl Tabular for Extensions {
-    const FILE_NAME: Query = Query::Extensions;
-
     fn new(row: &PgRow) -> Self {
         Self {
             name: row.try_get("name").unwrap_or_default(),
@@ -33,5 +31,9 @@ impl Tabular for Extensions {
 
     fn headers() -> prettytable::Row {
         row!["name", "default_version", "installed_version", "comment"]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/extensions.sql")
     }
 }

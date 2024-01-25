@@ -1,4 +1,4 @@
-use crate::structs::shared::{Query, Tabular};
+use crate::structs::shared::Tabular;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -10,8 +10,6 @@ pub struct Connections {
 }
 
 impl Tabular for Connections {
-    const FILE_NAME: Query = Query::Connections;
-
     fn new(row: &PgRow) -> Self {
         Self {
             username: row.try_get("username").unwrap_or_default(),
@@ -26,5 +24,9 @@ impl Tabular for Connections {
 
     fn headers() -> prettytable::Row {
         row!["username", "pid", "client_addr"]
+    }
+
+    fn read_file() -> &'static str {
+        include_str!("../queries/connections.sql")
     }
 }
