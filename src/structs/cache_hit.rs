@@ -1,4 +1,4 @@
-use crate::structs::shared::Tabular;
+use crate::structs::shared::{Query, Tabular};
 use sqlx::postgres::PgRow;
 use sqlx::types::BigDecimal;
 use sqlx::Row;
@@ -10,6 +10,8 @@ pub struct CacheHit {
 }
 
 impl Tabular for CacheHit {
+    const FILE_NAME: Query = Query::CacheHit;
+
     fn new(row: &PgRow) -> Self {
         Self {
             name: row.try_get("name").unwrap_or_default(),

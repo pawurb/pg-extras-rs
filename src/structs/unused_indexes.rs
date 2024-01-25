@@ -1,4 +1,4 @@
-use crate::structs::shared::Tabular;
+use crate::structs::shared::{Query, Tabular};
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -11,6 +11,8 @@ pub struct UnusedIndexes {
 }
 
 impl Tabular for UnusedIndexes {
+    const FILE_NAME: Query = Query::UnusedIndexes;
+
     fn new(row: &PgRow) -> Self {
         Self {
             table: row.try_get("table").unwrap_or_default(),

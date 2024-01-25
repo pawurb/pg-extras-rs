@@ -1,4 +1,4 @@
-use crate::structs::shared::{get_default_interval, Tabular};
+use crate::structs::shared::{get_default_interval, Query, Tabular};
 use sqlx::postgres::{types::PgInterval, PgRow};
 use sqlx::Row;
 
@@ -15,6 +15,8 @@ pub struct Blocking {
 }
 
 impl Tabular for Blocking {
+    const FILE_NAME: Query = Query::Blocking;
+
     fn new(row: &PgRow) -> Self {
         Self {
             blocked_pid: row.try_get("blocked_pid").unwrap_or_default(),

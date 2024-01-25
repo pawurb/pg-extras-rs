@@ -1,4 +1,4 @@
-use crate::structs::shared::Tabular;
+use crate::structs::shared::{Query, Tabular};
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -9,6 +9,8 @@ pub struct TotalTableSize {
 }
 
 impl Tabular for TotalTableSize {
+    const FILE_NAME: Query = Query::TotalTableSize;
+
     fn new(row: &PgRow) -> Self {
         Self {
             name: row.try_get("name").unwrap_or_default(),

@@ -1,4 +1,4 @@
-use crate::structs::shared::Tabular;
+use crate::structs::shared::{Query, Tabular};
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -10,6 +10,8 @@ pub struct Connections {
 }
 
 impl Tabular for Connections {
+    const FILE_NAME: Query = Query::Connections;
+
     fn new(row: &PgRow) -> Self {
         Self {
             username: row.try_get("username").unwrap_or_default(),

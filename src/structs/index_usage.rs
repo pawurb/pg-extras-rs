@@ -1,4 +1,4 @@
-use crate::structs::shared::Tabular;
+use crate::structs::shared::{Query, Tabular};
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -10,6 +10,8 @@ pub struct IndexUsage {
 }
 
 impl Tabular for IndexUsage {
+    const FILE_NAME: Query = Query::IndexUsage;
+
     fn new(row: &PgRow) -> Self {
         Self {
             relname: row.try_get("relname").unwrap_or_default(),

@@ -1,4 +1,4 @@
-use crate::structs::shared::Tabular;
+use crate::structs::shared::{Query, Tabular};
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -9,6 +9,8 @@ pub struct TableIndexScans {
 }
 
 impl Tabular for TableIndexScans {
+    const FILE_NAME: Query = Query::TableIndexScans;
+
     fn new(row: &PgRow) -> Self {
         Self {
             name: row.try_get("name").unwrap_or_default(),

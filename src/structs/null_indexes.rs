@@ -1,4 +1,4 @@
-use crate::structs::shared::Tabular;
+use crate::structs::shared::{Query, Tabular};
 use sqlx::postgres::types::Oid;
 use sqlx::postgres::PgRow;
 use sqlx::Row;
@@ -17,6 +17,8 @@ pub struct NullIndexes {
 }
 
 impl Tabular for NullIndexes {
+    const FILE_NAME: Query = Query::NullIndexes;
+
     fn new(row: &PgRow) -> Self {
         Self {
             oid: row.try_get("oid").unwrap_or_default(),

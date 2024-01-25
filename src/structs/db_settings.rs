@@ -1,16 +1,18 @@
-use crate::structs::shared::Tabular;
+use crate::structs::shared::{Query, Tabular};
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
 #[derive(Debug, Clone)]
-pub struct DbSetting {
+pub struct DbSettings {
     name: String,
     setting: String,
     unit: String,
     short_desc: String,
 }
 
-impl Tabular for DbSetting {
+impl Tabular for DbSettings {
+    const FILE_NAME: Query = Query::DbSettings;
+
     fn new(row: &PgRow) -> Self {
         Self {
             name: row.try_get("name").unwrap_or_default(),

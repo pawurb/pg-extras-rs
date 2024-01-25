@@ -1,4 +1,4 @@
-use crate::structs::shared::Tabular;
+use crate::structs::shared::{Query, Tabular};
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -8,6 +8,8 @@ pub struct SslUsed {
 }
 
 impl Tabular for SslUsed {
+    const FILE_NAME: Query = Query::SslUsed;
+
     fn new(row: &PgRow) -> Self {
         Self {
             ssl_used: row.try_get("ssl_used").unwrap_or(false),

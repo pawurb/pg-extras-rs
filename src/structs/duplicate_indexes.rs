@@ -1,4 +1,4 @@
-use crate::structs::shared::Tabular;
+use crate::structs::shared::{Query, Tabular};
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -12,6 +12,8 @@ pub struct DuplicateIndexes {
 }
 
 impl Tabular for DuplicateIndexes {
+    const FILE_NAME: Query = Query::DuplicateIndexes;
+
     fn new(row: &PgRow) -> Self {
         Self {
             size: row.try_get("size").unwrap_or_default(),

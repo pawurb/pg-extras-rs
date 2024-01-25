@@ -1,4 +1,4 @@
-use crate::structs::shared::Tabular;
+use crate::structs::shared::{Query, Tabular};
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -15,6 +15,8 @@ pub struct VacuumStats {
 }
 
 impl Tabular for VacuumStats {
+    const FILE_NAME: Query = Query::VacuumStats;
+
     fn new(row: &PgRow) -> Self {
         Self {
             schema: row.try_get("schema").unwrap_or_default(),

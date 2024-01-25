@@ -173,14 +173,14 @@ The same as `cache_hit` with each table's cache hit info displayed seperately.
 ### `db_settings`
 
 ```rust
-struct DbSetting {
+struct DbSettings {
     name: String,
     setting: String,
     unit: String,
     short_desc: String,
 }
 
-db_settings() -> Result<Vec<DbSetting>, PgExtrasError>
+db_settings() -> Result<Vec<DbSettings>, PgExtrasError>
 
              name             | setting | unit |
 ------------------------------+---------+------+

@@ -1,4 +1,4 @@
-use crate::structs::shared::Tabular;
+use crate::structs::shared::{Query, Tabular};
 use sqlx::postgres::PgRow;
 use sqlx::Row;
 
@@ -8,6 +8,8 @@ pub struct Mandelbrot {
 }
 
 impl Tabular for Mandelbrot {
+    const FILE_NAME: Query = Query::Mandelbrot;
+
     fn new(row: &PgRow) -> Self {
         Self {
             array_to_string: row.try_get("array_to_string").unwrap_or_default(),

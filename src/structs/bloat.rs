@@ -1,4 +1,4 @@
-use crate::structs::shared::Tabular;
+use crate::structs::shared::{Query, Tabular};
 use sqlx::postgres::PgRow;
 use sqlx::types::BigDecimal;
 use sqlx::Row;
@@ -13,6 +13,8 @@ pub struct Bloat {
 }
 
 impl Tabular for Bloat {
+    const FILE_NAME: Query = Query::Bloat;
+
     fn new(row: &PgRow) -> Self {
         Self {
             typefield: row.try_get("type").unwrap_or_default(),

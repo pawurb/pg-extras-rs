@@ -1,4 +1,4 @@
-use crate::structs::shared::{get_default_interval, Tabular};
+use crate::structs::shared::{get_default_interval, Query, Tabular};
 use sqlx::postgres::{types::PgInterval, PgRow};
 use sqlx::Row;
 
@@ -15,6 +15,8 @@ pub struct AllLocks {
 }
 
 impl Tabular for AllLocks {
+    const FILE_NAME: Query = Query::AllLocks;
+
     fn new(row: &PgRow) -> Self {
         Self {
             pid: row.try_get("pid").unwrap_or_default(),
