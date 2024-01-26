@@ -19,3 +19,7 @@ prettytable-rs = "0.10"
 sqlx = {version = "0.6", features = ["runtime-tokio-rustls", "postgres", "macros", "bigdecimal"]}
 thiserror = "1.0"
 tokio = {version = "1", features = ["full"]}
+
+[[bin]]
+name = "pg_extras"
+path = "src/main.rs"
