@@ -26,7 +26,7 @@ impl Query for Connections {
         row!["username", "pid", "client_addr"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/connections.sql")
+    fn read_file() -> String {
+        include_str!("../sql/connections.sql").to_string()
     }
 }

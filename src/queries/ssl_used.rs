@@ -22,7 +22,7 @@ impl Query for SslUsed {
         row!["ssl_used"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/ssl_used.sql")
+    fn read_file() -> String {
+        include_str!("../sql/ssl_used.sql").to_string()
     }
 }

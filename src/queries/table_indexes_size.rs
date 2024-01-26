@@ -24,7 +24,7 @@ impl Query for TableIndexesSize {
         row!["table", "index_size"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/table_indexes_size.sql")
+    fn read_file() -> String {
+        include_str!("../sql/table_indexes_size.sql").to_string()
     }
 }

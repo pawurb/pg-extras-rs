@@ -26,7 +26,7 @@ impl Query for LongRunningQueries {
         row!["pid", "duration", "query"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/long_running_queries.sql")
+    fn read_file() -> String {
+        include_str!("../sql/long_running_queries.sql").to_string()
     }
 }

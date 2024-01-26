@@ -24,7 +24,7 @@ impl Query for Tables {
         row!["tablename", "schemaname"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/tables.sql")
+    fn read_file() -> String {
+        include_str!("../sql/tables.sql").to_string()
     }
 }

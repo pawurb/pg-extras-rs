@@ -36,7 +36,7 @@ impl Query for IndexScans {
         row!["schemaname", "table", "index", "index_size", "index_scans"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/index_scans.sql")
+    fn read_file() -> String {
+        include_str!("../sql/index_scans.sql").to_string()
     }
 }

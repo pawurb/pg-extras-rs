@@ -54,7 +54,7 @@ impl Query for AllLocks {
         ]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/all_locks.sql")
+    fn read_file() -> String {
+        include_str!("../sql/all_locks.sql").to_string()
     }
 }

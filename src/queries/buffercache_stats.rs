@@ -38,7 +38,9 @@ impl Query for BuffercacheStats {
         ]
     }
 
-    fn read_file() -> &'static str {
+    fn read_file() -> String {
         include_str!("../sql/buffercache_stats.sql")
+            .to_string()
+            .to_string()
     }
 }

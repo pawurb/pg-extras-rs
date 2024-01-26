@@ -54,7 +54,7 @@ impl Query for VacuumStats {
         ]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/vacuum_stats.sql")
+    fn read_file() -> String {
+        include_str!("../sql/vacuum_stats.sql").to_string()
     }
 }

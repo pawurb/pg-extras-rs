@@ -30,7 +30,7 @@ impl Query for DuplicateIndexes {
         row!["size", "idx1", "idx2", "idx3", "idx4"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/duplicate_indexes.sql")
+    fn read_file() -> String {
+        include_str!("../sql/duplicate_indexes.sql").to_string()
     }
 }

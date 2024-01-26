@@ -24,7 +24,7 @@ impl Query for TotalTableSize {
         row!["name", "size"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/total_table_size.sql")
+    fn read_file() -> String {
+        include_str!("../sql/total_table_size.sql").to_string()
     }
 }

@@ -25,7 +25,7 @@ impl Query for CacheHit {
         row!["name", "ratio"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/cache_hit.sql")
+    fn read_file() -> String {
+        include_str!("../sql/cache_hit.sql").to_string()
     }
 }

@@ -5,7 +5,7 @@ pub trait Query {
     fn new(row: &PgRow) -> Self;
     fn to_row(&self) -> prettytable::Row;
     fn headers() -> prettytable::Row;
-    fn read_file() -> &'static str;
+    fn read_file() -> String;
 }
 
 pub fn get_default_interval() -> PgInterval {

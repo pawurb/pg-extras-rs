@@ -24,7 +24,7 @@ impl Query for TableIndexScans {
         row!["name", "count"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/table_index_scans.sql")
+    fn read_file() -> String {
+        include_str!("../sql/table_index_scans.sql").to_string()
     }
 }

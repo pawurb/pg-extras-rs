@@ -24,7 +24,7 @@ impl Query for BuffercacheUsage {
         row!["relname", "buffers"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/buffercache_usage.sql")
+    fn read_file() -> String {
+        include_str!("../sql/buffercache_usage.sql").to_string()
     }
 }

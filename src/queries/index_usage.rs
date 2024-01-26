@@ -32,7 +32,7 @@ impl Query for IndexUsage {
         row!["relname", "percent_of_times_index_used", "rows_in_table"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/index_usage.sql")
+    fn read_file() -> String {
+        include_str!("../sql/index_usage.sql").to_string()
     }
 }

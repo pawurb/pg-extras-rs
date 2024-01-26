@@ -36,7 +36,7 @@ impl Query for TableCacheHit {
         row!["name", "buffer_hits", "block_reads", "total_read", "ratio"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/table_cache_hit.sql")
+    fn read_file() -> String {
+        include_str!("../sql/table_cache_hit.sql").to_string()
     }
 }

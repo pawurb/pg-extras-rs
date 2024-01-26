@@ -28,7 +28,7 @@ impl Query for UnusedIndexes {
         row!["table", "index", "index_size", "index_scans"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/unused_indexes.sql")
+    fn read_file() -> String {
+        include_str!("../sql/unused_indexes.sql").to_string()
     }
 }

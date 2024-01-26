@@ -28,7 +28,7 @@ impl Query for DbSettings {
         row!["name", "setting", "unit", "short_desc"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/db_settings.sql")
+    fn read_file() -> String {
+        include_str!("../sql/db_settings.sql").to_string()
     }
 }

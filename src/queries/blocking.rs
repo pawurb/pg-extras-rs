@@ -58,7 +58,7 @@ impl Query for Blocking {
         ]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/blocking.sql")
+    fn read_file() -> String {
+        include_str!("../sql/blocking.sql").to_string()
     }
 }

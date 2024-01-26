@@ -37,7 +37,7 @@ impl Query for Bloat {
         row!["type", "schemaname", "object_name", "bloat", "waste"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/bloat.sql")
+    fn read_file() -> String {
+        include_str!("../sql/bloat.sql").to_string()
     }
 }

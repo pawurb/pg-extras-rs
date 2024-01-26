@@ -26,7 +26,7 @@ impl Query for IndexSize {
         row!["name", "size", "schema"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/index_size.sql")
+    fn read_file() -> String {
+        include_str!("../sql/index_size.sql").to_string()
     }
 }

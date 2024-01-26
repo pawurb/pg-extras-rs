@@ -33,7 +33,7 @@ impl Query for Extensions {
         row!["name", "default_version", "installed_version", "comment"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/extensions.sql")
+    fn read_file() -> String {
+        include_str!("../sql/extensions.sql").to_string()
     }
 }

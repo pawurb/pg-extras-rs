@@ -22,7 +22,7 @@ impl Query for TotalIndexSize {
         row!["size"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/total_index_size.sql")
+    fn read_file() -> String {
+        include_str!("../sql/total_index_size.sql").to_string()
     }
 }

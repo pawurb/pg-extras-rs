@@ -24,7 +24,7 @@ impl Query for SeqScans {
         row!["name", "count"]
     }
 
-    fn read_file() -> &'static str {
-        include_str!("../sql/seq_scans.sql")
+    fn read_file() -> String {
+        include_str!("../sql/seq_scans.sql").to_string()
     }
 }
