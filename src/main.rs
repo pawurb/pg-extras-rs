@@ -3,7 +3,7 @@ use std::env;
 use thiserror::Error;
 
 #[tokio::main]
-async fn main() -> Result<(), PgExtrasCmdError> {
+async fn main() {
     let args: Vec<String> = env::args().collect();
     let command = if args.len() > 1 {
         Some(args[1].clone())
@@ -11,8 +11,17 @@ async fn main() -> Result<(), PgExtrasCmdError> {
         None
     };
 
+    match execute(command).await {
+        Ok(_) => {}
+        Err(error) => {
+            println!("{}", error);
+        }
+    }
+}
+
+async fn execute(command: Option<String>) -> Result<(), PgExtrasCmdError> {
     if let Some(command) = command {
-        match &command[..] {
+        match command.as_str() {
             "all_locks" => {
                 render_table(all_locks().await?);
             }
@@ -113,9 +122,11 @@ async fn main() -> Result<(), PgExtrasCmdError> {
                 render_table(vacuum_stats().await?);
             }
             _ => {
-                return Err(PgExtrasCmdError::UnknownCommand(command));
+                return Err(PgExtrasCmdError::UnknownCommand(command.to_string()));
             }
         }
+    } else {
+        return Err(PgExtrasCmdError::MissingCommand);
     }
 
     Ok(())
@@ -124,9 +135,11 @@ async fn main() -> Result<(), PgExtrasCmdError> {
 #[derive(Error, Debug)]
 #[non_exhaustive]
 pub enum PgExtrasCmdError {
-    #[error("Unknown command")]
+    #[error("Unknown command '{0}'. Check https://github.com/pawurb/rust-pg-extras for list of available commands.")]
     UnknownCommand(String),
-    #[error("Unknown pg-extras error")]
+    #[error("Missing command. Check https://github.com/pawurb/rust-pg-extras for list of available commands.")]
+    MissingCommand,
+    #[error("{0}")]
     Other(PgExtrasError),
 }
 
