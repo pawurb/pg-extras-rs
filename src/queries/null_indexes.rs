@@ -5,15 +5,15 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct NullIndexes {
-    oid: Oid,
-    index: String,
-    index_size: String,
-    unique: bool,
-    indexed_column: String,
-    table: String,
-    null_frac: String,
-    expected_saving: String,
-    schema: String,
+    pub oid: Oid,
+    pub index: String,
+    pub index_size: String,
+    pub unique: bool,
+    pub indexed_column: String,
+    pub table: String,
+    pub null_frac: String,
+    pub expected_saving: String,
+    pub schema: String,
 }
 
 impl Query for NullIndexes {

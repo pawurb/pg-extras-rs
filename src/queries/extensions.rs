@@ -4,10 +4,10 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct Extensions {
-    name: String,
-    default_version: String,
-    installed_version: String,
-    comment: String,
+    pub name: String,
+    pub default_version: String,
+    pub installed_version: String,
+    pub comment: String,
 }
 
 impl Query for Extensions {

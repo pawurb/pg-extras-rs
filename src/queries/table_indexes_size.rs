@@ -4,8 +4,8 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct TableIndexesSize {
-    table: String,
-    index_size: String,
+    pub table: String,
+    pub index_size: String,
 }
 
 impl Query for TableIndexesSize {

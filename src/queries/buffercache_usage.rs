@@ -4,8 +4,8 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct BuffercacheUsage {
-    relname: String,
-    buffers: i64,
+    pub relname: String,
+    pub buffers: i64,
 }
 
 impl Query for BuffercacheUsage {

@@ -4,8 +4,8 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct TotalTableSize {
-    name: String,
-    size: String,
+    pub name: String,
+    pub size: String,
 }
 
 impl Query for TotalTableSize {

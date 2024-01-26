@@ -4,8 +4,8 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct Tables {
-    tablename: String,
-    schemaname: String,
+    pub tablename: String,
+    pub schemaname: String,
 }
 
 impl Query for Tables {

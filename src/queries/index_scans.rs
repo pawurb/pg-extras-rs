@@ -4,11 +4,11 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct IndexScans {
-    schemaname: String,
-    table: String,
-    index: String,
-    index_size: String,
-    index_scans: i64,
+    pub schemaname: String,
+    pub table: String,
+    pub index: String,
+    pub index_size: String,
+    pub index_scans: i64,
 }
 
 impl Query for IndexScans {

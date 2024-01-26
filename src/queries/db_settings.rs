@@ -4,10 +4,10 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct DbSettings {
-    name: String,
-    setting: String,
-    unit: String,
-    short_desc: String,
+    pub name: String,
+    pub setting: String,
+    pub unit: String,
+    pub short_desc: String,
 }
 
 impl Query for DbSettings {

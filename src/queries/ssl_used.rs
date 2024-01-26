@@ -4,7 +4,7 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct SslUsed {
-    ssl_used: bool,
+    pub ssl_used: bool,
 }
 
 impl Query for SslUsed {

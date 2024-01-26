@@ -4,14 +4,14 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct VacuumStats {
-    schema: String,
-    table: String,
-    last_vacuum: String,
-    last_autovacuum: String,
-    rowcount: String,
-    dead_rowcount: String,
-    autovacuum_threshold: String,
-    expect_autovacuum: String,
+    pub schema: String,
+    pub table: String,
+    pub last_vacuum: String,
+    pub last_autovacuum: String,
+    pub rowcount: String,
+    pub dead_rowcount: String,
+    pub autovacuum_threshold: String,
+    pub expect_autovacuum: String,
 }
 
 impl Query for VacuumStats {

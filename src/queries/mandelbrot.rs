@@ -4,7 +4,7 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct Mandelbrot {
-    array_to_string: String,
+    pub array_to_string: String,
 }
 
 impl Query for Mandelbrot {

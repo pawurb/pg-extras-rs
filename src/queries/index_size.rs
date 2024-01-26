@@ -4,9 +4,9 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct IndexSize {
-    name: String,
-    size: String,
-    schema: String,
+    pub name: String,
+    pub size: String,
+    pub schema: String,
 }
 
 impl Query for IndexSize {

@@ -4,9 +4,9 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct Connections {
-    username: String,
-    pid: i32,
-    client_addr: String,
+    pub username: String,
+    pub pid: i32,
+    pub client_addr: String,
 }
 
 impl Query for Connections {

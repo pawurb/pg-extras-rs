@@ -4,8 +4,8 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct RecordsRank {
-    name: String,
-    esiimated_count: i64,
+    pub name: String,
+    pub esiimated_count: i64,
 }
 
 impl Query for RecordsRank {

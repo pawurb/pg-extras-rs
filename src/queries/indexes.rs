@@ -4,10 +4,10 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct Indexes {
-    schemaname: String,
-    indexname: String,
-    tablename: String,
-    columns: String,
+    pub schemaname: String,
+    pub indexname: String,
+    pub tablename: String,
+    pub columns: String,
 }
 
 impl Query for Indexes {

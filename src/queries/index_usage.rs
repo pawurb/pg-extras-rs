@@ -4,9 +4,9 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct IndexUsage {
-    relname: String,
-    percent_of_times_index_used: String,
-    rows_in_table: i64,
+    pub relname: String,
+    pub percent_of_times_index_used: String,
+    pub rows_in_table: i64,
 }
 
 impl Query for IndexUsage {

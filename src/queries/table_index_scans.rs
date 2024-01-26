@@ -4,8 +4,8 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct TableIndexScans {
-    name: String,
-    count: i64,
+    pub name: String,
+    pub count: i64,
 }
 
 impl Query for TableIndexScans {

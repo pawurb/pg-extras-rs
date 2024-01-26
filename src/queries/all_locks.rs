@@ -4,14 +4,14 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct AllLocks {
-    pid: i32,
-    relname: String,
-    transactionid: String,
-    granted: bool,
-    mode: String,
-    query_snippet: String,
-    age: PgInterval,
-    application: String,
+    pub pid: i32,
+    pub relname: String,
+    pub transactionid: String,
+    pub granted: bool,
+    pub mode: String,
+    pub query_snippet: String,
+    pub age: PgInterval,
+    pub application: String,
 }
 
 impl Query for AllLocks {

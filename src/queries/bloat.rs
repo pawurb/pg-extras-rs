@@ -5,11 +5,11 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct Bloat {
-    typefield: String,
-    schemaname: String,
-    object_name: String,
-    bloat: BigDecimal,
-    waste: String,
+    pub typefield: String,
+    pub schemaname: String,
+    pub object_name: String,
+    pub bloat: BigDecimal,
+    pub waste: String,
 }
 
 impl Query for Bloat {

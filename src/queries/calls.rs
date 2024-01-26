@@ -4,11 +4,11 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct Calls {
-    qry: String,
-    exec_time: PgInterval,
-    prop_exec_time: String,
-    ncalls: String,
-    sync_io_time: PgInterval,
+    pub qry: String,
+    pub exec_time: PgInterval,
+    pub prop_exec_time: String,
+    pub ncalls: String,
+    pub sync_io_time: PgInterval,
 }
 
 impl Query for Calls {

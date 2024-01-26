@@ -5,8 +5,8 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct CacheHit {
-    name: String,
-    ratio: BigDecimal,
+    pub name: String,
+    pub ratio: BigDecimal,
 }
 
 impl Query for CacheHit {

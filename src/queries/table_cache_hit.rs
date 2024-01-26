@@ -4,11 +4,11 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct TableCacheHit {
-    name: String,
-    buffer_hits: i64,
-    block_reads: i64,
-    total_read: i64,
-    ratio: String,
+    pub name: String,
+    pub buffer_hits: i64,
+    pub block_reads: i64,
+    pub total_read: i64,
+    pub ratio: String,
 }
 
 impl Query for TableCacheHit {

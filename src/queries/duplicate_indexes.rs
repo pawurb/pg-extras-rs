@@ -4,11 +4,11 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct DuplicateIndexes {
-    size: String,
-    idx1: String,
-    idx2: String,
-    idx3: String,
-    idx4: String,
+    pub size: String,
+    pub idx1: String,
+    pub idx2: String,
+    pub idx3: String,
+    pub idx4: String,
 }
 
 impl Query for DuplicateIndexes {

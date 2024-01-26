@@ -4,7 +4,7 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct TotalIndexSize {
-    size: String,
+    pub size: String,
 }
 
 impl Query for TotalIndexSize {

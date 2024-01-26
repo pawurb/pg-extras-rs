@@ -4,9 +4,9 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct LongRunningQueries {
-    pid: i32,
-    duration: PgInterval,
-    query: String,
+    pub pid: i32,
+    pub duration: PgInterval,
+    pub query: String,
 }
 
 impl Query for LongRunningQueries {

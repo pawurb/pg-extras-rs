@@ -4,10 +4,10 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct BuffercacheStats {
-    relname: String,
-    buffered: String,
-    buffer_percent: f64,
-    percent_of_relation: f64,
+    pub relname: String,
+    pub buffered: String,
+    pub buffer_percent: f64,
+    pub percent_of_relation: f64,
 }
 
 impl Query for BuffercacheStats {

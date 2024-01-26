@@ -4,14 +4,14 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct Blocking {
-    blocked_pid: i32,
-    blocking_statement: String,
-    blocking_duration: PgInterval,
-    blocking_pid: i32,
-    blocked_statement: String,
-    blocked_duration: PgInterval,
-    blocked_sql_app: String,
-    blocking_sql_app: String,
+    pub blocked_pid: i32,
+    pub blocking_statement: String,
+    pub blocking_duration: PgInterval,
+    pub blocking_pid: i32,
+    pub blocked_statement: String,
+    pub blocked_duration: PgInterval,
+    pub blocked_sql_app: String,
+    pub blocking_sql_app: String,
 }
 
 impl Query for Blocking {

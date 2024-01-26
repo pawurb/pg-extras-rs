@@ -4,11 +4,11 @@ use sqlx::Row;
 
 #[derive(Debug, Clone)]
 pub struct Outliers {
-    total_exec_time: PgInterval,
-    prop_exec_time: String,
-    ncalls: String,
-    sync_io_time: PgInterval,
-    query: String,
+    pub total_exec_time: PgInterval,
+    pub prop_exec_time: String,
+    pub ncalls: String,
+    pub sync_io_time: PgInterval,
+    pub query: String,
 }
 
 impl Query for Outliers {
