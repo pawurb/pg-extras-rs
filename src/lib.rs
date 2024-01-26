@@ -1,47 +1,47 @@
 use std::env;
-pub mod structs;
+pub mod queries;
+pub use queries::all_locks::AllLocks;
+pub use queries::bloat::Bloat;
+pub use queries::blocking::Blocking;
+pub use queries::buffercache_stats::BuffercacheStats;
+pub use queries::buffercache_usage::BuffercacheUsage;
+pub use queries::cache_hit::CacheHit;
+pub use queries::calls::Calls;
+pub use queries::connections::Connections;
+pub use queries::db_settings::DbSettings;
+pub use queries::duplicate_indexes::DuplicateIndexes;
+pub use queries::extensions::Extensions;
+pub use queries::index_cache_hit::IndexCacheHit;
+pub use queries::index_scans::IndexScans;
+pub use queries::index_size::IndexSize;
+pub use queries::index_usage::IndexUsage;
+pub use queries::indexes::Indexes;
+pub use queries::locks::Locks;
+pub use queries::long_running_queries::LongRunningQueries;
+pub use queries::mandelbrot::Mandelbrot;
+pub use queries::null_indexes::NullIndexes;
+pub use queries::outliers::Outliers;
+pub use queries::records_rank::RecordsRank;
+pub use queries::seq_scans::SeqScans;
+pub use queries::shared::{get_default_schema, Query};
+pub use queries::ssl_used::SslUsed;
+pub use queries::table_cache_hit::TableCacheHit;
+pub use queries::table_index_scans::TableIndexScans;
+pub use queries::table_indexes_size::TableIndexesSize;
+pub use queries::table_size::TableSize;
+pub use queries::tables::Tables;
+pub use queries::total_index_size::TotalIndexSize;
+pub use queries::total_table_size::TotalTableSize;
+pub use queries::unused_indexes::UnusedIndexes;
+pub use queries::vacuum_stats::VacuumStats;
 use sqlx::postgres::PgPoolOptions;
-pub use structs::all_locks::AllLocks;
-pub use structs::bloat::Bloat;
-pub use structs::blocking::Blocking;
-pub use structs::buffercache_stats::BuffercacheStats;
-pub use structs::buffercache_usage::BuffercacheUsage;
-pub use structs::cache_hit::CacheHit;
-pub use structs::calls::Calls;
-pub use structs::connections::Connections;
-pub use structs::db_settings::DbSettings;
-pub use structs::duplicate_indexes::DuplicateIndexes;
-pub use structs::extensions::Extensions;
-pub use structs::index_cache_hit::IndexCacheHit;
-pub use structs::index_scans::IndexScans;
-pub use structs::index_size::IndexSize;
-pub use structs::index_usage::IndexUsage;
-pub use structs::indexes::Indexes;
-pub use structs::locks::Locks;
-pub use structs::long_running_queries::LongRunningQueries;
-pub use structs::mandelbrot::Mandelbrot;
-pub use structs::null_indexes::NullIndexes;
-pub use structs::outliers::Outliers;
-pub use structs::records_rank::RecordsRank;
-pub use structs::seq_scans::SeqScans;
-pub use structs::shared::{get_default_schema, Tabular};
-pub use structs::ssl_used::SslUsed;
-pub use structs::table_cache_hit::TableCacheHit;
-pub use structs::table_index_scans::TableIndexScans;
-pub use structs::table_indexes_size::TableIndexesSize;
-pub use structs::table_size::TableSize;
-pub use structs::tables::Tables;
-pub use structs::total_index_size::TotalIndexSize;
-pub use structs::total_table_size::TotalTableSize;
-pub use structs::unused_indexes::UnusedIndexes;
-pub use structs::vacuum_stats::VacuumStats;
 use thiserror::Error;
 
 #[macro_use]
 extern crate prettytable;
 use prettytable::Table;
 
-pub fn render_table<T: Tabular>(items: Vec<T>) {
+pub fn render_table<T: Query>(items: Vec<T>) {
     let mut table = Table::new();
     table.add_row(T::headers());
 
@@ -246,7 +246,7 @@ pub enum PgExtrasError {
     Unknown(String),
 }
 
-async fn get_rows<T: Tabular>(query: &str) -> Result<Vec<T>, PgExtrasError> {
+async fn get_rows<T: Query>(query: &str) -> Result<Vec<T>, PgExtrasError> {
     let pool = match PgPoolOptions::new()
         .max_connections(5)
         .connect(db_url()?.as_str())
