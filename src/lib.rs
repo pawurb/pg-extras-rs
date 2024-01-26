@@ -40,15 +40,20 @@ use thiserror::Error;
 
 #[macro_use]
 extern crate prettytable;
-use prettytable::Table;
+use prettytable::{Cell, Row, Table};
 
 pub fn render_table<T: Query>(items: Vec<T>) {
     let mut table = Table::new();
     table.add_row(T::headers());
 
+    let columns_count = T::headers().len();
+
     for item in items {
         table.add_row(item.to_row());
     }
+    table.set_titles(Row::new(vec![
+        Cell::new(T::description().as_str()).style_spec(format!("H{}", columns_count).as_str())
+    ]));
     table.printstd();
 }
 
