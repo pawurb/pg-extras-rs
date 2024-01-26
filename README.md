@@ -23,7 +23,7 @@ Alternative versions:
 In your Cargo.toml
 
 ```rust
-pg-extras = "0.3.0"
+pg-extras = "0.3"
 ```
 
 `calls` and `outliers` queries require [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) extension.
@@ -52,7 +52,7 @@ CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 
 ## Usage
 
-Gem expects the `ENV['PG_EXTRAS_DATABASE_URL']` or `ENV['DATABASE_URL']` value in the following format:
+Package expects the `ENV['PG_EXTRAS_DATABASE_URL']` or `ENV['DATABASE_URL']` value in the following format:
 
 ```rust
 ENV["DATABASE_URL"] = "postgresql://postgres:secret@localhost:5432/database_name"
@@ -96,6 +96,23 @@ cache_hit(Some("other_schema".to_string)).await?;
 ```
 
 You can customize the default `public` schema by setting `ENV['PG_EXTRAS_SCHEMA']` value.
+
+## Command line
+
+After running `cargo install pg-extras` you can use `pg_extras` shell command:
+
+```bash
+$ pg_extras cache_hit
++----------------+------------------------+
+| /* Index and table hit rate */          |
++================+========================+
+| name           | ratio                  |
++----------------+------------------------+
+| index hit rate | 0.99138647287107053837 |
++----------------+------------------------+
+| table hit rate | 0.99984856854492081787 |
++----------------+------------------------+
+``````
 
 ## Available methods
 
