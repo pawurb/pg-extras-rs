@@ -1,4 +1,12 @@
-use pg_extras::*;
+use pg_extras::{
+    all_locks, bloat, blocking, buffercache_stats, buffercache_usage, cache_hit, calls,
+    connections, db_settings, duplicate_indexes, extensions, index_cache_hit, index_scans,
+    index_size, index_usage, indexes, locks, long_running_queries, mandelbrot, null_indexes,
+    outliers, records_rank, render_table, seq_scans, ssl_used, table_cache_hit, table_index_scans,
+    table_indexes_size, table_size, tables, total_index_size, total_table_size, unused_indexes,
+    vacuum_stats, PgExtrasError,
+};
+
 use std::env;
 use thiserror::Error;
 
