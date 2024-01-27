@@ -13,11 +13,7 @@ use thiserror::Error;
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = env::args().collect();
-    let command = if args.len() > 1 {
-        Some(args[1].clone())
-    } else {
-        None
-    };
+    let command = args.get(1);
 
     match execute(command).await {
         Ok(_) => {}
@@ -27,7 +23,7 @@ async fn main() {
     }
 }
 
-async fn execute(command: Option<String>) -> Result<(), PgExtrasCmdError> {
+async fn execute(command: Option<&String>) -> Result<(), PgExtrasCmdError> {
     if let Some(command) = command {
         match command.as_str() {
             "all_locks" => {
