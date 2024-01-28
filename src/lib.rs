@@ -209,9 +209,9 @@ pub async fn db_settings() -> Result<Vec<DbSettings>, PgExtrasError> {
 pub enum PgExtrasError {
     #[error("Both $DATABASE_URL and $PG_EXTRAS_DATABASE_URL are not set.")]
     MissingConfigVars(),
-    #[error("Cannot connect to database.")]
+    #[error("Cannot connect to database: '{0}'")]
     DbConnectionError(String),
-    #[error("Unknown pg-extras error.")]
+    #[error("Unknown pg-extras error: '{0}'")]
     Unknown(String),
 }
 
