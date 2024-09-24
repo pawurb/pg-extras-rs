@@ -321,4 +321,45 @@ mod tests {
 
         Ok(())
     }
+
+    fn is_normal<T: Sized + Send + Sync + Unpin>() {}
+
+    #[test]
+    fn normal_types() {
+        is_normal::<NullIndexes>();
+        is_normal::<Bloat>();
+        is_normal::<Blocking>();
+        is_normal::<Calls>();
+        is_normal::<Extensions>();
+        is_normal::<TableCacheHit>();
+        is_normal::<Tables>();
+        is_normal::<IndexCacheHit>();
+        is_normal::<Indexes>();
+        is_normal::<IndexSize>();
+        is_normal::<IndexUsage>();
+        is_normal::<IndexScans>();
+        is_normal::<NullIndexes>();
+        is_normal::<Locks>();
+        is_normal::<AllLocks>();
+        is_normal::<LongRunningQueries>();
+        is_normal::<Mandelbrot>();
+        is_normal::<Outliers>();
+        is_normal::<RecordsRank>();
+        is_normal::<SeqScans>();
+        is_normal::<TableIndexScans>();
+        is_normal::<TableIndexesSize>();
+        is_normal::<TableSize>();
+        is_normal::<TotalIndexSize>();
+        is_normal::<TotalTableSize>();
+        is_normal::<UnusedIndexes>();
+        is_normal::<DuplicateIndexes>();
+        is_normal::<VacuumStats>();
+        is_normal::<DuplicateIndexes>();
+        is_normal::<BuffercacheStats>();
+        is_normal::<SslUsed>();
+        is_normal::<Connections>();
+        is_normal::<CacheHit>();
+        is_normal::<DbSettings>();
+        is_normal::<PgExtrasError>();
+    }
 }
