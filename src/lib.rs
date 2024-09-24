@@ -279,14 +279,11 @@ fn limit_params(limit: Option<String>) -> HashMap<String, String> {
 
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
-
     use super::*;
 
     async fn setup() -> Result<(), Box<dyn std::error::Error>> {
         let pool = PgPoolOptions::new()
             .max_connections(5)
-            .acquire_timeout(Duration::from_secs(10))
             .connect(db_url()?.as_str())
             .await?;
 

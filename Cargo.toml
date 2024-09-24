@@ -12,14 +12,15 @@ version = "0.3.2"
 exclude = ["docker-compose.yml.sample", "live_tests.sh"]
 
 [dependencies]
-prettytable-rs = "0.10"
-sqlx = { version = "0.6", features = [
+prettytable-rs = "0.10.0"
+sqlx = { version = "0.8", features = [
   "runtime-tokio-rustls",
   "postgres",
   "macros",
   "bigdecimal",
 ] }
-tokio = { version = "1", features = ["full"] }
+
+tokio = { version = "1.40", features = ["full"] }
 
 [[bin]]
 name = "pg_extras"
