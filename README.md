@@ -23,7 +23,7 @@ Alternative versions:
 In your Cargo.toml
 
 ```rust
-pg-extras = "0.3"
+pg-extras = "0.4"
 ```
 
 `calls` and `outliers` queries require [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) extension.
