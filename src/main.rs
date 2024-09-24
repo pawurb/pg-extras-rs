@@ -7,8 +7,7 @@ use pg_extras::{
     vacuum_stats, PgExtrasError,
 };
 
-use std::env;
-use thiserror::Error;
+use std::{env, fmt};
 
 #[tokio::main]
 async fn main() {
@@ -136,19 +135,42 @@ async fn execute(command: Option<&String>) -> Result<(), PgExtrasCmdError> {
     Ok(())
 }
 
-#[derive(Error, Debug)]
+#[derive(Debug, Clone)]
 #[non_exhaustive]
 pub enum PgExtrasCmdError {
-    #[error("Unknown command '{0}'. Check https://github.com/pawurb/rust-pg-extras for list of available commands.")]
     UnknownCommand(String),
-    #[error("Missing command. Check https://github.com/pawurb/rust-pg-extras for list of available commands.")]
     MissingCommand,
-    #[error("{0}")]
     Other(PgExtrasError),
+}
+
+impl fmt::Display for PgExtrasCmdError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let check_command_text =
+            "Check https://github.com/pawurb/rust-pg-extras for list of available commands.";
+
+        let msg = match self {
+            Self::UnknownCommand(command) => {
+                format!("Unknown command '{}'. {}", command, check_command_text)
+            }
+            Self::MissingCommand => {
+                format!("Missing command. {}", check_command_text)
+            }
+            Self::Other(error) => format!("{}", error),
+        };
+        write!(f, "{}", msg)
+    }
 }
 
 impl From<pg_extras::PgExtrasError> for PgExtrasCmdError {
     fn from(error: pg_extras::PgExtrasError) -> Self {
         Self::Other(error)
     }
+}
+
+impl std::error::Error for PgExtrasCmdError {}
+
+#[test]
+fn normal_types() {
+    fn is_normal<T: Sized + Send + Sync + Unpin>() {}
+    is_normal::<PgExtrasCmdError>();
 }

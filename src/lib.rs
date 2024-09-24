@@ -1,5 +1,6 @@
 use std::collections::HashMap;
-use std::env;
+use std::time::Duration;
+use std::{env, fmt};
 pub mod queries;
 pub use queries::all_locks::AllLocks;
 pub use queries::bloat::Bloat;
@@ -36,7 +37,6 @@ pub use queries::total_table_size::TotalTableSize;
 pub use queries::unused_indexes::UnusedIndexes;
 pub use queries::vacuum_stats::VacuumStats;
 use sqlx::postgres::PgPoolOptions;
-use thiserror::Error;
 
 #[macro_use]
 extern crate prettytable;
@@ -204,16 +204,29 @@ pub async fn db_settings() -> Result<Vec<DbSettings>, PgExtrasError> {
     get_rows(None).await
 }
 
-#[derive(Error, Debug)]
+#[derive(Debug, Clone)]
 #[non_exhaustive]
 pub enum PgExtrasError {
-    #[error("Both $DATABASE_URL and $PG_EXTRAS_DATABASE_URL are not set.")]
     MissingConfigVars(),
-    #[error("Cannot connect to database: '{0}'")]
     DbConnectionError(String),
-    #[error("Unknown pg-extras error: '{0}'")]
     Unknown(String),
 }
+
+impl fmt::Display for PgExtrasError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let msg = match self {
+            Self::MissingConfigVars() => {
+                "Both $DATABASE_URL and $PG_EXTRAS_DATABASE_URL are not set."
+            }
+            Self::DbConnectionError(e) => &format!("Cannot connect to database: '{}'", e),
+            Self::Unknown(e) => &format!("Unknown pg-extras error: '{}'", e),
+        };
+
+        write!(f, "{}", msg)
+    }
+}
+
+impl std::error::Error for PgExtrasError {}
 
 async fn get_rows<T: Query>(
     params: Option<HashMap<String, String>>,
@@ -228,6 +241,7 @@ async fn get_rows<T: Query>(
 
     let pool = match PgPoolOptions::new()
         .max_connections(5)
+        .acquire_timeout(Duration::from_secs(10))
         .connect(db_url()?.as_str())
         .await
     {
@@ -265,11 +279,14 @@ fn limit_params(limit: Option<String>) -> HashMap<String, String> {
 
 #[cfg(test)]
 mod tests {
+    use std::time::Duration;
+
     use super::*;
 
     async fn setup() -> Result<(), Box<dyn std::error::Error>> {
         let pool = PgPoolOptions::new()
             .max_connections(5)
+            .acquire_timeout(Duration::from_secs(10))
             .connect(db_url()?.as_str())
             .await?;
 
@@ -322,10 +339,10 @@ mod tests {
         Ok(())
     }
 
-    fn is_normal<T: Sized + Send + Sync + Unpin>() {}
-
     #[test]
     fn normal_types() {
+        fn is_normal<T: Sized + Send + Sync + Unpin>() {}
+
         is_normal::<NullIndexes>();
         is_normal::<Bloat>();
         is_normal::<Blocking>();
