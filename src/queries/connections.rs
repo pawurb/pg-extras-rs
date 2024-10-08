@@ -1,6 +1,5 @@
-use crate::queries::shared::Query;
-use sqlx::postgres::PgRow;
-use sqlx::Row;
+use crate::{queries::shared::Query, PgStatsVersion};
+use sqlx::{postgres::PgRow, Row};
 
 #[derive(Debug, Clone)]
 pub struct Connections {
@@ -26,7 +25,7 @@ impl Query for Connections {
         row!["username", "pid", "client_addr"]
     }
 
-    fn read_file() -> String {
+    fn read_file(_pg_statement_version: Option<PgStatsVersion>) -> String {
         include_str!("../sql/connections.sql").to_string()
     }
 }

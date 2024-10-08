@@ -17,7 +17,7 @@ async fn main() {
     match execute(command).await {
         Ok(_) => {}
         Err(error) => {
-            println!("{}", error);
+            eprintln!("{}", error);
         }
     }
 }

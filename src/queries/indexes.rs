@@ -1,6 +1,5 @@
-use crate::queries::shared::Query;
-use sqlx::postgres::PgRow;
-use sqlx::Row;
+use crate::{queries::shared::Query, PgStatsVersion};
+use sqlx::{postgres::PgRow, Row};
 
 #[derive(Debug, Clone)]
 pub struct Indexes {
@@ -33,7 +32,7 @@ impl Query for Indexes {
         row!["schemaname", "indexname", "tablename", "columns"]
     }
 
-    fn read_file() -> String {
+    fn read_file(_pg_statement_version: Option<PgStatsVersion>) -> String {
         include_str!("../sql/indexes.sql").to_string()
     }
 }

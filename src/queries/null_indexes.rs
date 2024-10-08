@@ -1,7 +1,6 @@
-use crate::queries::shared::Query;
+use crate::{queries::shared::Query, PgStatsVersion};
 use sqlx::postgres::types::Oid;
-use sqlx::postgres::PgRow;
-use sqlx::Row;
+use sqlx::{postgres::PgRow, Row};
 
 #[derive(Debug, Clone)]
 pub struct NullIndexes {
@@ -59,7 +58,7 @@ impl Query for NullIndexes {
         ]
     }
 
-    fn read_file() -> String {
+    fn read_file(_pg_statement_version: Option<PgStatsVersion>) -> String {
         include_str!("../sql/null_indexes.sql").to_string()
     }
 }

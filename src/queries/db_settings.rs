@@ -1,6 +1,5 @@
-use crate::queries::shared::Query;
-use sqlx::postgres::PgRow;
-use sqlx::Row;
+use crate::{queries::shared::Query, PgStatsVersion};
+use sqlx::{postgres::PgRow, Row};
 
 #[derive(Debug, Clone)]
 pub struct DbSettings {
@@ -28,7 +27,7 @@ impl Query for DbSettings {
         row!["name", "setting", "unit", "short_desc"]
     }
 
-    fn read_file() -> String {
+    fn read_file(_pg_statement_version: Option<PgStatsVersion>) -> String {
         include_str!("../sql/db_settings.sql").to_string()
     }
 }

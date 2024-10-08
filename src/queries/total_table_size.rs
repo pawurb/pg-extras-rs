@@ -1,6 +1,5 @@
-use crate::queries::shared::Query;
-use sqlx::postgres::PgRow;
-use sqlx::Row;
+use crate::{queries::shared::Query, PgStatsVersion};
+use sqlx::{postgres::PgRow, Row};
 
 #[derive(Debug, Clone)]
 pub struct TotalTableSize {
@@ -24,7 +23,7 @@ impl Query for TotalTableSize {
         row!["name", "size"]
     }
 
-    fn read_file() -> String {
+    fn read_file(_pg_statement_version: Option<PgStatsVersion>) -> String {
         include_str!("../sql/total_table_size.sql").to_string()
     }
 }

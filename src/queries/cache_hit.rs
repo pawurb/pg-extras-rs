@@ -1,4 +1,4 @@
-use crate::queries::shared::Query;
+use crate::{queries::shared::Query, PgStatsVersion};
 use sqlx::postgres::PgRow;
 use sqlx::types::BigDecimal;
 use sqlx::Row;
@@ -25,7 +25,7 @@ impl Query for CacheHit {
         row!["name", "ratio"]
     }
 
-    fn read_file() -> String {
+    fn read_file(_pg_statement_version: Option<PgStatsVersion>) -> String {
         include_str!("../sql/cache_hit.sql").to_string()
     }
 }

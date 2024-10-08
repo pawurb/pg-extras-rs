@@ -1,13 +1,15 @@
 use sqlx::postgres::{types::PgInterval, PgRow};
 use std::env;
 
+use crate::PgStatsVersion;
+
 pub trait Query {
     fn new(row: &PgRow) -> Self;
     fn to_row(&self) -> prettytable::Row;
     fn headers() -> prettytable::Row;
-    fn read_file() -> String;
+    fn read_file(pg_statement_version: Option<PgStatsVersion>) -> String;
     fn description() -> String {
-        Self::read_file().lines().take(1).collect()
+        Self::read_file(None).lines().take(1).collect()
     }
 }
 

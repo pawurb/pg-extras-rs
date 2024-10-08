@@ -7,4 +7,4 @@ interval '1 millisecond' * (blk_read_time + blk_write_time) AS sync_io_time,
 query AS query
 FROM pg_stat_statements WHERE userid = (SELECT usesysid FROM pg_user WHERE usename = current_user LIMIT 1)
 ORDER BY total_time DESC
-LIMIT %{limit};
+LIMIT 20;

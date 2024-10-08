@@ -1,4 +1,5 @@
 use crate::queries::shared::{get_default_interval, Query};
+use crate::PgStatsVersion;
 use sqlx::postgres::{types::PgInterval, PgRow};
 use sqlx::Row;
 
@@ -44,7 +45,15 @@ impl Query for Calls {
         ]
     }
 
-    fn read_file() -> String {
-        include_str!("../sql/calls.sql").to_string()
+    fn read_file(pg_statement_version: Option<PgStatsVersion>) -> String {
+        let default = include_str!("../sql/calls.sql");
+
+        match pg_statement_version {
+            Some(PgStatsVersion::Legacy) => include_str!("../sql/calls_legacy.sql"),
+            Some(PgStatsVersion::Standard) => default,
+            Some(PgStatsVersion::Pg17) => include_str!("../sql/calls_17.sql"),
+            None => default,
+        }
+        .to_string()
     }
 }

@@ -1,6 +1,5 @@
-use crate::queries::shared::Query;
-use sqlx::postgres::PgRow;
-use sqlx::Row;
+use crate::{queries::shared::Query, PgStatsVersion};
+use sqlx::{postgres::PgRow, Row};
 
 #[derive(Debug, Clone)]
 pub struct BuffercacheUsage {
@@ -24,7 +23,7 @@ impl Query for BuffercacheUsage {
         row!["relname", "buffers"]
     }
 
-    fn read_file() -> String {
+    fn read_file(_pg_statement_version: Option<PgStatsVersion>) -> String {
         include_str!("../sql/buffercache_usage.sql").to_string()
     }
 }

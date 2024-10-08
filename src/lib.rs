@@ -1,46 +1,51 @@
-use std::collections::HashMap;
-use std::time::Duration;
-use std::{env, fmt};
+use std::{
+    collections::HashMap,
+    time::Duration,
+    {env, fmt},
+};
 pub mod queries;
-pub use queries::all_locks::AllLocks;
-pub use queries::bloat::Bloat;
-pub use queries::blocking::Blocking;
-pub use queries::buffercache_stats::BuffercacheStats;
-pub use queries::buffercache_usage::BuffercacheUsage;
-pub use queries::cache_hit::CacheHit;
-pub use queries::calls::Calls;
-pub use queries::connections::Connections;
-pub use queries::db_settings::DbSettings;
-pub use queries::duplicate_indexes::DuplicateIndexes;
-pub use queries::extensions::Extensions;
-pub use queries::index_cache_hit::IndexCacheHit;
-pub use queries::index_scans::IndexScans;
-pub use queries::index_size::IndexSize;
-pub use queries::index_usage::IndexUsage;
-pub use queries::indexes::Indexes;
-pub use queries::locks::Locks;
-pub use queries::long_running_queries::LongRunningQueries;
-pub use queries::mandelbrot::Mandelbrot;
-pub use queries::null_indexes::NullIndexes;
-pub use queries::outliers::Outliers;
-pub use queries::records_rank::RecordsRank;
-pub use queries::seq_scans::SeqScans;
-pub use queries::shared::{get_default_schema, Query};
-pub use queries::ssl_used::SslUsed;
-pub use queries::table_cache_hit::TableCacheHit;
-pub use queries::table_index_scans::TableIndexScans;
-pub use queries::table_indexes_size::TableIndexesSize;
-pub use queries::table_size::TableSize;
-pub use queries::tables::Tables;
-pub use queries::total_index_size::TotalIndexSize;
-pub use queries::total_table_size::TotalTableSize;
-pub use queries::unused_indexes::UnusedIndexes;
-pub use queries::vacuum_stats::VacuumStats;
-use sqlx::postgres::PgPoolOptions;
+pub use queries::{
+    all_locks::AllLocks,
+    bloat::Bloat,
+    blocking::Blocking,
+    buffercache_stats::BuffercacheStats,
+    buffercache_usage::BuffercacheUsage,
+    cache_hit::CacheHit,
+    calls::Calls,
+    connections::Connections,
+    db_settings::DbSettings,
+    duplicate_indexes::DuplicateIndexes,
+    extensions::Extensions,
+    index_cache_hit::IndexCacheHit,
+    index_scans::IndexScans,
+    index_size::IndexSize,
+    index_usage::IndexUsage,
+    indexes::Indexes,
+    locks::Locks,
+    long_running_queries::LongRunningQueries,
+    mandelbrot::Mandelbrot,
+    null_indexes::NullIndexes,
+    outliers::Outliers,
+    records_rank::RecordsRank,
+    seq_scans::SeqScans,
+    shared::{get_default_schema, Query},
+    ssl_used::SslUsed,
+    table_cache_hit::TableCacheHit,
+    table_index_scans::TableIndexScans,
+    table_indexes_size::TableIndexesSize,
+    table_size::TableSize,
+    tables::Tables,
+    total_index_size::TotalIndexSize,
+    total_table_size::TotalTableSize,
+    unused_indexes::UnusedIndexes,
+    vacuum_stats::VacuumStats,
+};
+use semver::Version;
+use sqlx::{postgres::PgPoolOptions, Row};
 
 #[macro_use]
 extern crate prettytable;
-use prettytable::{Cell, Row, Table};
+use prettytable::{Cell, Row as TableRow, Table};
 
 pub fn render_table<T: Query>(items: Vec<T>) {
     let mut table = Table::new();
@@ -51,7 +56,7 @@ pub fn render_table<T: Query>(items: Vec<T>) {
     for item in items {
         table.add_row(item.to_row());
     }
-    table.set_titles(Row::new(vec![
+    table.set_titles(TableRow::new(vec![
         Cell::new(T::description().as_str()).style_spec(format!("H{}", columns_count).as_str())
     ]));
     table.printstd();
@@ -228,17 +233,23 @@ impl fmt::Display for PgExtrasError {
 
 impl std::error::Error for PgExtrasError {}
 
+use lazy_static::lazy_static;
+
+lazy_static! {
+    pub static ref NEW_PG_STAT_STATEMENTS: Version = Version::parse("1.8.0").unwrap();
+    pub static ref PG_STAT_STATEMENTS_17: Version = semver::Version::parse("1.11.0").unwrap();
+}
+
+#[derive(Debug)]
+pub enum PgStatsVersion {
+    Legacy,
+    Standard,
+    Pg17,
+}
+
 async fn get_rows<T: Query>(
     params: Option<HashMap<String, String>>,
 ) -> Result<Vec<T>, PgExtrasError> {
-    let mut query = T::read_file();
-
-    if let Some(params) = params {
-        for (key, value) in &params {
-            query = query.replace(&format!("%{{{}}}", key), value.as_str());
-        }
-    }
-
     let pool = match PgPoolOptions::new()
         .max_connections(5)
         .acquire_timeout(Duration::from_secs(10))
@@ -248,6 +259,37 @@ async fn get_rows<T: Query>(
         Ok(pool) => pool,
         Err(e) => return Err(PgExtrasError::DbConnectionError(format!("{}", e))),
     };
+
+    let pg_statements_query =
+        "select installed_version from pg_available_extensions where name='pg_stat_statements'";
+
+    let pg_statements_version = match sqlx::query(pg_statements_query).fetch_one(&pool).await {
+        Ok(row) => row
+            .try_get::<String, _>("installed_version")
+            .unwrap_or_default(),
+        Err(_) => "".to_string(),
+    };
+
+    let default_version = NEW_PG_STAT_STATEMENTS.clone();
+    let pg_statements_version = format!("{}.0", pg_statements_version);
+    let pg_statements_version =
+        Version::parse(&pg_statements_version).unwrap_or(default_version.clone());
+
+    let pg_statements_version = if pg_statements_version < default_version {
+        PgStatsVersion::Legacy
+    } else if pg_statements_version >= *PG_STAT_STATEMENTS_17 {
+        PgStatsVersion::Pg17
+    } else {
+        PgStatsVersion::Standard
+    };
+
+    let mut query = T::read_file(Some(pg_statements_version));
+
+    if let Some(params) = params {
+        for (key, value) in &params {
+            query = query.replace(&format!("%{{{}}}", key), value.as_str());
+        }
+    }
 
     Ok(match sqlx::query(&query).fetch_all(&pool).await {
         Ok(rows) => rows.iter().map(T::new).collect(),
@@ -282,6 +324,24 @@ mod tests {
     use super::*;
 
     async fn setup() -> Result<(), Box<dyn std::error::Error>> {
+        let port = match env::var("PG_VERSION").expect("PG_VERSION not set").as_str() {
+            "12" => "5432",
+            "13" => "5433",
+            "14" => "5434",
+            "15" => "5435",
+            "16" => "5436",
+            "17" => "5437",
+            _ => "5432",
+        };
+
+        env::set_var(
+            "PG_EXTRAS_DATABASE_URL",
+            format!(
+                "postgres://postgres:secret@localhost:{}/rust-pg-extras-test",
+                port
+            ),
+        );
+
         let pool = PgPoolOptions::new()
             .max_connections(5)
             .connect(db_url()?.as_str())

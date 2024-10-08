@@ -1,4 +1,5 @@
 use crate::queries::shared::{get_default_interval, Query};
+use crate::PgStatsVersion;
 use sqlx::postgres::{types::PgInterval, PgRow};
 use sqlx::Row;
 
@@ -54,7 +55,7 @@ impl Query for Locks {
         ]
     }
 
-    fn read_file() -> String {
+    fn read_file(_pg_statement_version: Option<PgStatsVersion>) -> String {
         include_str!("../sql/locks.sql").to_string()
     }
 }
