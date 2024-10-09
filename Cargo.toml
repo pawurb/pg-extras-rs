@@ -27,3 +27,7 @@ tokio = { version = "1.40", features = ["full"] }
 [[bin]]
 name = "pg_extras"
 path = "src/main.rs"
+
+[[example]]
+name = "db_settings"
+path = "examples/db_settings.rs"

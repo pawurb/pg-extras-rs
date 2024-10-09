@@ -20,10 +20,8 @@ Alternative versions:
 
 ## Installation
 
-In your Cargo.toml
-
-```rust
-pg-extras = "0.4"
+```bash
+cargo add pg-extras
 ```
 
 `calls` and `outliers` queries require [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) extension.
