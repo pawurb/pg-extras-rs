@@ -337,7 +337,7 @@ mod tests {
         env::set_var(
             "PG_EXTRAS_DATABASE_URL",
             format!(
-                "postgres://postgres:secret@localhost:{}/rust-pg-extras-test",
+                "postgres://postgres:secret@localhost:{}/pg-extras-rs-test",
                 port
             ),
         );

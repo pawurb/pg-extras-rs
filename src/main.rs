@@ -146,7 +146,7 @@ pub enum PgExtrasCmdError {
 impl fmt::Display for PgExtrasCmdError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let check_command_text =
-            "Check https://github.com/pawurb/rust-pg-extras for list of available commands.";
+            "Check https://github.com/pawurb/pg-extras-rs for list of available commands.";
 
         let msg = match self {
             Self::UnknownCommand(command) => {

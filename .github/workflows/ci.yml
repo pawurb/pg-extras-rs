@@ -20,28 +20,28 @@ jobs:
       - name: Run PostgreSQL 12
         run: |
           docker run --env POSTGRES_USER=postgres \
-            --env POSTGRES_DB=rust-pg-extras-test \
+            --env POSTGRES_DB=pg-extras-rs-test \
             --env POSTGRES_PASSWORD=secret \
             -d -p 5432:5432 postgres:12.20-alpine \
             postgres -c shared_preload_libraries=pg_stat_statements
       - name: Run PostgreSQL 13
         run: |
           docker run --env POSTGRES_USER=postgres \
-            --env POSTGRES_DB=rust-pg-extras-test \
+            --env POSTGRES_DB=pg-extras-rs-test \
             --env POSTGRES_PASSWORD=secret \
             -d -p 5433:5432 postgres:13.16-alpine \
             postgres -c shared_preload_libraries=pg_stat_statements
       - name: Run PostgreSQL 14
         run: |
           docker run --env POSTGRES_USER=postgres \
-            --env POSTGRES_DB=rust-pg-extras-test \
+            --env POSTGRES_DB=pg-extras-rs-test \
             --env POSTGRES_PASSWORD=secret \
             -d -p 5434:5432 postgres:14.13-alpine \
             postgres -c shared_preload_libraries=pg_stat_statements
       - name: Run PostgreSQL 15
         run: |
           docker run --env POSTGRES_USER=postgres \
-            --env POSTGRES_DB=rust-pg-extras-test \
+            --env POSTGRES_DB=pg-extras-rs-test \
             --env POSTGRES_PASSWORD=secret \
             -d -p 5435:5432 postgres:15.8-alpine \
             postgres -c shared_preload_libraries=pg_stat_statements
@@ -49,7 +49,7 @@ jobs:
       - name: Run PostgreSQL 16
         run: |
           docker run --env POSTGRES_USER=postgres \
-            --env POSTGRES_DB=rust-pg-extras-test \
+            --env POSTGRES_DB=pg-extras-rs-test \
             --env POSTGRES_PASSWORD=secret \
             -d -p 5436:5432 postgres:16.4-alpine \
             postgres -c shared_preload_libraries=pg_stat_statements
@@ -57,7 +57,7 @@ jobs:
       - name: Run PostgreSQL 17
         run: |
           docker run --env POSTGRES_USER=postgres \
-            --env POSTGRES_DB=rust-pg-extras-test \
+            --env POSTGRES_DB=pg-extras-rs-test \
             --env POSTGRES_PASSWORD=secret \
             -d -p 5437:5432 postgres:17.0-alpine \
             postgres -c shared_preload_libraries=pg_stat_statements

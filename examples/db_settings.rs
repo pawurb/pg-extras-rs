@@ -5,7 +5,7 @@ use pg_extras::{db_settings, render_table, PgExtrasError};
 async fn main() -> Result<(), PgExtrasError> {
     std::env::set_var(
         "PG_EXTRAS_DATABASE_URL",
-        "postgres://postgres:secret@localhost:5432/rust-pg-extras-test",
+        "postgres://postgres:secret@localhost:5432/pg-extras-rs-test",
     );
 
     let settings = db_settings().await?;
