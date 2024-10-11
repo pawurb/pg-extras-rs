@@ -7,11 +7,12 @@ license = "MIT"
 name = "pg-extras"
 readme = "README.md"
 repository = "https://github.com/pawurb/pg-extras-rs"
-version = "0.4.1"
+version = "0.5.0"
 
 exclude = ["docker-compose.yml.sample", "live_tests.sh"]
 
 [dependencies]
+clap = { version = "4.5.20", features = ["derive"] }
 lazy_static = "1.5.0"
 prettytable-rs = "0.10.0"
 semver = "1.0.23"
@@ -26,7 +27,7 @@ tokio = { version = "1.40", features = ["full"] }
 
 [[bin]]
 name = "pg_extras"
-path = "src/main.rs"
+path = "bin/main.rs"
 
 [[example]]
 name = "db_settings"
