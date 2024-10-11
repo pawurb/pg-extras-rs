@@ -72,8 +72,8 @@ jobs:
         run: cargo check 
       - name: Fmt
         run: cargo fmt --all --check
-      # - name: Lint
-      #   run: cargo clippy --all --all-features -- -D warnings
+      - name: Lint
+        run: cargo clippy --all --all-features -- -D warnings
       - name: Run tests for PG 12
         env:
           PG_VERSION: 12
