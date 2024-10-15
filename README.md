@@ -21,17 +21,40 @@ Alternative versions:
 ## Installation
 
 ```bash
-cargo add pg-extras
+cargo install pg-extras
 ```
+
+## Usage
+
+Package expects the `$PG_EXTRAS_DATABASE_URL` or `$DATABASE_URL` env in the following format:
+
+```rust
+export DATABASE_URL="postgresql://postgres:secret@localhost:5432/database_name"
+```
+
+You can use `pg_extras` shell command:
+
+```bash
+$ pg_extras cache_hit
++----------------+------------------------+
+| /* Index and table hit rate */          |
++================+========================+
+| name           | ratio                  |
++----------------+------------------------+
+| index hit rate | 0.99138647287107053837 |
++----------------+------------------------+
+| table hit rate | 0.99984856854492081787 |
++----------------+------------------------+
+```
+
+## Dependencies
 
 `calls` and `outliers` queries require [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) extension.
 
 You can check if it is enabled in your database by running:
 
-```rust
-use pg_extras::{render_table, extensions}
-
-render_table(extensions()?);
+```bash
+pg_extras extensions
 ```
 
 You should see the similar line in the output:
@@ -48,15 +71,9 @@ CREATE EXTENSION IF NOT EXISTS pg_buffercache;
 CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 ```
 
-## Usage
+## Rust API
 
-Package expects the `ENV['PG_EXTRAS_DATABASE_URL']` or `ENV['DATABASE_URL']` value in the following format:
-
-```rust
-ENV["DATABASE_URL"] = "postgresql://postgres:secret@localhost:5432/database_name"
-```
-
-You can run queries using a Rust API to display an ASCCI table with results:
+You can also run queries using a Rust API to display an ASCCI table with results:
 
 ```rust
 use pg_extras::{render_table, cache_hit}
@@ -80,7 +97,7 @@ Alternatively you can work directly with returned structs:
 ```rust
 use pg_extras::{render_table, cache_hit, CacheHit}
 
-let cache_hit_res: Vec<CacheHit> = cache_hit(None).await?;
+let cache_hit_res = cache_hit(None).await?;
 println!("{:?}", cache_hit_res);
 
 // [CacheHit { name: "index hit rate", ratio:  0.9779... }, CacheHit { name: "table hit rate", ratio: 0.9672... }]
@@ -95,22 +112,6 @@ cache_hit(Some("other_schema".to_string)).await?;
 
 You can customize the default `public` schema by setting `ENV['PG_EXTRAS_SCHEMA']` value.
 
-## Command line
-
-After running `cargo install pg-extras` you can use `pg_extras` shell command:
-
-```bash
-$ pg_extras cache_hit
-+----------------+------------------------+
-| /* Index and table hit rate */          |
-+================+========================+
-| name           | ratio                  |
-+----------------+------------------------+
-| index hit rate | 0.99138647287107053837 |
-+----------------+------------------------+
-| table hit rate | 0.99984856854492081787 |
-+----------------+------------------------+
-``````
 
 ## Available methods
 
