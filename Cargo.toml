@@ -25,6 +25,9 @@ sqlx = { version = "0.8", features = [
 
 tokio = { version = "1.40", features = ["full"] }
 
+[profile.release]
+lto = true
+
 [[bin]]
 name = "pg_extras"
 path = "bin/main.rs"
