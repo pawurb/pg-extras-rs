@@ -32,10 +32,10 @@ Package expects the `$PG_EXTRAS_DATABASE_URL` or `$DATABASE_URL` env in the foll
 export DATABASE_URL="postgresql://postgres:secret@localhost:5432/database_name"
 ```
 
-You can use `pg_extras` shell command:
+You can use `pgextras` shell command:
 
 ```bash
-$ pg_extras cache_hit
+$ pgextras cache_hit
 +----------------+------------------------+
 | /* Index and table hit rate */          |
 +================+========================+
@@ -54,7 +54,7 @@ $ pg_extras cache_hit
 You can check if it is enabled in your database by running:
 
 ```bash
-pg_extras extensions
+pgextras extensions
 ```
 
 You should see the similar line in the output:
