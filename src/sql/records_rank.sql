@@ -1,4 +1,4 @@
-/* All tables and the number of rows in each ordered by number of rows descending */
+/* All tables and the number of rows in each ordered by number of rows descending. */
 
 SELECT
   relname AS name,

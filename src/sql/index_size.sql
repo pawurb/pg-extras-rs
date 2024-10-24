@@ -1,4 +1,4 @@
-/* The size of indexes, descending by size */
+/* The size of indexes, descending by size. */
 
 SELECT c.relname AS name,
   pg_size_pretty(sum(c.relpages::bigint*8192)::bigint) AS size,

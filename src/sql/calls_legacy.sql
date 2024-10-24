@@ -1,4 +1,4 @@
-/* Queries that have highest frequency of execution */
+/* Queries that have highest frequency of execution. */
 
 SELECT query AS qry,
 interval '1 millisecond' * total_time AS exec_time,

@@ -1,4 +1,4 @@
-/* Total size of all indexes in MB */
+/* Total size of all indexes in MB. */
 
 SELECT pg_size_pretty(sum(c.relpages::bigint*8192)::bigint) AS size
 FROM pg_class c

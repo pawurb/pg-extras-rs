@@ -1,4 +1,4 @@
-/* Dead rows and whether an automatic vacuum is expected to be triggered */
+/* Dead rows and whether an automatic vacuum is expected to be triggered. */
 
 WITH table_opts AS (
   SELECT

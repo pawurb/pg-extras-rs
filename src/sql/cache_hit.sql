@@ -1,4 +1,4 @@
-/* Index and table hit rate */
+/* Index and table hit rate. */
 
 SELECT
   'index hit rate' AS name,

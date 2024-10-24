@@ -1,4 +1,4 @@
-/* Calculates percentages of relations buffered in database share buffer */
+/* Calculates percentages of relations buffered in database share buffer. */
 
 SELECT
   c.relname,

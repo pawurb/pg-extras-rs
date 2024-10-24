@@ -1,4 +1,4 @@
-/* Calculates your cache hit rate for reading tables */
+/* Calculates your cache hit rate for reading tables. */
 
 SELECT
   relname AS name,

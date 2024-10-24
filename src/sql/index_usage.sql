@@ -1,4 +1,4 @@
-/* Index hit rate (effective databases are at 99 percent and up) */
+/* Index hit rate (effective databases are at 99 percent and up). */
 
 SELECT relname,
    CASE idx_scan

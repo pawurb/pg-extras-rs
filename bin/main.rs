@@ -23,38 +23,71 @@ pub struct PgExtrasArgs {
 
 #[derive(Subcommand, Debug)]
 pub enum PgSubcommand {
+    /// All the current locks, regardless of their type.
     AllLocks(EmptyArgs),
+    /// An estimation of table "bloat".
     Bloat(EmptyArgs),
+    /// Statements that are currently holding locks that other statements are waiting to be released.
     Blocking(EmptyArgs),
+    /// Relations buffered in database share buffer, ordered by percentage taken.
     BuffercacheStats(EmptyArgs),
+    /// Calculates how many blocks from which table are currently cached.
     BuffercacheUsage(EmptyArgs),
+    /// Information on the efficiency of the buffer cache, index reads and table reads.
     CacheHit(EmptyArgs),
+    /// Just like `outliers`, but ordered by the number of times a statement has been called.
     Calls(EmptyArgs),
+    /// Returns the list of all active database connections.
     Connections(EmptyArgs),
+    /// Displays values for selected PostgreSQL settings.
     DbSettings(EmptyArgs),
+    /// Displays duplicate indexes, usually it's safe to drop one of them.
     DuplicateIndexes(EmptyArgs),
+    /// Lists all the currently installed and available PostgreSQL extensions.
     Extensions(EmptyArgs),
+    /// The same as `cache_hit` with each table's indexes cache hit info displayed separately.
     IndexCacheHit(EmptyArgs),
+    /// Number of scans performed on indexes.
     IndexScans(EmptyArgs),
+    /// The size of indexes, descending by size.
     IndexSize(EmptyArgs),
+    /// Index hit rate (effective databases are at 99 percent and up).
     IndexUsage(EmptyArgs),
+    /// List all the indexes with their corresponding tables and columns.
     Indexes(EmptyArgs),
+    /// Queries with active exclusive locks.
     Locks(EmptyArgs),
+    /// All queries longer than the threshold by descending duration.
     LongRunningQueries(EmptyArgs),
+    /// Indexes with a high ratio of NULL values.
     NullIndexes(EmptyArgs),
+    /// Queries that have longest execution time in aggregate.
     Outliers(EmptyArgs),
+    /// The mandelbrot set.
     Mandelbrot(EmptyArgs),
+    /// All tables and the number of rows in each ordered by number of rows descending.
     RecordsRank(EmptyArgs),
+    /// Count of sequential scans by table descending by order.
     SeqScans(EmptyArgs),
+    /// Check if SSL connection is used.
     SslUsed(EmptyArgs),
+    /// Calculates your cache hit rate for reading tables.
     TableCacheHit(EmptyArgs),
+    /// Count of index scans by table descending by order.
     TableIndexScans(EmptyArgs),
+    /// Total size of all the indexes on each table, descending by size.
     TableIndexesSize(EmptyArgs),
+    /// Size of the tables (excluding indexes), descending by size.
     TableSize(EmptyArgs),
+    /// List all the tables.
     Tables(EmptyArgs),
+    /// Total size of all indexes in MB.
     TotalIndexSize(EmptyArgs),
+    /// Size of the tables (including indexes), descending by size.
     TotalTableSize(EmptyArgs),
+    /// Unused and almost unused indexes.
     UnusedIndexes(EmptyArgs),
+    /// Dead rows and whether an automatic vacuum is expected to be triggered.
     VacuumStats(EmptyArgs),
 }
 

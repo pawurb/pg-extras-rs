@@ -1,4 +1,4 @@
-/* Count of index scans by table descending by order */
+/* Count of index scans by table descending by order. */
 
 SELECT relname AS name,
        idx_scan as count

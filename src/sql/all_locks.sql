@@ -1,4 +1,4 @@
-/* Queries with active locks */
+/* Queries with active locks. */
 
 SELECT
   pg_stat_activity.pid,

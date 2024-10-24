@@ -1,4 +1,4 @@
-/* Size of the tables (including indexes), descending by size */
+/* Size of the tables (including indexes), descending by size. */
 
 SELECT c.relname AS name,
   pg_size_pretty(pg_total_relation_size(c.oid)) AS size

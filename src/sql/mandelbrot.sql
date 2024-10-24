@@ -1,4 +1,4 @@
-/* The mandelbrot set */
+/* The mandelbrot set. */
 
 WITH RECURSIVE Z(IX, IY, CX, CY, X, Y, I) AS (
           SELECT IX, IY, X::float, Y::float, X::float, Y::float, 0

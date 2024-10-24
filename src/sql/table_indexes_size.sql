@@ -1,4 +1,4 @@
-/* Total size of all the indexes on each table, descending by size */
+/* Total size of all the indexes on each table, descending by size. */
 
 SELECT c.relname AS table,
   pg_size_pretty(pg_indexes_size(c.oid)) AS index_size

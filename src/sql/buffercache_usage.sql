@@ -1,4 +1,4 @@
-/* Calculate how many blocks from which table are currently cached */
+/* Calculate how many blocks from which table are currently cached. */
 
 SELECT c.relname, count(*) AS buffers
 FROM pg_class c

@@ -7,7 +7,7 @@ license = "MIT"
 name = "pg-extras"
 readme = "README.md"
 repository = "https://github.com/pawurb/pg-extras-rs"
-version = "0.6.0"
+version = "0.6.1"
 
 exclude = ["docker-compose.yml.sample", "live_tests.sh"]
 

@@ -1,4 +1,4 @@
-/* Number of scans performed on indexes */
+/* Number of scans performed on indexes. */
 
 SELECT
   schemaname,

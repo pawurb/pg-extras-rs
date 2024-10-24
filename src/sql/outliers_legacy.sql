@@ -1,4 +1,4 @@
-/* Queries that have longest execution time in aggregate */
+/* Queries that have longest execution time in aggregate. */
 
 SELECT interval '1 millisecond' * total_time AS total_exec_time,
 to_char((total_time/sum(total_time) OVER()) * 100, 'FM90D0') || '%%'  AS prop_exec_time,

@@ -1,4 +1,4 @@
-/* Values of selected PostgreSQL settings */
+/* Values of selected PostgreSQL settings. */
 
 SELECT name, setting, unit, short_desc FROM pg_settings
 WHERE name IN (

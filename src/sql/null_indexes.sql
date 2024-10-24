@@ -1,4 +1,4 @@
-/* Find indexes with a high ratio of NULL values */
+/* Indexes with a high ratio of NULL values. */
 
 SELECT
     c.oid,

@@ -1,4 +1,4 @@
-/* Count of sequential scans by table descending by order */
+/* Count of sequential scans by table descending by order. */
 
 SELECT relname AS name,
        seq_scan as count
