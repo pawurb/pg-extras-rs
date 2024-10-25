@@ -1,12 +1,10 @@
 use crate::{cache_hit, extensions, ssl_used, Extensions, PgExtrasError};
 use sqlx::types::BigDecimal;
-use strum::AsRefStr;
 
 const TABLE_CACHE_HIT_MIN: f64 = 0.985;
 const INDEX_CACHE_HIT_MIN: f64 = 0.985;
 
-#[derive(Debug, AsRefStr)]
-#[strum(serialize_all = "snake_case")]
+#[derive(Debug)]
 enum Check {
     TableCacheHit,
     IndexCacheHit,
@@ -71,7 +69,7 @@ impl Diagnose {
             Check::TableCacheHit => Self::table_cache_hit().await,
             Check::IndexCacheHit => Self::index_cache_hit().await,
             Check::SslUsed => Self::ssl_used().await,
-            _ => Ok(CheckResult::new(true, "Not implemented".to_string(), check.as_ref().to_string())),
+            _ => Ok(CheckResult::new(true, "Not implemented".to_string(), stringify!(check).to_string())),
         }
     }
 
@@ -87,9 +85,9 @@ impl Diagnose {
             } else {
                 format!("Table cache hit rate is too low: {:.4}", table_hit_rate.ratio)
             };
-            Ok(CheckResult::new(ok, message, Check::TableCacheHit.as_ref().to_string()))
+            Ok(CheckResult::new(ok, message, stringify!(table_cache_hit).to_string()))
         } else {
-            Ok(CheckResult::new(false, "Table cache hit rate not found".to_string(), Check::TableCacheHit.as_ref().to_string()))
+            Ok(CheckResult::new(false, "Table cache hit rate not found".to_string(), stringify!(table_cache_hit).to_string()))
         }
     }
 
@@ -105,9 +103,9 @@ impl Diagnose {
             } else {
                 format!("Index cache hit rate is too low: {:.4}", index_hit_rate.ratio)
             };
-            Ok(CheckResult::new(ok, message, Check::IndexCacheHit.as_ref().to_string()))
+            Ok(CheckResult::new(ok, message, stringify!(index_cache_hit).to_string()))
         } else {
-            Ok(CheckResult::new(false, "Index cache hit rate not found".to_string(), Check::IndexCacheHit.as_ref().to_string()))
+            Ok(CheckResult::new(false, "Index cache hit rate not found".to_string(), stringify!(index_cache_hit).to_string()))
         }
     }
 
@@ -118,8 +116,8 @@ impl Diagnose {
             } else {
                 "Database client is using an unencrypted connection."
             };
-            return Ok(CheckResult::new(ssl_conn.ssl_used, message.to_string(), Check::SslUsed.as_ref().to_string()));
+            return Ok(CheckResult::new(ssl_conn.ssl_used, message.to_string(), stringify!(ssl_used).to_string()));
         }
-        Ok(CheckResult::new(false, "Unable to get connection information.".to_string(), Check::SslUsed.as_ref().to_string()))
+        Ok(CheckResult::new(false, "Unable to get connection information.".to_string(), stringify!(ssl_used).to_string()))
     }
 }

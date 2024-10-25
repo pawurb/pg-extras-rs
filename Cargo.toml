@@ -24,7 +24,6 @@ sqlx = { version = "0.8", features = [
 ] }
 
 tokio = { version = "1.40", features = ["full"] }
-strum = { version = "0.26", features = ["derive"] }
 
 [profile.release]
 lto = true
