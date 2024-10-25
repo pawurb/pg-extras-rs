@@ -1,4 +1,4 @@
-use crate::{cache_hit, extensions, Extensions, PgExtrasError};
+use crate::{cache_hit, extensions, ssl_used, Extensions, PgExtrasError};
 use sqlx::types::BigDecimal;
 use strum::AsRefStr;
 
@@ -70,6 +70,7 @@ impl Diagnose {
         match check {
             Check::TableCacheHit => Self::table_cache_hit().await,
             Check::IndexCacheHit => Self::index_cache_hit().await,
+            Check::SslUsed => Self::ssl_used().await,
             _ => Ok(CheckResult::new(true, "Not implemented".to_string(), check.as_ref().to_string())),
         }
     }
@@ -108,5 +109,17 @@ impl Diagnose {
         } else {
             Ok(CheckResult::new(false, "Index cache hit rate not found".to_string(), Check::IndexCacheHit.as_ref().to_string()))
         }
+    }
+
+    async fn ssl_used() -> Result<CheckResult, PgExtrasError> {
+        if let Some(ssl_conn) = ssl_used().await?.first() {
+            let message = if ssl_conn.ssl_used {
+                "Database client is using a secure SSL connection."
+            } else {
+                "Database client is using an unencrypted connection."
+            };
+            return Ok(CheckResult::new(ssl_conn.ssl_used, message.to_string(), Check::SslUsed.as_ref().to_string()));
+        }
+        Ok(CheckResult::new(false, "Unable to get connection information.".to_string(), Check::SslUsed.as_ref().to_string()))
     }
 }
