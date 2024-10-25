@@ -64,25 +64,22 @@ pub fn render_table<T: Query>(items: Vec<T>) {
     table.printstd();
 }
 
-pub fn render_diagnose_result(items: Vec<CheckResult>)
+pub fn render_diagnose_report(items: Vec<CheckResult>)
 {
     let mut table = Table::new();
 
-    let mut cell = Cell::new("Diagnose Results").style_spec("H3");
-    cell.align(prettytable::format::Alignment::CENTER);
-    table.set_titles(TableRow::new(vec![cell]));
-
-    table.add_row(TableRow::new(vec![
-        Cell::new("Status"),
-        Cell::new("Check"),
-        Cell::new("Message"),
-    ]));
+    let mut header_cell = Cell::new("Diagnose Report").style_spec("bH2");
+    header_cell.align(prettytable::format::Alignment::CENTER);
+    table.set_titles(TableRow::new(vec![header_cell]));
 
     for item in items {
+        let style = if item.ok { "Fg" } else { "Fr" };
+
+        let status_and_name = format!("[{}] - {}", if item.ok { "√" } else { "x" }, item.check_name);
+
         table.add_row(TableRow::new(vec![
-            Cell::new(if item.ok { "OK" } else { "FAIL" }),
-            Cell::new(item.check_name.as_str()),
-            Cell::new(item.message.as_str()),
+            Cell::new(status_and_name.as_str()).style_spec(style),
+            Cell::new(item.message.as_str()).style_spec(style),
         ]));
     }
 
