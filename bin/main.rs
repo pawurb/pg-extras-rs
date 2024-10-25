@@ -220,12 +220,14 @@ async fn execute() -> Result<(), PgExtrasError> {
 }
 
 fn extract_desc(desc: &str) -> String {
-    let start = desc.find("/*").unwrap();
-    let end = desc.find("*/").unwrap();
-    let extracted = &desc[start + 2..end];
-    let mut trimmed = extracted.trim().to_string();
-    if trimmed.ends_with('.') {
-        trimmed.pop();
+    if let (Some(start), Some(end)) = (desc.find("/*"), desc.find("*/")) {
+        let extracted = &desc[start + 2..end];
+        let mut trimmed = extracted.trim().to_string();
+        if trimmed.ends_with('.') {
+            trimmed.pop();
+        }
+        trimmed
+    } else {
+        desc.to_string()
     }
-    trimmed
 }
