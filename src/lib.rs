@@ -74,7 +74,7 @@ pub fn render_diagnose_result(items: Vec<CheckResult>)
 
     table.add_row(TableRow::new(vec![
         Cell::new("Status"),
-        Cell::new("Check Name"),
+        Cell::new("Check"),
         Cell::new("Message"),
     ]));
 
