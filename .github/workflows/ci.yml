@@ -73,6 +73,11 @@ jobs:
         run: cargo fmt --all --check
       - name: Lint
         run: cargo clippy --all --all-features -- -D warnings
+      - name: Smoke test CLI
+        env: 
+          DATABASE_URL: postgres://postgres:secret@localhost:5432/pg-extras-rs-test
+        run: |
+          cargo run --bin pgextras || cargo run --bin pgextras cache-hit
       - name: Run tests for PG 12
         env:
           PG_VERSION: 12
