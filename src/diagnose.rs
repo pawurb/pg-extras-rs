@@ -1,11 +1,11 @@
 use crate::{cache_hit, extensions, Extensions, PgExtrasError};
 use sqlx::types::BigDecimal;
-use strum::{AsRefStr, EnumIter};
+use strum::AsRefStr;
 
-const PG_EXTRAS_TABLE_CACHE_HIT_MIN_EXPECTED: f64 = 0.985;
-const PG_EXTRAS_INDEX_CACHE_HIT_MIN_EXPECTED: f64 = 0.985;
+const TABLE_CACHE_HIT_MIN: f64 = 0.985;
+const INDEX_CACHE_HIT_MIN: f64 = 0.985;
 
-#[derive(Debug, EnumIter, AsRefStr)]
+#[derive(Debug, AsRefStr)]
 #[strum(serialize_all = "snake_case")]
 enum Check {
     TableCacheHit,
@@ -26,12 +26,8 @@ pub struct CheckResult {
 }
 
 impl CheckResult {
-    pub fn new(ok: bool, message: String, check_name: String) -> CheckResult {
-        CheckResult {
-            ok,
-            message,
-            check_name,
-        }
+    pub fn new(ok: bool, message: String, check_name: String) -> Self {
+        Self { ok, message, check_name }
     }
 }
 
@@ -50,101 +46,67 @@ impl Diagnose {
 
         let extensions_data = extensions().await?;
 
-        if Diagnose::extension_enabled(&extensions_data, "sslinfo") {
+        if Self::extension_enabled(&extensions_data, "sslinfo") {
             checks.push(Check::SslUsed);
         }
 
-        if Diagnose::extension_enabled(&extensions_data, "pg_stat_statements") {
+        if Self::extension_enabled(&extensions_data, "pg_stat_statements") {
             checks.push(Check::Outliers);
         }
 
         let mut results = Vec::new();
-
-        // run checks sequentially
         for check in checks {
-            let result = Diagnose::run_check(check).await?;
-            results.push(result);
+            results.push(Self::run_check(check).await?);
         }
 
         Ok(results)
     }
 
-    fn extension_enabled(extensions_data: &Vec<Extensions>, extension_name: &str) -> bool {
-        extensions_data
-            .iter()
-            .any(|e| e.name == extension_name && !e.installed_version.is_empty())
+    fn extension_enabled(extensions_data: &[Extensions], extension_name: &str) -> bool {
+        extensions_data.iter().any(|e| e.name == extension_name && !e.installed_version.is_empty())
     }
 
     async fn run_check(check: Check) -> Result<CheckResult, PgExtrasError> {
         match check {
-            Check::TableCacheHit => Diagnose::table_cache_hit().await,
-            Check::IndexCacheHit => Diagnose::index_cache_hit().await,
-            _ => Ok(CheckResult::new(
-                false,
-                "Not implemented".to_string(),
-                "NotImplemented".to_string(),
-            )),
+            Check::TableCacheHit => Self::table_cache_hit().await,
+            Check::IndexCacheHit => Self::index_cache_hit().await,
+            _ => Ok(CheckResult::new(true, "Not implemented".to_string(), check.as_ref().to_string())),
         }
     }
 
     async fn table_cache_hit() -> Result<CheckResult, PgExtrasError> {
-        let min_expected = BigDecimal::try_from(PG_EXTRAS_TABLE_CACHE_HIT_MIN_EXPECTED).unwrap();
-
+        let min_expected = BigDecimal::try_from(TABLE_CACHE_HIT_MIN).unwrap();
         let cache_hit = cache_hit(None).await?;
-
         let table_cache_hit = cache_hit.iter().find(|item| item.name == "table hit rate");
 
         if let Some(table_hit_rate) = table_cache_hit {
             let ok = table_hit_rate.ratio >= min_expected;
             let message = if ok {
                 format!("Table cache hit rate is correct: {:.4}", table_hit_rate.ratio)
-            }
-            else {
+            } else {
                 format!("Table cache hit rate is too low: {:.4}", table_hit_rate.ratio)
             };
-
-            Ok(CheckResult::new(
-                ok,
-                message,
-                format!("{}", Check::TableCacheHit.as_ref()),
-            ))
+            Ok(CheckResult::new(ok, message, Check::TableCacheHit.as_ref().to_string()))
         } else {
-            Ok(CheckResult::new(
-                false,
-                "Table cache hit rate not found".to_string(),
-                format!("{}", Check::TableCacheHit.as_ref()),
-            ))
+            Ok(CheckResult::new(false, "Table cache hit rate not found".to_string(), Check::TableCacheHit.as_ref().to_string()))
         }
     }
 
     async fn index_cache_hit() -> Result<CheckResult, PgExtrasError> {
-        let min_expected = BigDecimal::try_from(PG_EXTRAS_INDEX_CACHE_HIT_MIN_EXPECTED).unwrap();
-
+        let min_expected = BigDecimal::try_from(INDEX_CACHE_HIT_MIN).unwrap();
         let cache_hit = cache_hit(None).await?;
-
         let index_cache_hit = cache_hit.iter().find(|item| item.name == "index hit rate");
 
         if let Some(index_hit_rate) = index_cache_hit {
             let ok = index_hit_rate.ratio >= min_expected;
-
             let message = if ok {
                 format!("Index cache hit rate is correct: {:.4}", index_hit_rate.ratio)
-            }
-            else {
+            } else {
                 format!("Index cache hit rate is too low: {:.4}", index_hit_rate.ratio)
             };
-
-            Ok(CheckResult::new(
-                ok,
-                message,
-                format!("{}", Check::IndexCacheHit.as_ref()),
-            ))
+            Ok(CheckResult::new(ok, message, Check::IndexCacheHit.as_ref().to_string()))
         } else {
-            Ok(CheckResult::new(
-                false,
-                "Index cache hit rate not found".to_string(),
-                format!("{}", Check::IndexCacheHit.as_ref()),
-            ))
+            Ok(CheckResult::new(false, "Index cache hit rate not found".to_string(), Check::IndexCacheHit.as_ref().to_string()))
         }
     }
 }
