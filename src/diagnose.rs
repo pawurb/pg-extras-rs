@@ -1,4 +1,4 @@
-use crate::{cache_hit, extensions, PgExtrasError};
+use crate::{cache_hit, extensions, Extensions, PgExtrasError};
 use sqlx::types::BigDecimal;
 use strum::{AsRefStr, EnumIter};
 
@@ -37,7 +37,7 @@ impl CheckResult {
 pub struct Diagnose;
 
 impl Diagnose {
-    pub async fn run() -> Result<Vec<CheckResult>, PgExtrasError>  {
+    pub async fn run() -> Result<Vec<CheckResult>, PgExtrasError> {
         let mut checks = vec![
             Check::TableCacheHit,
             Check::IndexCacheHit,
@@ -49,11 +49,11 @@ impl Diagnose {
 
         let extensions_data = extensions().await?;
 
-        if extensions_data.iter().any(|e| e.name == "sslinfo" && !e.installed_version.is_empty()) {
+        if Diagnose::extension_enabled(&extensions_data, "sslinfo") {
             checks.push(Check::SslUsed);
         }
 
-        if extensions_data.iter().any(|e| e.name == "pg_stat_statements" && !e.installed_version.is_empty()) {
+        if Diagnose::extension_enabled(&extensions_data, "pg_stat_statements") {
             checks.push(Check::Outliers);
         }
 
@@ -68,10 +68,20 @@ impl Diagnose {
         Ok(results)
     }
 
+    fn extension_enabled(extensions_data: &Vec<Extensions>, extension_name: &str) -> bool {
+        extensions_data
+            .iter()
+            .any(|e| e.name == extension_name && !e.installed_version.is_empty())
+    }
+
     async fn run_check(check: Check) -> Result<CheckResult, PgExtrasError> {
         match check {
             Check::TableCacheHit => Diagnose::table_cache_hit().await,
-            _ => Ok(CheckResult::new(false, "Not implemented".to_string(), "NotImplemented".to_string())),
+            _ => Ok(CheckResult::new(
+                false,
+                "Not implemented".to_string(),
+                "NotImplemented".to_string(),
+            )),
         }
     }
 
@@ -86,10 +96,17 @@ impl Diagnose {
             let ok = table_hit_rate.ratio >= min_expected;
             let message = format!("Table cache hit rate is {:.2}%", table_hit_rate.ratio);
 
-            Ok(CheckResult::new(ok, message, format!("{}", Check::TableCacheHit.as_ref())))
+            Ok(CheckResult::new(
+                ok,
+                message,
+                format!("{}", Check::TableCacheHit.as_ref()),
+            ))
         } else {
-            Ok(CheckResult::new(false, "Table cache hit rate not found".to_string(), "TableCacheHit".to_string()))
+            Ok(CheckResult::new(
+                false,
+                "Table cache hit rate not found".to_string(),
+                "TableCacheHit".to_string(),
+            ))
         }
-
     }
 }
