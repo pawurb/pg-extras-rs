@@ -3,6 +3,7 @@ use sqlx::types::BigDecimal;
 use strum::{AsRefStr, EnumIter};
 
 const PG_EXTRAS_TABLE_CACHE_HIT_MIN_EXPECTED: f64 = 0.985;
+const PG_EXTRAS_INDEX_CACHE_HIT_MIN_EXPECTED: f64 = 0.985;
 
 #[derive(Debug, EnumIter, AsRefStr)]
 #[strum(serialize_all = "snake_case")]
@@ -77,6 +78,7 @@ impl Diagnose {
     async fn run_check(check: Check) -> Result<CheckResult, PgExtrasError> {
         match check {
             Check::TableCacheHit => Diagnose::table_cache_hit().await,
+            Check::IndexCacheHit => Diagnose::index_cache_hit().await,
             _ => Ok(CheckResult::new(
                 false,
                 "Not implemented".to_string(),
@@ -94,7 +96,12 @@ impl Diagnose {
 
         if let Some(table_hit_rate) = table_cache_hit {
             let ok = table_hit_rate.ratio >= min_expected;
-            let message = format!("Table cache hit rate is {:.2}%", table_hit_rate.ratio);
+            let message = if ok {
+                format!("Table cache hit rate is correct: {:.4}", table_hit_rate.ratio)
+            }
+            else {
+                format!("Table cache hit rate is too low: {:.4}", table_hit_rate.ratio)
+            };
 
             Ok(CheckResult::new(
                 ok,
@@ -105,7 +112,38 @@ impl Diagnose {
             Ok(CheckResult::new(
                 false,
                 "Table cache hit rate not found".to_string(),
-                "TableCacheHit".to_string(),
+                format!("{}", Check::TableCacheHit.as_ref()),
+            ))
+        }
+    }
+
+    async fn index_cache_hit() -> Result<CheckResult, PgExtrasError> {
+        let min_expected = BigDecimal::try_from(PG_EXTRAS_INDEX_CACHE_HIT_MIN_EXPECTED).unwrap();
+
+        let cache_hit = cache_hit(None).await?;
+
+        let index_cache_hit = cache_hit.iter().find(|item| item.name == "index hit rate");
+
+        if let Some(index_hit_rate) = index_cache_hit {
+            let ok = index_hit_rate.ratio >= min_expected;
+
+            let message = if ok {
+                format!("Index cache hit rate is correct: {:.4}", index_hit_rate.ratio)
+            }
+            else {
+                format!("Index cache hit rate is too low: {:.4}", index_hit_rate.ratio)
+            };
+
+            Ok(CheckResult::new(
+                ok,
+                message,
+                format!("{}", Check::IndexCacheHit.as_ref()),
+            ))
+        } else {
+            Ok(CheckResult::new(
+                false,
+                "Index cache hit rate not found".to_string(),
+                format!("{}", Check::IndexCacheHit.as_ref()),
             ))
         }
     }
