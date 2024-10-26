@@ -5,6 +5,7 @@ use std::{
 };
 pub mod queries;
 pub mod diagnose;
+pub mod size_parser;
 
 pub use queries::{
     all_locks::AllLocks,

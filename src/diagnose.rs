@@ -1,8 +1,10 @@
-use crate::{cache_hit, extensions, ssl_used, Extensions, PgExtrasError};
+use crate::size_parser::to_bytes;
+use crate::{cache_hit, extensions, ssl_used, unused_indexes, Extensions, PgExtrasError};
 use sqlx::types::BigDecimal;
 
-const TABLE_CACHE_HIT_MIN: f64 = 0.985;
-const INDEX_CACHE_HIT_MIN: f64 = 0.985;
+const TABLE_CACHE_HIT_MIN: f32 = 0.985;
+const INDEX_CACHE_HIT_MIN: f32 = 0.985;
+const UNUSED_INDEXES_MIN_SIZE_BYTES: u64 = 1_000_000; // 1 MB
 
 #[derive(Debug)]
 enum Check {
@@ -68,6 +70,7 @@ impl Diagnose {
         match check {
             Check::TableCacheHit => Self::table_cache_hit().await,
             Check::IndexCacheHit => Self::index_cache_hit().await,
+            Check::UnusedIndexes => Self::unused_index().await,
             Check::SslUsed => Self::ssl_used().await,
             _ => Ok(CheckResult::new(true, "Not implemented".to_string(), stringify!(check).to_string())),
         }
@@ -119,5 +122,23 @@ impl Diagnose {
             return Ok(CheckResult::new(ssl_conn.ssl_used, message.to_string(), stringify!(ssl_used).to_string()));
         }
         Ok(CheckResult::new(false, "Unable to get connection information.".to_string(), stringify!(ssl_used).to_string()))
+    }
+
+    async fn unused_index() -> Result<CheckResult, PgExtrasError> {
+        let indexes = unused_indexes(None).await?
+            .into_iter()
+            .filter(|i| to_bytes(&i.index_size).unwrap_or(0) >= UNUSED_INDEXES_MIN_SIZE_BYTES)
+            .collect::<Vec<_>>();
+
+        if indexes.is_empty() {
+            return Ok(CheckResult::new(true, "No unused indexes detected.".to_string(), stringify!(unused_indexes).to_string()))
+        }
+
+        let print_indexes = indexes.iter()
+            .map(|i| format!("'{}' on '{}' size {}", i.index, i.table, i.index_size))
+            .collect::<Vec<_>>()
+            .join(",\n");
+
+        Ok(CheckResult::new(false, format!("Unused indexes detected:\n{}", print_indexes), stringify!(unused_indexes).to_string()))
     }
 }
