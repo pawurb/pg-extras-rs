@@ -1,5 +1,5 @@
 use crate::size_parser::to_bytes;
-use crate::{bloat, cache_hit, extensions, null_indexes, ssl_used, unused_indexes, Extensions, PgExtrasError};
+use crate::{bloat, cache_hit, duplicate_indexes, extensions, null_indexes, ssl_used, unused_indexes, Extensions, PgExtrasError};
 use sqlx::types::BigDecimal;
 
 const TABLE_CACHE_HIT_MIN: f32 = 0.985;
@@ -76,6 +76,7 @@ impl Diagnose {
             Check::UnusedIndexes => Self::unused_index().await,
             Check::NullIndexes => Self::null_index().await,
             Check::Bloat => Self::bloat().await,
+            Check::DuplicateIndexes => Self::duplicate_indexes().await,
             Check::SslUsed => Self::ssl_used().await,
             _ => Ok(CheckResult::new(true, "Not implemented".to_string(), stringify!(check).to_string())),
         }
@@ -184,5 +185,20 @@ impl Diagnose {
             .join(",\n");
 
         Ok(CheckResult::new(false, format!("Bloat detected:\n{}", print_bloat), stringify!(bloat).to_string()))
+    }
+
+    async fn duplicate_indexes() -> Result<CheckResult, PgExtrasError> {
+        let indexes = duplicate_indexes().await?;
+
+        if indexes.is_empty() {
+            return Ok(CheckResult::new(true, "No duplicate indexes detected.".to_string(), stringify!(duplicate_indexes).to_string()))
+        }
+
+        let print_indexes = indexes.iter()
+            .map(|i| format!("'{}' of size {} is identical to '{}'", i.idx1, i.size, i.idx2))
+            .collect::<Vec<_>>()
+            .join(",\n");
+
+        Ok(CheckResult::new(false, format!("Duplicate indexes detected:\n{}", print_indexes), stringify!(duplicate_indexes).to_string()))
     }
 }
