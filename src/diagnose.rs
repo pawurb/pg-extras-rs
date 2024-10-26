@@ -1,5 +1,5 @@
 use crate::size_parser::to_bytes;
-use crate::{cache_hit, extensions, null_indexes, ssl_used, unused_indexes, Extensions, PgExtrasError};
+use crate::{bloat, cache_hit, extensions, null_indexes, ssl_used, unused_indexes, Extensions, PgExtrasError};
 use sqlx::types::BigDecimal;
 
 const TABLE_CACHE_HIT_MIN: f32 = 0.985;
@@ -7,6 +7,7 @@ const INDEX_CACHE_HIT_MIN: f32 = 0.985;
 const UNUSED_INDEXES_MIN_SIZE_BYTES: u64 = 1_000_000; // 1 MB
 const NULL_INDEXES_MIN_SIZE_MB: &str = "1"; // 1 MB
 const NULL_MIN_NULL_FRAC_PERCENT: f64 = 50.0; // 50%
+const BLOAT_MIN_VALUE: f64 = 10.0;
 
 #[derive(Debug)]
 enum Check {
@@ -74,6 +75,7 @@ impl Diagnose {
             Check::IndexCacheHit => Self::index_cache_hit().await,
             Check::UnusedIndexes => Self::unused_index().await,
             Check::NullIndexes => Self::null_index().await,
+            Check::Bloat => Self::bloat().await,
             Check::SslUsed => Self::ssl_used().await,
             _ => Ok(CheckResult::new(true, "Not implemented".to_string(), stringify!(check).to_string())),
         }
@@ -163,6 +165,24 @@ impl Diagnose {
             .collect::<Vec<_>>()
             .join(",\n");
 
-        Ok(CheckResult::new(false, format!("Null indexes detected:\n{}", print_indexes), stringify!(unused_indexes).to_string()))
+        Ok(CheckResult::new(false, format!("Null indexes detected:\n{}", print_indexes), stringify!(null_index).to_string()))
+    }
+
+    async fn bloat() -> Result<CheckResult, PgExtrasError> {
+        let bloat_data = bloat().await?
+            .into_iter()
+            .filter(|b| b.bloat >= BigDecimal::try_from(BLOAT_MIN_VALUE).unwrap())
+            .collect::<Vec<_>>();
+
+        if bloat_data.is_empty() {
+            return Ok(CheckResult::new(true, "No bloat detected.".to_string(), stringify!(bloat).to_string()))
+        }
+
+        let print_bloat = bloat_data.iter()
+            .map(|b| format!("'{}' bloat {} waste {}", b.object_name, b.bloat, b.waste))
+            .collect::<Vec<_>>()
+            .join(",\n");
+
+        Ok(CheckResult::new(false, format!("Bloat detected:\n{}", print_bloat), stringify!(bloat).to_string()))
     }
 }
