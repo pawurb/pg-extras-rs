@@ -235,7 +235,7 @@ pub async fn db_settings() -> Result<Vec<DbSettings>, PgExtrasError> {
 }
 
 pub async fn diagnose() -> Result<Vec<CheckResult>, PgExtrasError> {
-    diagnose::Diagnose::run().await
+    diagnose::run().await
 }
 
 #[derive(Debug, Clone)]
