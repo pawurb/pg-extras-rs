@@ -1,5 +1,5 @@
 use crate::size_parser::to_bytes;
-use crate::{bloat, cache_hit, duplicate_indexes, extensions, null_indexes, ssl_used, unused_indexes, Extensions, PgExtrasError};
+use crate::{bloat, cache_hit, duplicate_indexes, extensions, null_indexes, outliers, ssl_used, unused_indexes, Extensions, PgExtrasError};
 use sqlx::types::BigDecimal;
 
 const TABLE_CACHE_HIT_MIN: f32 = 0.985;
@@ -8,6 +8,7 @@ const UNUSED_INDEXES_MIN_SIZE_BYTES: u64 = 1_000_000; // 1 MB
 const NULL_INDEXES_MIN_SIZE_MB: &str = "1"; // 1 MB
 const NULL_MIN_NULL_FRAC_PERCENT: f64 = 50.0; // 50%
 const BLOAT_MIN_VALUE: f64 = 10.0;
+const OUTLIERS_MIN_EXEC_RATIO: f64 = 33.0; // 33%
 
 #[derive(Debug)]
 enum Check {
@@ -78,7 +79,7 @@ impl Diagnose {
             Check::Bloat => Self::bloat().await,
             Check::DuplicateIndexes => Self::duplicate_indexes().await,
             Check::SslUsed => Self::ssl_used().await,
-            _ => Ok(CheckResult::new(true, "Not implemented".to_string(), stringify!(check).to_string())),
+            Check::Outliers => Self::outliers().await,
         }
     }
 
@@ -200,5 +201,23 @@ impl Diagnose {
             .join(",\n");
 
         Ok(CheckResult::new(false, format!("Duplicate indexes detected:\n{}", print_indexes), stringify!(duplicate_indexes).to_string()))
+    }
+
+    async fn outliers() -> Result<CheckResult, PgExtrasError> {
+        let queries = outliers().await?
+            .into_iter().filter(|q| {
+            q.prop_exec_time.replace("%", "").parse::<f64>().unwrap() >= OUTLIERS_MIN_EXEC_RATIO
+        }).collect::<Vec<_>>();
+
+        if queries.is_empty() {
+            return Ok(CheckResult::new(true, "No queries using significant execution ratio detected.".to_string(), stringify!(outliers).to_string()))
+        }
+
+        let print_queries = queries.iter().map(|q|
+            { format!("'{}...' called {} times, using {} of total exec time.", q.query.chars().take(30).collect::<String>(), q.ncalls, q.prop_exec_time) })
+            .collect::<Vec<_>>()
+            .join(",\n");
+
+        Ok(CheckResult::new(false, format!("Queries using significant execution ratio detected:\n{}", print_queries), stringify!(outliers).to_string()))
     }
 }
