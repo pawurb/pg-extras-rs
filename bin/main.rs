@@ -29,6 +29,8 @@ pub struct PgExtrasArgs {
 
 #[derive(Subcommand, Debug)]
 pub enum PgSubcommand {
+    #[command(about = "Diagnose common database problems")]
+    Diagnose(EmptyArgs),
     #[command(about = extract_desc(&AllLocks::description()))]
     AllLocks(EmptyArgs),
     #[command(about = extract_desc(&Bloat::description()))]
@@ -47,8 +49,6 @@ pub enum PgSubcommand {
     Connections(EmptyArgs),
     #[command(about = extract_desc(&DbSettings::description()))]
     DbSettings(EmptyArgs),
-    #[command(about = "Diagnose common database problems")]
-    Diagnose(EmptyArgs),
     #[command(about = extract_desc(&DuplicateIndexes::description()))]
     DuplicateIndexes(EmptyArgs),
     #[command(about = extract_desc(&Extensions::description()))]
