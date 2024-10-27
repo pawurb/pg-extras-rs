@@ -24,6 +24,8 @@ sqlx = { version = "0.8", features = [
 ] }
 
 tokio = { version = "1.40", features = ["full"] }
+unicode-width = "0.2.0"
+textwrap = { version = "0.16.1", features = ["terminal_size"] }
 
 [profile.release]
 lto = true

@@ -5,7 +5,6 @@ use std::{
 };
 pub mod queries;
 pub mod diagnose;
-pub mod size_parser;
 
 pub use queries::{
     all_locks::AllLocks,
@@ -62,28 +61,6 @@ pub fn render_table<T: Query>(items: Vec<T>) {
     table.set_titles(TableRow::new(vec![
         Cell::new(T::description().as_str()).style_spec(format!("H{}", columns_count).as_str())
     ]));
-    table.printstd();
-}
-
-pub fn render_diagnose_report(items: Vec<CheckResult>)
-{
-    let mut table = Table::new();
-
-    let mut header_cell = Cell::new("Diagnose Report").style_spec("bH2");
-    header_cell.align(prettytable::format::Alignment::CENTER);
-    table.set_titles(TableRow::new(vec![header_cell]));
-
-    for item in items {
-        let style = if item.ok { "Fg" } else { "Fr" };
-
-        let status_and_name = format!("[{}] - {}", if item.ok { "√" } else { "x" }, item.check_name);
-
-        table.add_row(TableRow::new(vec![
-            Cell::new(status_and_name.as_str()).style_spec(style),
-            Cell::new(item.message.as_str()).style_spec(style),
-        ]));
-    }
-
     table.printstd();
 }
 
@@ -235,7 +212,7 @@ pub async fn db_settings() -> Result<Vec<DbSettings>, PgExtrasError> {
 }
 
 pub async fn diagnose() -> Result<Vec<CheckResult>, PgExtrasError> {
-    diagnose::run().await
+    run_diagnose().await
 }
 
 #[derive(Debug, Clone)]
@@ -263,7 +240,7 @@ impl fmt::Display for PgExtrasError {
 impl std::error::Error for PgExtrasError {}
 
 use lazy_static::lazy_static;
-use crate::diagnose::CheckResult;
+use crate::diagnose::run::{run_diagnose, CheckResult};
 
 lazy_static! {
     pub static ref NEW_PG_STAT_STATEMENTS: Version = Version::parse("1.8.0").unwrap();
@@ -351,6 +328,7 @@ fn limit_params(limit: Option<String>) -> HashMap<String, String> {
 
 #[cfg(test)]
 mod tests {
+    use crate::diagnose::report::render_diagnose_report;
     use super::*;
 
     async fn setup() -> Result<(), Box<dyn std::error::Error>> {

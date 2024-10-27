@@ -1,4 +1,4 @@
-use crate::size_parser::to_bytes;
+use crate::diagnose::size_parser::to_bytes;
 use crate::{
     bloat, cache_hit, duplicate_indexes, extensions, null_indexes, outliers, ssl_used,
     unused_indexes, Extensions, PgExtrasError,
@@ -13,8 +13,8 @@ const NULL_MIN_NULL_FRAC_PERCENT: f64 = 50.0; // 50%
 const BLOAT_MIN_VALUE: f64 = 10.0;
 const OUTLIERS_MIN_EXEC_RATIO: f64 = 33.0; // 33%
 
-#[derive(Debug)]
-enum Check {
+#[derive(Debug, Hash, Eq, PartialEq)]
+pub enum Check {
     TableCacheHit,
     IndexCacheHit,
     SslUsed,
@@ -29,10 +29,26 @@ enum Check {
 pub struct CheckResult {
     pub ok: bool,
     pub message: String,
-    pub check_name: String,
+    pub check: Check
 }
 
-pub async fn run() -> Result<Vec<CheckResult>, PgExtrasError> {
+impl std::fmt::Display for Check {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let name = format!("{:?}", self);
+        let snake_case_name = name
+            .chars()
+            .flat_map(|c| if c.is_uppercase() {
+                vec!['_', c.to_ascii_lowercase()]
+            } else {
+                vec![c]
+            })
+            .skip(1)
+            .collect::<String>();
+        write!(f, "{}", snake_case_name)
+    }
+}
+
+pub async fn run_diagnose() -> Result<Vec<CheckResult>, PgExtrasError> {
     let mut checks = vec![
         Check::TableCacheHit,
         Check::IndexCacheHit,
@@ -88,7 +104,7 @@ async fn check_table_cache_hit() -> Result<CheckResult, PgExtrasError> {
         return Ok(CheckResult {
             ok: false,
             message: "Table cache hit rate not found".to_string(),
-            check_name: stringify!(table_cache_hit).to_string(),
+            check: Check::TableCacheHit
         });
     };
 
@@ -102,7 +118,7 @@ async fn check_table_cache_hit() -> Result<CheckResult, PgExtrasError> {
     Ok(CheckResult {
         ok,
         message,
-        check_name: stringify!(table_cache_hit).to_string(),
+        check: Check::TableCacheHit
     })
 }
 
@@ -115,7 +131,7 @@ async fn check_index_cache_hit() -> Result<CheckResult, PgExtrasError> {
         return Ok(CheckResult {
             ok: false,
             message: "Index cache hit rate not found".to_string(),
-            check_name: stringify!(table_cache_hit).to_string(),
+            check: Check::IndexCacheHit
         });
     };
 
@@ -129,7 +145,7 @@ async fn check_index_cache_hit() -> Result<CheckResult, PgExtrasError> {
     Ok(CheckResult {
         ok,
         message,
-        check_name: stringify!(index_cache_hit).to_string(),
+        check: Check::IndexCacheHit
     })
 }
 
@@ -139,7 +155,7 @@ async fn detect_ssl_used() -> Result<CheckResult, PgExtrasError> {
         return Ok(CheckResult {
             ok: false,
             message: "Unable to get connection information.".to_string(),
-            check_name: stringify!(ssl_used).to_string(),
+            check: Check::SslUsed,
         });
     };
 
@@ -152,7 +168,7 @@ async fn detect_ssl_used() -> Result<CheckResult, PgExtrasError> {
     Ok(CheckResult {
         ok: ssl_conn.ssl_used,
         message: message.to_string(),
-        check_name: stringify!(ssl_used).to_string(),
+        check: Check::SslUsed,
     })
 }
 
@@ -167,7 +183,7 @@ async fn check_unused_index() -> Result<CheckResult, PgExtrasError> {
         return Ok(CheckResult {
             ok: true,
             message: "No unused indexes detected.".to_string(),
-            check_name: stringify!(unused_indexes).to_string(),
+            check: Check::UnusedIndexes,
         });
     }
 
@@ -180,7 +196,7 @@ async fn check_unused_index() -> Result<CheckResult, PgExtrasError> {
     Ok(CheckResult {
         ok: false,
         message: format!("Unused indexes detected:\n{}", print_indexes),
-        check_name: stringify!(unused_indexes).to_string(),
+        check: Check::UnusedIndexes,
     })
 }
 
@@ -201,7 +217,7 @@ async fn check_null_index() -> Result<CheckResult, PgExtrasError> {
         return Ok(CheckResult {
             ok: true,
             message: "No null indexes detected.".to_string(),
-            check_name: stringify!(null_indexes).to_string(),
+            check: Check::NullIndexes,
         });
     }
 
@@ -219,7 +235,7 @@ async fn check_null_index() -> Result<CheckResult, PgExtrasError> {
     Ok(CheckResult {
         ok: false,
         message: format!("Null indexes detected:\n{}", print_indexes),
-        check_name: stringify!(null_index).to_string(),
+        check: Check::NullIndexes,
     })
 }
 
@@ -234,7 +250,7 @@ async fn check_bloat() -> Result<CheckResult, PgExtrasError> {
         return Ok(CheckResult {
             ok: true,
             message: "No bloat detected.".to_string(),
-            check_name: stringify!(bloat).to_string(),
+            check: Check::Bloat,
         });
     }
 
@@ -247,7 +263,7 @@ async fn check_bloat() -> Result<CheckResult, PgExtrasError> {
     Ok(CheckResult {
         ok: false,
         message: format!("Bloat detected:\n{}", print_bloat),
-        check_name: stringify!(bloat).to_string(),
+        check: Check::Bloat,
     })
 }
 
@@ -258,7 +274,7 @@ async fn check_duplicate_indexes() -> Result<CheckResult, PgExtrasError> {
         return Ok(CheckResult {
             ok: true,
             message: "No duplicate indexes detected.".to_string(),
-            check_name: stringify!(duplicate_indexes).to_string(),
+            check: Check::DuplicateIndexes,
         });
     }
 
@@ -276,7 +292,7 @@ async fn check_duplicate_indexes() -> Result<CheckResult, PgExtrasError> {
     Ok(CheckResult {
         ok: false,
         message: format!("Duplicate indexes detected:\n{}", print_indexes),
-        check_name: stringify!(duplicate_indexes).to_string(),
+        check: Check::DuplicateIndexes,
     })
 }
 
@@ -293,7 +309,7 @@ async fn check_outliers() -> Result<CheckResult, PgExtrasError> {
         return Ok(CheckResult {
             ok: true,
             message: "No queries using significant execution ratio detected.".to_string(),
-            check_name: stringify!(outliers).to_string(),
+            check: Check::Outliers,
         });
     }
 
@@ -316,6 +332,6 @@ async fn check_outliers() -> Result<CheckResult, PgExtrasError> {
             "Queries using significant execution ratio detected:\n{}",
             print_queries
         ),
-        check_name: stringify!(outliers).to_string(),
+        check: Check::Outliers,
     })
 }
