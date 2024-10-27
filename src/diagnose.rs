@@ -84,31 +84,26 @@ async fn check_table_cache_hit() -> Result<CheckResult, PgExtrasError> {
     let cache_hit = cache_hit(None).await?;
     let table_cache_hit = cache_hit.iter().find(|item| item.name == "table hit rate");
 
-    if let Some(table_hit_rate) = table_cache_hit {
-        let ok = table_hit_rate.ratio >= min_expected;
-        let message = if ok {
-            format!(
-                "Table cache hit rate is correct: {:.4}",
-                table_hit_rate.ratio
-            )
-        } else {
-            format!(
-                "Table cache hit rate is too low: {:.4}",
-                table_hit_rate.ratio
-            )
-        };
-        Ok(CheckResult {
-            ok,
-            message,
-            check_name: stringify!(table_cache_hit).to_string(),
-        })
-    } else {
-        Ok(CheckResult {
+    let Some(table_hit_rate) = table_cache_hit else {
+        return Ok(CheckResult {
             ok: false,
             message: "Table cache hit rate not found".to_string(),
             check_name: stringify!(table_cache_hit).to_string(),
-        })
-    }
+        });
+    };
+
+    let ok = table_hit_rate.ratio >= min_expected;
+    let message = format!(
+        "Table cache hit rate is {}: {:.4}",
+        if ok { "correct" } else { "too low" },
+        table_hit_rate.ratio
+    );
+
+    Ok(CheckResult {
+        ok,
+        message,
+        check_name: stringify!(table_cache_hit).to_string(),
+    })
 }
 
 async fn check_index_cache_hit() -> Result<CheckResult, PgExtrasError> {
@@ -116,49 +111,47 @@ async fn check_index_cache_hit() -> Result<CheckResult, PgExtrasError> {
     let cache_hit = cache_hit(None).await?;
     let index_cache_hit = cache_hit.iter().find(|item| item.name == "index hit rate");
 
-    if let Some(index_hit_rate) = index_cache_hit {
-        let ok = index_hit_rate.ratio >= min_expected;
-        let message = if ok {
-            format!(
-                "Index cache hit rate is correct: {:.4}",
-                index_hit_rate.ratio
-            )
-        } else {
-            format!(
-                "Index cache hit rate is too low: {:.4}",
-                index_hit_rate.ratio
-            )
-        };
-        Ok(CheckResult {
-            ok,
-            message,
-            check_name: stringify!(index_cache_hit).to_string(),
-        })
-    } else {
-        Ok(CheckResult {
+    let Some(index_hit_rate) = index_cache_hit else {
+        return Ok(CheckResult {
             ok: false,
             message: "Index cache hit rate not found".to_string(),
-            check_name: stringify!(index_cache_hit).to_string(),
-        })
-    }
+            check_name: stringify!(table_cache_hit).to_string(),
+        });
+    };
+
+    let ok = index_hit_rate.ratio >= min_expected;
+    let message = format!(
+        "Index cache hit rate is {}: {:.4}",
+        if ok { "correct" } else { "too low" },
+        index_hit_rate.ratio
+    );
+
+    Ok(CheckResult {
+        ok,
+        message,
+        check_name: stringify!(index_cache_hit).to_string(),
+    })
 }
 
 async fn detect_ssl_used() -> Result<CheckResult, PgExtrasError> {
-    if let Some(ssl_conn) = ssl_used().await?.first() {
-        let message = if ssl_conn.ssl_used {
-            "Database client is using a secure SSL connection."
-        } else {
-            "Database client is using an unencrypted connection."
-        };
+    let ssl_results = ssl_used().await?;
+    let Some(ssl_conn) = ssl_results.first() else {
         return Ok(CheckResult {
-            ok: ssl_conn.ssl_used,
-            message: message.to_string(),
+            ok: false,
+            message: "Unable to get connection information.".to_string(),
             check_name: stringify!(ssl_used).to_string(),
         });
-    }
+    };
+
+    let message = if ssl_conn.ssl_used {
+        "Database client is using a secure SSL connection."
+    } else {
+        "Database client is using an unencrypted connection."
+    };
+
     Ok(CheckResult {
-        ok: false,
-        message: "Unable to get connection information.".to_string(),
+        ok: ssl_conn.ssl_used,
+        message: message.to_string(),
         check_name: stringify!(ssl_used).to_string(),
     })
 }
