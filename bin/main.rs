@@ -1,17 +1,6 @@
 use clap::{Parser, Subcommand};
-use pg_extras::{
-    all_locks, bloat, blocking, buffercache_stats, buffercache_usage, cache_hit, calls,
-    connections, db_settings, duplicate_indexes, extensions, index_cache_hit, index_scans,
-    index_size, index_usage, indexes, locks, long_running_queries, mandelbrot, null_indexes,
-    outliers, records_rank, render_table, seq_scans, ssl_used, table_cache_hit, table_index_scans,
-    table_indexes_size, table_size, tables, total_index_size, total_table_size, unused_indexes,
-    vacuum_stats, AllLocks, Bloat, Blocking, BuffercacheStats, BuffercacheUsage, CacheHit, Calls,
-    Connections, DbSettings, DuplicateIndexes, Extensions, IndexCacheHit, IndexScans, IndexSize,
-    IndexUsage, Indexes, Locks, LongRunningQueries, Mandelbrot, NullIndexes, Outliers,
-    PgExtrasError, Query, RecordsRank, SeqScans, SslUsed, TableCacheHit, TableIndexScans,
-    TableIndexesSize, TableSize, Tables, TotalIndexSize, TotalTableSize, UnusedIndexes,
-    VacuumStats,
-};
+use pg_extras::{all_locks, bloat, blocking, buffercache_stats, buffercache_usage, cache_hit, calls, connections, db_settings, diagnose, duplicate_indexes, extensions, index_cache_hit, index_scans, index_size, index_usage, indexes, locks, long_running_queries, mandelbrot, null_indexes, outliers, records_rank, render_table, seq_scans, ssl_used, table_cache_hit, table_index_scans, table_indexes_size, table_size, tables, total_index_size, total_table_size, unused_indexes, vacuum_stats, AllLocks, Bloat, Blocking, BuffercacheStats, BuffercacheUsage, CacheHit, Calls, Connections, DbSettings, DuplicateIndexes, Extensions, IndexCacheHit, IndexScans, IndexSize, IndexUsage, Indexes, Locks, LongRunningQueries, Mandelbrot, NullIndexes, Outliers, PgExtrasError, Query, RecordsRank, SeqScans, SslUsed, TableCacheHit, TableIndexScans, TableIndexesSize, TableSize, Tables, TotalIndexSize, TotalTableSize, UnusedIndexes, VacuumStats};
+use pg_extras::diagnose::report::render_diagnose_report;
 
 #[derive(Parser, Debug)]
 #[command(
@@ -46,6 +35,8 @@ pub enum PgSubcommand {
     Connections(EmptyArgs),
     #[command(about = extract_desc(&DbSettings::description()))]
     DbSettings(EmptyArgs),
+    #[command(about = "Diagnose common database problems")]
+    Diagnose(EmptyArgs),
     #[command(about = extract_desc(&DuplicateIndexes::description()))]
     DuplicateIndexes(EmptyArgs),
     #[command(about = extract_desc(&Extensions::description()))]
@@ -141,6 +132,9 @@ async fn execute() -> Result<(), PgExtrasError> {
         }
         PG::DbSettings(_args) => {
             render_table(db_settings().await?);
+        }
+        PG::Diagnose(_args) => {
+            render_diagnose_report(diagnose().await?);
         }
         PG::DuplicateIndexes(_args) => {
             render_table(duplicate_indexes().await?);
