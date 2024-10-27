@@ -7,7 +7,7 @@ license = "MIT"
 name = "pg-extras"
 readme = "README.md"
 repository = "https://github.com/pawurb/pg-extras-rs"
-version = "0.6.1"
+version = "0.6.2"
 
 exclude = ["docker-compose.yml.sample", "live_tests.sh"]
 
@@ -24,6 +24,8 @@ sqlx = { version = "0.8", features = [
 ] }
 
 tokio = { version = "1.40", features = ["full"] }
+unicode-width = "0.2.0"
+textwrap = { version = "0.16.1", features = ["terminal_size"] }
 
 [profile.release]
 lto = true

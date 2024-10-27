@@ -112,6 +112,20 @@ cache_hit(Some("other_schema".to_string)).await?;
 
 You can customize the default `public` schema by setting `ENV['PG_EXTRAS_SCHEMA']` value.
 
+## Diagnose Report
+
+The simplest way to start using pg-extras is to execute a `diagnose` method. It runs a set of checks and prints out a report highlighting areas that may require additional investigation:
+
+```rust
+use pg_extras::{diagnose, diagnose::report::render_diagnose_report};
+
+render_diagnose_report(diagnose().await?);
+
+```
+
+![Diagnose report](pg-extras-diagnose-report.png)
+
+Keep reading to learn about methods that `diagnose` uses under the hood.
 
 ## Available methods
 

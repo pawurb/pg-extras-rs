@@ -3,7 +3,9 @@ use std::{
     time::Duration,
     {env, fmt},
 };
+pub mod diagnose;
 pub mod queries;
+
 pub use queries::{
     all_locks::AllLocks,
     bloat::Bloat,
@@ -209,6 +211,10 @@ pub async fn db_settings() -> Result<Vec<DbSettings>, PgExtrasError> {
     get_rows(None).await
 }
 
+pub async fn diagnose() -> Result<Vec<CheckResult>, PgExtrasError> {
+    run_diagnose().await
+}
+
 #[derive(Debug, Clone)]
 #[non_exhaustive]
 pub enum PgExtrasError {
@@ -233,6 +239,7 @@ impl fmt::Display for PgExtrasError {
 
 impl std::error::Error for PgExtrasError {}
 
+use crate::diagnose::run::{run_diagnose, CheckResult};
 use lazy_static::lazy_static;
 
 lazy_static! {
@@ -322,6 +329,7 @@ fn limit_params(limit: Option<String>) -> HashMap<String, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::diagnose::report::render_diagnose_report;
 
     async fn setup() -> Result<(), Box<dyn std::error::Error>> {
         let port = match env::var("PG_VERSION").expect("PG_VERSION not set").as_str() {
@@ -392,6 +400,7 @@ mod tests {
         render_table(ssl_used().await?);
         render_table(connections().await?);
         render_table(db_settings().await?);
+        render_diagnose_report(diagnose().await?);
 
         Ok(())
     }
