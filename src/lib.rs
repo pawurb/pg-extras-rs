@@ -3,8 +3,8 @@ use std::{
     time::Duration,
     {env, fmt},
 };
-pub mod queries;
 pub mod diagnose;
+pub mod queries;
 
 pub use queries::{
     all_locks::AllLocks,
@@ -239,8 +239,8 @@ impl fmt::Display for PgExtrasError {
 
 impl std::error::Error for PgExtrasError {}
 
-use lazy_static::lazy_static;
 use crate::diagnose::run::{run_diagnose, CheckResult};
+use lazy_static::lazy_static;
 
 lazy_static! {
     pub static ref NEW_PG_STAT_STATEMENTS: Version = Version::parse("1.8.0").unwrap();
@@ -328,8 +328,8 @@ fn limit_params(limit: Option<String>) -> HashMap<String, String> {
 
 #[cfg(test)]
 mod tests {
-    use crate::diagnose::report::render_diagnose_report;
     use super::*;
+    use crate::diagnose::report::render_diagnose_report;
 
     async fn setup() -> Result<(), Box<dyn std::error::Error>> {
         let port = match env::var("PG_VERSION").expect("PG_VERSION not set").as_str() {

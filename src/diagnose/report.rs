@@ -1,9 +1,8 @@
-use prettytable::{Cell, Row as TableRow, Table};
 use crate::diagnose::recommendation;
 use crate::diagnose::run::CheckResult;
+use prettytable::{Cell, Row as TableRow, Table};
 
-pub fn render_diagnose_report(items: Vec<CheckResult>)
-{
+pub fn render_diagnose_report(items: Vec<CheckResult>) {
     let term_width = textwrap::termwidth();
     let recommendation_width = term_width / 3; // need to adjust this to make the recommendation text wrap nicely
 
@@ -40,7 +39,8 @@ pub fn render_diagnose_report(items: Vec<CheckResult>)
         table.add_row(TableRow::new(vec![
             Cell::new(status_and_name.as_str()).style_spec(style),
             Cell::new(item.message.as_str()).style_spec(style),
-            Cell::new(textwrap::fill(&recommendation, recommendation_width).as_str()).style_spec(style),
+            Cell::new(textwrap::fill(&recommendation, recommendation_width).as_str())
+                .style_spec(style),
         ]));
     }
 

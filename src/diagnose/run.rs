@@ -29,7 +29,7 @@ pub enum Check {
 pub struct CheckResult {
     pub ok: bool,
     pub message: String,
-    pub check: Check
+    pub check: Check,
 }
 
 impl std::fmt::Display for Check {
@@ -37,10 +37,12 @@ impl std::fmt::Display for Check {
         let name = format!("{:?}", self);
         let snake_case_name = name
             .chars()
-            .flat_map(|c| if c.is_uppercase() {
-                vec!['_', c.to_ascii_lowercase()]
-            } else {
-                vec![c]
+            .flat_map(|c| {
+                if c.is_uppercase() {
+                    vec!['_', c.to_ascii_lowercase()]
+                } else {
+                    vec![c]
+                }
             })
             .skip(1)
             .collect::<String>();
@@ -104,7 +106,7 @@ async fn check_table_cache_hit() -> Result<CheckResult, PgExtrasError> {
         return Ok(CheckResult {
             ok: false,
             message: "Table cache hit rate not found".to_string(),
-            check: Check::TableCacheHit
+            check: Check::TableCacheHit,
         });
     };
 
@@ -118,7 +120,7 @@ async fn check_table_cache_hit() -> Result<CheckResult, PgExtrasError> {
     Ok(CheckResult {
         ok,
         message,
-        check: Check::TableCacheHit
+        check: Check::TableCacheHit,
     })
 }
 
@@ -131,7 +133,7 @@ async fn check_index_cache_hit() -> Result<CheckResult, PgExtrasError> {
         return Ok(CheckResult {
             ok: false,
             message: "Index cache hit rate not found".to_string(),
-            check: Check::IndexCacheHit
+            check: Check::IndexCacheHit,
         });
     };
 
@@ -145,7 +147,7 @@ async fn check_index_cache_hit() -> Result<CheckResult, PgExtrasError> {
     Ok(CheckResult {
         ok,
         message,
-        check: Check::IndexCacheHit
+        check: Check::IndexCacheHit,
     })
 }
 

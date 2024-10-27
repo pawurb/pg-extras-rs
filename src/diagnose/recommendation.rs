@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-use lazy_static::lazy_static;
 use crate::diagnose::run::Check;
+use lazy_static::lazy_static;
+use std::collections::HashMap;
 
 lazy_static! {
     pub static ref Recommendations: HashMap<Check, (&'static str, Vec<&'static str>)> = {

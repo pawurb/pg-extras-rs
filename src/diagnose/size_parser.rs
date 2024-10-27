@@ -10,7 +10,10 @@ use crate::PgExtrasError;
 pub fn to_bytes(size: &str) -> Result<u64, PgExtrasError> {
     let size = size.trim();
     let (num, unit) = size.split_at(size.find(char::is_alphabetic).unwrap_or(size.len()));
-    let num: f64 = num.trim().parse().map_err(|_| PgExtrasError::Unknown(size.to_string()))?;
+    let num: f64 = num
+        .trim()
+        .parse()
+        .map_err(|_| PgExtrasError::Unknown(size.to_string()))?;
     let multiplier: i64 = match unit.trim().to_lowercase().as_str() {
         "b" => 1,
         "kb" => 1_000,
@@ -21,7 +24,6 @@ pub fn to_bytes(size: &str) -> Result<u64, PgExtrasError> {
     };
     Ok((num * multiplier as f64) as u64)
 }
-
 
 #[cfg(test)]
 mod tests {
