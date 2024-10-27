@@ -32,16 +32,6 @@ pub struct CheckResult {
     pub check_name: String,
 }
 
-impl CheckResult {
-    pub fn new(ok: bool, message: String, check_name: String) -> Self {
-        Self {
-            ok,
-            message,
-            check_name,
-        }
-    }
-}
-
 pub async fn run() -> Result<Vec<CheckResult>, PgExtrasError> {
     let mut checks = vec![
         Check::TableCacheHit,
@@ -107,17 +97,17 @@ async fn check_table_cache_hit() -> Result<CheckResult, PgExtrasError> {
                 table_hit_rate.ratio
             )
         };
-        Ok(CheckResult::new(
+        Ok(CheckResult {
             ok,
             message,
-            stringify!(table_cache_hit).to_string(),
-        ))
+            check_name: stringify!(table_cache_hit).to_string(),
+        })
     } else {
-        Ok(CheckResult::new(
-            false,
-            "Table cache hit rate not found".to_string(),
-            stringify!(table_cache_hit).to_string(),
-        ))
+        Ok(CheckResult {
+            ok: false,
+            message: "Table cache hit rate not found".to_string(),
+            check_name: stringify!(table_cache_hit).to_string(),
+        })
     }
 }
 
@@ -139,17 +129,17 @@ async fn check_index_cache_hit() -> Result<CheckResult, PgExtrasError> {
                 index_hit_rate.ratio
             )
         };
-        Ok(CheckResult::new(
+        Ok(CheckResult {
             ok,
             message,
-            stringify!(index_cache_hit).to_string(),
-        ))
+            check_name: stringify!(index_cache_hit).to_string(),
+        })
     } else {
-        Ok(CheckResult::new(
-            false,
-            "Index cache hit rate not found".to_string(),
-            stringify!(index_cache_hit).to_string(),
-        ))
+        Ok(CheckResult {
+            ok: false,
+            message: "Index cache hit rate not found".to_string(),
+            check_name: stringify!(index_cache_hit).to_string(),
+        })
     }
 }
 
@@ -160,17 +150,17 @@ async fn detect_ssl_used() -> Result<CheckResult, PgExtrasError> {
         } else {
             "Database client is using an unencrypted connection."
         };
-        return Ok(CheckResult::new(
-            ssl_conn.ssl_used,
-            message.to_string(),
-            stringify!(ssl_used).to_string(),
-        ));
+        return Ok(CheckResult {
+            ok: ssl_conn.ssl_used,
+            message: message.to_string(),
+            check_name: stringify!(ssl_used).to_string(),
+        });
     }
-    Ok(CheckResult::new(
-        false,
-        "Unable to get connection information.".to_string(),
-        stringify!(ssl_used).to_string(),
-    ))
+    Ok(CheckResult {
+        ok: false,
+        message: "Unable to get connection information.".to_string(),
+        check_name: stringify!(ssl_used).to_string(),
+    })
 }
 
 async fn check_unused_index() -> Result<CheckResult, PgExtrasError> {
@@ -181,11 +171,11 @@ async fn check_unused_index() -> Result<CheckResult, PgExtrasError> {
         .collect::<Vec<_>>();
 
     if indexes.is_empty() {
-        return Ok(CheckResult::new(
-            true,
-            "No unused indexes detected.".to_string(),
-            stringify!(unused_indexes).to_string(),
-        ));
+        return Ok(CheckResult {
+            ok: true,
+            message: "No unused indexes detected.".to_string(),
+            check_name: stringify!(unused_indexes).to_string(),
+        });
     }
 
     let print_indexes = indexes
@@ -194,11 +184,11 @@ async fn check_unused_index() -> Result<CheckResult, PgExtrasError> {
         .collect::<Vec<_>>()
         .join(",\n");
 
-    Ok(CheckResult::new(
-        false,
-        format!("Unused indexes detected:\n{}", print_indexes),
-        stringify!(unused_indexes).to_string(),
-    ))
+    Ok(CheckResult {
+        ok: false,
+        message: format!("Unused indexes detected:\n{}", print_indexes),
+        check_name: stringify!(unused_indexes).to_string(),
+    })
 }
 
 async fn check_null_index() -> Result<CheckResult, PgExtrasError> {
@@ -215,11 +205,11 @@ async fn check_null_index() -> Result<CheckResult, PgExtrasError> {
         .collect::<Vec<_>>();
 
     if indexes.is_empty() {
-        return Ok(CheckResult::new(
-            true,
-            "No null indexes detected.".to_string(),
-            stringify!(null_indexes).to_string(),
-        ));
+        return Ok(CheckResult {
+            ok: true,
+            message: "No null indexes detected.".to_string(),
+            check_name: stringify!(null_indexes).to_string(),
+        });
     }
 
     let print_indexes = indexes
@@ -233,11 +223,11 @@ async fn check_null_index() -> Result<CheckResult, PgExtrasError> {
         .collect::<Vec<_>>()
         .join(",\n");
 
-    Ok(CheckResult::new(
-        false,
-        format!("Null indexes detected:\n{}", print_indexes),
-        stringify!(null_index).to_string(),
-    ))
+    Ok(CheckResult {
+        ok: false,
+        message: format!("Null indexes detected:\n{}", print_indexes),
+        check_name: stringify!(null_index).to_string(),
+    })
 }
 
 async fn check_bloat() -> Result<CheckResult, PgExtrasError> {
@@ -248,11 +238,11 @@ async fn check_bloat() -> Result<CheckResult, PgExtrasError> {
         .collect::<Vec<_>>();
 
     if bloat_data.is_empty() {
-        return Ok(CheckResult::new(
-            true,
-            "No bloat detected.".to_string(),
-            stringify!(bloat).to_string(),
-        ));
+        return Ok(CheckResult {
+            ok: true,
+            message: "No bloat detected.".to_string(),
+            check_name: stringify!(bloat).to_string(),
+        });
     }
 
     let print_bloat = bloat_data
@@ -261,22 +251,22 @@ async fn check_bloat() -> Result<CheckResult, PgExtrasError> {
         .collect::<Vec<_>>()
         .join(",\n");
 
-    Ok(CheckResult::new(
-        false,
-        format!("Bloat detected:\n{}", print_bloat),
-        stringify!(bloat).to_string(),
-    ))
+    Ok(CheckResult {
+        ok: false,
+        message: format!("Bloat detected:\n{}", print_bloat),
+        check_name: stringify!(bloat).to_string(),
+    })
 }
 
 async fn check_duplicate_indexes() -> Result<CheckResult, PgExtrasError> {
     let indexes = duplicate_indexes().await?;
 
     if indexes.is_empty() {
-        return Ok(CheckResult::new(
-            true,
-            "No duplicate indexes detected.".to_string(),
-            stringify!(duplicate_indexes).to_string(),
-        ));
+        return Ok(CheckResult {
+            ok: true,
+            message: "No duplicate indexes detected.".to_string(),
+            check_name: stringify!(duplicate_indexes).to_string(),
+        });
     }
 
     let print_indexes = indexes
@@ -290,11 +280,11 @@ async fn check_duplicate_indexes() -> Result<CheckResult, PgExtrasError> {
         .collect::<Vec<_>>()
         .join(",\n");
 
-    Ok(CheckResult::new(
-        false,
-        format!("Duplicate indexes detected:\n{}", print_indexes),
-        stringify!(duplicate_indexes).to_string(),
-    ))
+    Ok(CheckResult {
+        ok: false,
+        message: format!("Duplicate indexes detected:\n{}", print_indexes),
+        check_name: stringify!(duplicate_indexes).to_string(),
+    })
 }
 
 async fn check_outliers() -> Result<CheckResult, PgExtrasError> {
@@ -307,11 +297,11 @@ async fn check_outliers() -> Result<CheckResult, PgExtrasError> {
         .collect::<Vec<_>>();
 
     if queries.is_empty() {
-        return Ok(CheckResult::new(
-            true,
-            "No queries using significant execution ratio detected.".to_string(),
-            stringify!(outliers).to_string(),
-        ));
+        return Ok(CheckResult {
+            ok: true,
+            message: "No queries using significant execution ratio detected.".to_string(),
+            check_name: stringify!(outliers).to_string(),
+        });
     }
 
     let print_queries = queries
@@ -327,12 +317,12 @@ async fn check_outliers() -> Result<CheckResult, PgExtrasError> {
         .collect::<Vec<_>>()
         .join(",\n");
 
-    Ok(CheckResult::new(
-        false,
-        format!(
+    Ok(CheckResult {
+        ok: false,
+        message: format!(
             "Queries using significant execution ratio detected:\n{}",
             print_queries
         ),
-        stringify!(outliers).to_string(),
-    ))
+        check_name: stringify!(outliers).to_string(),
+    })
 }
