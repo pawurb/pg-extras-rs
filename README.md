@@ -116,11 +116,8 @@ You can customize the default `public` schema by setting `ENV['PG_EXTRAS_SCHEMA'
 
 The simplest way to start using pg-extras is to execute a `diagnose` method. It runs a set of checks and prints out a report highlighting areas that may require additional investigation:
 
-```rust
-use pg_extras::{diagnose, diagnose::report::render_diagnose_report};
-
-render_diagnose_report(diagnose().await?);
-
+```bash
+pgextras diagnose
 ```
 
 ![Diagnose report](pg-extras-diagnose-report.png)
