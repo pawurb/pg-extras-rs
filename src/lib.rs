@@ -422,6 +422,7 @@ mod tests {
         render_table(ssl_used().await?);
         render_table(connections().await?);
         render_table(db_settings().await?);
+        render_diagnose_report(diagnose().await?);
 
         Ok(())
     }
