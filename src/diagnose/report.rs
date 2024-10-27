@@ -24,8 +24,7 @@ pub fn render_diagnose_report(items: Vec<CheckResult>)
         let recommendation = if item.ok {
             "None".to_string()
         } else {
-            let empty = ("", vec![]);
-            let (header, details) = recommendation::Recommendations.get(&item.check).unwrap_or(&empty);
+            let (header, details) = recommendation::Recommendations.get(&item.check).unwrap();
             // build the recommendation text by concatenating the header and details with bullet points
             format!(
                 "{}:\n{}",
