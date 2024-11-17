@@ -31,71 +31,71 @@ pub struct PgExtrasArgs {
 pub enum PgSubcommand {
     #[command(about = "Diagnose common database problems")]
     Diagnose(EmptyArgs),
-    #[command(about = extract_desc(&AllLocks::description()))]
+    #[command(about = &AllLocks::description())]
     AllLocks(EmptyArgs),
-    #[command(about = extract_desc(&Bloat::description()))]
+    #[command(about = &Bloat::description())]
     Bloat(EmptyArgs),
-    #[command(about = extract_desc(&Blocking::description()))]
+    #[command(about = &Blocking::description())]
     Blocking(EmptyArgs),
-    #[command(about = extract_desc(&BuffercacheStats::description()))]
+    #[command(about = &BuffercacheStats::description())]
     BuffercacheStats(EmptyArgs),
-    #[command(about = extract_desc(&BuffercacheUsage::description()))]
+    #[command(about = &BuffercacheUsage::description())]
     BuffercacheUsage(EmptyArgs),
-    #[command(about = extract_desc(&CacheHit::description()))]
+    #[command(about = &CacheHit::description())]
     CacheHit(EmptyArgs),
-    #[command(about = extract_desc(&Calls::description()))]
+    #[command(about = &Calls::description())]
     Calls(EmptyArgs),
-    #[command(about = extract_desc(&Connections::description()))]
+    #[command(about = &Connections::description())]
     Connections(EmptyArgs),
-    #[command(about = extract_desc(&DbSettings::description()))]
+    #[command(about = &DbSettings::description())]
     DbSettings(EmptyArgs),
-    #[command(about = extract_desc(&DuplicateIndexes::description()))]
+    #[command(about = &DuplicateIndexes::description())]
     DuplicateIndexes(EmptyArgs),
-    #[command(about = extract_desc(&Extensions::description()))]
+    #[command(about = &Extensions::description())]
     Extensions(EmptyArgs),
-    #[command(about = extract_desc(&IndexCacheHit::description()))]
+    #[command(about = &IndexCacheHit::description())]
     IndexCacheHit(EmptyArgs),
-    #[command(about = extract_desc(&IndexScans::description()))]
+    #[command(about = &IndexScans::description())]
     IndexScans(EmptyArgs),
-    #[command(about = extract_desc(&IndexSize::description()))]
+    #[command(about = &IndexSize::description())]
     IndexSize(EmptyArgs),
-    #[command(about = extract_desc(&IndexUsage::description()))]
+    #[command(about = &IndexUsage::description())]
     IndexUsage(EmptyArgs),
-    #[command(about = extract_desc(&Indexes::description()))]
+    #[command(about = &Indexes::description())]
     Indexes(EmptyArgs),
-    #[command(about = extract_desc(&Locks::description()))]
+    #[command(about = &Locks::description())]
     Locks(EmptyArgs),
-    #[command(about = extract_desc(&LongRunningQueries::description()))]
+    #[command(about = &LongRunningQueries::description())]
     LongRunningQueries(EmptyArgs),
-    #[command(about = extract_desc(&NullIndexes::description()))]
+    #[command(about = &NullIndexes::description())]
     NullIndexes(EmptyArgs),
-    #[command(about = extract_desc(&Outliers::description()))]
+    #[command(about = &Outliers::description())]
     Outliers(EmptyArgs),
-    #[command(about = extract_desc(&Mandelbrot::description()))]
+    #[command(about = &Mandelbrot::description())]
     Mandelbrot(EmptyArgs),
-    #[command(about = extract_desc(&RecordsRank::description()))]
+    #[command(about = &RecordsRank::description())]
     RecordsRank(EmptyArgs),
-    #[command(about = extract_desc(&SeqScans::description()))]
+    #[command(about = &SeqScans::description())]
     SeqScans(EmptyArgs),
-    #[command(about = extract_desc(&SslUsed::description()))]
+    #[command(about = &SslUsed::description())]
     SslUsed(EmptyArgs),
-    #[command(about = extract_desc(&TableCacheHit::description()))]
+    #[command(about = &TableCacheHit::description())]
     TableCacheHit(EmptyArgs),
-    #[command(about = extract_desc(&TableIndexScans::description()))]
+    #[command(about = &TableIndexScans::description())]
     TableIndexScans(EmptyArgs),
-    #[command(about = extract_desc(&TableIndexesSize::description()))]
+    #[command(about = &TableIndexesSize::description())]
     TableIndexesSize(EmptyArgs),
-    #[command(about = extract_desc(&TableSize::description()))]
+    #[command(about = &TableSize::description())]
     TableSize(EmptyArgs),
-    #[command(about = extract_desc(&Tables::description()))]
+    #[command(about = &Tables::description())]
     Tables(EmptyArgs),
-    #[command(about = extract_desc(&TotalIndexSize::description()))]
+    #[command(about = &TotalIndexSize::description())]
     TotalIndexSize(EmptyArgs),
-    #[command(about = extract_desc(&TotalTableSize::description()))]
+    #[command(about = &TotalTableSize::description())]
     TotalTableSize(EmptyArgs),
-    #[command(about = extract_desc(&UnusedIndexes::description()))]
+    #[command(about = &UnusedIndexes::description())]
     UnusedIndexes(EmptyArgs),
-    #[command(about = extract_desc(&VacuumStats::description()))]
+    #[command(about = &VacuumStats::description())]
     VacuumStats(EmptyArgs),
 }
 
@@ -223,17 +223,4 @@ async fn execute() -> Result<(), PgExtrasError> {
     }
 
     Ok(())
-}
-
-fn extract_desc(desc: &str) -> String {
-    if let (Some(start), Some(end)) = (desc.find("/*"), desc.find("*/")) {
-        let extracted = &desc[start + 2..end];
-        let mut trimmed = extracted.trim().to_string();
-        if trimmed.ends_with('.') {
-            trimmed.pop();
-        }
-        trimmed
-    } else {
-        desc.to_string()
-    }
 }
