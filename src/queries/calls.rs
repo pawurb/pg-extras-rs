@@ -12,6 +12,22 @@ pub struct Calls {
     pub sync_io_time: PgInterval,
 }
 
+impl serde::Serialize for Calls {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut state = serializer.serialize_struct("Calls", 5)?;
+        state.serialize_field("qry", &self.qry)?;
+        state.serialize_field("exec_time", &format!("{:?}", self.exec_time))?;
+        state.serialize_field("prop_exec_time", &self.prop_exec_time)?;
+        state.serialize_field("ncalls", &self.ncalls)?;
+        state.serialize_field("sync_io_time", &format!("{:?}", self.sync_io_time))?;
+        state.end()
+    }
+}
+
 impl Query for Calls {
     fn new(row: &PgRow) -> Self {
         Self {

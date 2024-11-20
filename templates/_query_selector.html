@@ -1,0 +1,44 @@
+<form id="queries" action="/pg_extras/queries" accept-charset="UTF-8" method="get"><input name="utf8" type="hidden"
+    value="&#x2713;" autocomplete="off" />
+  <select name="query_name" id="query_name" class="border p-2 font-bold" autofocus="autofocus">
+    <option value="">--- select query ---</option>
+    <option value="bloat">bloat</option>
+    <option value="blocking">blocking</option>
+    <option value="cache_hit">cache_hit</option>
+    <option value="db_settings">db_settings</option>
+    <option value="calls">calls</option>
+    <option value="extensions">extensions</option>
+    <option value="table_cache_hit">table_cache_hit</option>
+    <option value="tables">tables</option>
+    <option value="index_cache_hit">index_cache_hit</option>
+    <option value="indexes">indexes</option>
+    <option value="index_size">index_size</option>
+    <option value="index_usage">index_usage</option>
+    <option value="index_scans">index_scans</option>
+    <option value="null_indexes">null_indexes</option>
+    <option value="locks">locks</option>
+    <option value="all_locks">all_locks</option>
+    <option value="long_running_queries">long_running_queries</option>
+    <option value="outliers">outliers</option>
+    <option value="records_rank">records_rank</option>
+    <option value="seq_scans">seq_scans</option>
+    <option value="table_index_scans">table_index_scans</option>
+    <option value="table_indexes_size">table_indexes_size</option>
+    <option value="table_size">table_size</option>
+    <option value="total_index_size">total_index_size</option>
+    <option value="total_table_size">total_table_size</option>
+    <option value="unused_indexes">unused_indexes</option>
+    <option value="duplicate_indexes">duplicate_indexes</option>
+    <option value="vacuum_stats">vacuum_stats</option>
+    <option value="buffercache_stats">buffercache_stats</option>
+    <option value="buffercache_usage">buffercache_usage</option>
+    <option value="ssl_used">ssl_used</option>
+    <option value="connections">connections</option>
+  </select>
+</form>
+
+<script>
+  document.getElementById('query_name').addEventListener('change', function() {
+    document.getElementById('queries').submit();
+  });
+</script>

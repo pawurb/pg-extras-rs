@@ -6,6 +6,9 @@ use std::{
 pub mod diagnose;
 pub mod queries;
 
+#[cfg(feature = "web")]
+pub mod web;
+
 pub use queries::{
     all_locks::AllLocks,
     bloat::Bloat,
@@ -43,7 +46,7 @@ pub use queries::{
     vacuum_stats::VacuumStats,
 };
 use semver::Version;
-use sqlx::{postgres::PgPoolOptions, Row};
+use sqlx::{postgres::PgPoolOptions, Pool, Postgres, Row};
 
 #[macro_use]
 extern crate prettytable;
@@ -64,52 +67,71 @@ pub fn render_table<T: Query>(items: Vec<T>) {
     table.printstd();
 }
 
-pub async fn bloat() -> Result<Vec<Bloat>, PgExtrasError> {
-    get_rows(None).await
+pub async fn bloat(pool: &Pool<Postgres>) -> Result<Vec<Bloat>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn blocking(limit: Option<String>) -> Result<Vec<Blocking>, PgExtrasError> {
-    get_rows(Some(limit_params(limit))).await
+pub async fn blocking(
+    limit: Option<String>,
+    pool: &Pool<Postgres>,
+) -> Result<Vec<Blocking>, PgExtrasError> {
+    get_rows(Some(limit_params(limit)), pool).await
 }
 
-pub async fn calls(limit: Option<String>) -> Result<Vec<Calls>, PgExtrasError> {
-    get_rows(Some(limit_params(limit))).await
+pub async fn calls(
+    limit: Option<String>,
+    pool: &Pool<Postgres>,
+) -> Result<Vec<Calls>, PgExtrasError> {
+    get_rows(Some(limit_params(limit)), pool).await
 }
 
-pub async fn extensions() -> Result<Vec<Extensions>, PgExtrasError> {
-    get_rows(None).await
+pub async fn extensions(pool: &Pool<Postgres>) -> Result<Vec<Extensions>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn table_cache_hit() -> Result<Vec<TableCacheHit>, PgExtrasError> {
-    get_rows(None).await
+pub async fn table_cache_hit(pool: &Pool<Postgres>) -> Result<Vec<TableCacheHit>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn tables(schema: Option<String>) -> Result<Vec<Tables>, PgExtrasError> {
-    get_rows(Some(schema_params(schema))).await
+pub async fn tables(
+    schema: Option<String>,
+    pool: &Pool<Postgres>,
+) -> Result<Vec<Tables>, PgExtrasError> {
+    get_rows(Some(schema_params(schema)), pool).await
 }
 
-pub async fn index_cache_hit(schema: Option<String>) -> Result<Vec<IndexCacheHit>, PgExtrasError> {
-    get_rows(Some(schema_params(schema))).await
+pub async fn index_cache_hit(
+    schema: Option<String>,
+    pool: &Pool<Postgres>,
+) -> Result<Vec<IndexCacheHit>, PgExtrasError> {
+    get_rows(Some(schema_params(schema)), pool).await
 }
 
-pub async fn indexes() -> Result<Vec<Indexes>, PgExtrasError> {
-    get_rows(None).await
+pub async fn indexes(pool: &Pool<Postgres>) -> Result<Vec<Indexes>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn index_size() -> Result<Vec<IndexSize>, PgExtrasError> {
-    get_rows(None).await
+pub async fn index_size(pool: &Pool<Postgres>) -> Result<Vec<IndexSize>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn index_usage(schema: Option<String>) -> Result<Vec<IndexUsage>, PgExtrasError> {
-    get_rows(Some(schema_params(schema))).await
+pub async fn index_usage(
+    schema: Option<String>,
+    pool: &Pool<Postgres>,
+) -> Result<Vec<IndexUsage>, PgExtrasError> {
+    get_rows(Some(schema_params(schema)), pool).await
 }
 
-pub async fn index_scans(schema: Option<String>) -> Result<Vec<IndexScans>, PgExtrasError> {
-    get_rows(Some(schema_params(schema))).await
+pub async fn index_scans(
+    schema: Option<String>,
+    pool: &Pool<Postgres>,
+) -> Result<Vec<IndexScans>, PgExtrasError> {
+    get_rows(Some(schema_params(schema)), pool).await
 }
 
 pub async fn null_indexes(
     min_relation_size_mb: Option<String>,
+    pool: &Pool<Postgres>,
 ) -> Result<Vec<NullIndexes>, PgExtrasError> {
     let min_relation_size_mb = min_relation_size_mb.unwrap_or("10".to_string());
 
@@ -120,99 +142,121 @@ pub async fn null_indexes(
     .iter()
     .cloned()
     .collect();
-    get_rows(Some(params)).await
+    get_rows(Some(params), pool).await
 }
 
-pub async fn locks() -> Result<Vec<Locks>, PgExtrasError> {
-    get_rows(None).await
+pub async fn locks(pool: &Pool<Postgres>) -> Result<Vec<Locks>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn all_locks() -> Result<Vec<AllLocks>, PgExtrasError> {
-    get_rows(None).await
+pub async fn all_locks(pool: &Pool<Postgres>) -> Result<Vec<AllLocks>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn long_running_queries() -> Result<Vec<LongRunningQueries>, PgExtrasError> {
-    get_rows(None).await
+pub async fn long_running_queries(
+    pool: &Pool<Postgres>,
+) -> Result<Vec<LongRunningQueries>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn mandelbrot() -> Result<Vec<Mandelbrot>, PgExtrasError> {
-    get_rows(None).await
+pub async fn mandelbrot(pool: &Pool<Postgres>) -> Result<Vec<Mandelbrot>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn outliers() -> Result<Vec<Outliers>, PgExtrasError> {
-    get_rows(None).await
+pub async fn outliers(pool: &Pool<Postgres>) -> Result<Vec<Outliers>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn records_rank(schema: Option<String>) -> Result<Vec<RecordsRank>, PgExtrasError> {
-    get_rows(Some(schema_params(schema))).await
+pub async fn records_rank(
+    schema: Option<String>,
+    pool: &Pool<Postgres>,
+) -> Result<Vec<RecordsRank>, PgExtrasError> {
+    get_rows(Some(schema_params(schema)), pool).await
 }
 
-pub async fn seq_scans(schema: Option<String>) -> Result<Vec<SeqScans>, PgExtrasError> {
-    get_rows(Some(schema_params(schema))).await
+pub async fn seq_scans(
+    schema: Option<String>,
+    pool: &Pool<Postgres>,
+) -> Result<Vec<SeqScans>, PgExtrasError> {
+    get_rows(Some(schema_params(schema)), pool).await
 }
 
 pub async fn table_index_scans(
     schema: Option<String>,
+    pool: &Pool<Postgres>,
 ) -> Result<Vec<TableIndexScans>, PgExtrasError> {
-    get_rows(Some(schema_params(schema))).await
+    get_rows(Some(schema_params(schema)), pool).await
 }
 
 pub async fn table_indexes_size(
     schema: Option<String>,
+    pool: &Pool<Postgres>,
 ) -> Result<Vec<TableIndexesSize>, PgExtrasError> {
-    get_rows(Some(schema_params(schema))).await
+    get_rows(Some(schema_params(schema)), pool).await
 }
 
-pub async fn table_size() -> Result<Vec<TableSize>, PgExtrasError> {
-    get_rows(None).await
+pub async fn table_size(pool: &Pool<Postgres>) -> Result<Vec<TableSize>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn total_index_size() -> Result<Vec<TotalIndexSize>, PgExtrasError> {
-    get_rows(None).await
+pub async fn total_index_size(pool: &Pool<Postgres>) -> Result<Vec<TotalIndexSize>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn total_table_size() -> Result<Vec<TotalTableSize>, PgExtrasError> {
-    get_rows(None).await
+pub async fn total_table_size(pool: &Pool<Postgres>) -> Result<Vec<TotalTableSize>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn unused_indexes(schema: Option<String>) -> Result<Vec<UnusedIndexes>, PgExtrasError> {
-    get_rows(Some(schema_params(schema))).await
+pub async fn unused_indexes(
+    schema: Option<String>,
+    pool: &Pool<Postgres>,
+) -> Result<Vec<UnusedIndexes>, PgExtrasError> {
+    get_rows(Some(schema_params(schema)), pool).await
 }
 
-pub async fn duplicate_indexes() -> Result<Vec<DuplicateIndexes>, PgExtrasError> {
-    get_rows(None).await
+pub async fn duplicate_indexes(
+    pool: &Pool<Postgres>,
+) -> Result<Vec<DuplicateIndexes>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn vacuum_stats() -> Result<Vec<VacuumStats>, PgExtrasError> {
-    get_rows(None).await
+pub async fn vacuum_stats(pool: &Pool<Postgres>) -> Result<Vec<VacuumStats>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn buffercache_stats() -> Result<Vec<BuffercacheStats>, PgExtrasError> {
-    get_rows(None).await
+pub async fn buffercache_stats(
+    pool: &Pool<Postgres>,
+) -> Result<Vec<BuffercacheStats>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn buffercache_usage() -> Result<Vec<BuffercacheUsage>, PgExtrasError> {
-    get_rows(None).await
+pub async fn buffercache_usage(
+    pool: &Pool<Postgres>,
+) -> Result<Vec<BuffercacheUsage>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn ssl_used() -> Result<Vec<SslUsed>, PgExtrasError> {
-    get_rows(None).await
+pub async fn ssl_used(pool: &Pool<Postgres>) -> Result<Vec<SslUsed>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn connections() -> Result<Vec<Connections>, PgExtrasError> {
-    get_rows(None).await
+pub async fn connections(pool: &Pool<Postgres>) -> Result<Vec<Connections>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn cache_hit(schema: Option<String>) -> Result<Vec<CacheHit>, PgExtrasError> {
-    get_rows(Some(schema_params(schema))).await
+pub async fn cache_hit(
+    schema: Option<String>,
+    pool: &Pool<Postgres>,
+) -> Result<Vec<CacheHit>, PgExtrasError> {
+    get_rows(Some(schema_params(schema)), pool).await
 }
 
-pub async fn db_settings() -> Result<Vec<DbSettings>, PgExtrasError> {
-    get_rows(None).await
+pub async fn db_settings(pool: &Pool<Postgres>) -> Result<Vec<DbSettings>, PgExtrasError> {
+    get_rows(None, pool).await
 }
 
-pub async fn diagnose() -> Result<Vec<CheckResult>, PgExtrasError> {
-    run_diagnose().await
+pub async fn diagnose(pool: &Pool<Postgres>) -> Result<Vec<CheckResult>, PgExtrasError> {
+    run_diagnose(pool).await
 }
 
 #[derive(Debug, Clone)]
@@ -220,7 +264,7 @@ pub async fn diagnose() -> Result<Vec<CheckResult>, PgExtrasError> {
 pub enum PgExtrasError {
     MissingConfigVars(),
     DbConnectionError(String),
-    Unknown(String),
+    Other(String),
 }
 
 impl fmt::Display for PgExtrasError {
@@ -230,7 +274,7 @@ impl fmt::Display for PgExtrasError {
                 "Both $DATABASE_URL and $PG_EXTRAS_DATABASE_URL are not set."
             }
             Self::DbConnectionError(e) => &format!("Cannot connect to database: '{}'", e),
-            Self::Unknown(e) => &format!("Unknown pg-extras error: '{}'", e),
+            Self::Other(e) => &format!("Other pg-extras error: '{}'", e),
         };
 
         write!(f, "{}", msg)
@@ -254,23 +298,26 @@ pub enum PgStatsVersion {
     Pg17,
 }
 
-async fn get_rows<T: Query>(
-    params: Option<HashMap<String, String>>,
-) -> Result<Vec<T>, PgExtrasError> {
-    let pool = match PgPoolOptions::new()
+pub async fn pg_pool() -> Result<Pool<Postgres>, PgExtrasError> {
+    match PgPoolOptions::new()
         .max_connections(5)
         .acquire_timeout(Duration::from_secs(10))
         .connect(db_url()?.as_str())
         .await
     {
-        Ok(pool) => pool,
-        Err(e) => return Err(PgExtrasError::DbConnectionError(format!("{}", e))),
-    };
+        Ok(pool) => Ok(pool),
+        Err(e) => Err(PgExtrasError::DbConnectionError(format!("{}", e))),
+    }
+}
 
+async fn get_rows<T: Query>(
+    params: Option<HashMap<String, String>>,
+    pool: &Pool<Postgres>,
+) -> Result<Vec<T>, PgExtrasError> {
     let pg_statements_query =
         "select installed_version from pg_available_extensions where name='pg_stat_statements'";
 
-    let pg_statements_version = match sqlx::query(pg_statements_query).fetch_one(&pool).await {
+    let pg_statements_version = match sqlx::query(pg_statements_query).fetch_one(pool).await {
         Ok(row) => row
             .try_get::<String, _>("installed_version")
             .unwrap_or_default(),
@@ -298,9 +345,9 @@ async fn get_rows<T: Query>(
         }
     }
 
-    Ok(match sqlx::query(&query).fetch_all(&pool).await {
+    Ok(match sqlx::query(&query).fetch_all(pool).await {
         Ok(rows) => rows.iter().map(T::new).collect(),
-        Err(e) => return Err(PgExtrasError::Unknown(format!("{}", e))),
+        Err(e) => return Err(PgExtrasError::Other(format!("{}", e))),
     })
 }
 
@@ -367,40 +414,42 @@ mod tests {
     async fn it_works() -> Result<(), Box<dyn std::error::Error>> {
         setup().await?;
 
-        render_table(cache_hit(None).await?);
-        render_table(bloat().await?);
-        render_table(blocking(None).await?);
-        render_table(calls(None).await?);
-        render_table(extensions().await?);
-        render_table(table_cache_hit().await?);
-        render_table(seq_scans(None).await?);
-        render_table(table_index_scans(None).await?);
-        render_table(table_indexes_size(None).await?);
-        render_table(tables(None).await?);
-        render_table(index_cache_hit(None).await?);
-        render_table(indexes().await?);
-        render_table(index_size().await?);
-        render_table(index_usage(None).await?);
-        render_table(index_scans(None).await?);
-        render_table(null_indexes(None).await?);
-        render_table(locks().await?);
-        render_table(all_locks().await?);
-        render_table(long_running_queries().await?);
-        render_table(mandelbrot().await?);
-        render_table(outliers().await?);
-        render_table(records_rank(None).await?);
-        render_table(table_size().await?);
-        render_table(total_index_size().await?);
-        render_table(total_table_size().await?);
-        render_table(unused_indexes(None).await?);
-        render_table(duplicate_indexes().await?);
-        render_table(vacuum_stats().await?);
-        render_table(buffercache_stats().await?);
-        render_table(buffercache_usage().await?);
-        render_table(ssl_used().await?);
-        render_table(connections().await?);
-        render_table(db_settings().await?);
-        render_diagnose_report(diagnose().await?);
+        let pool = pg_pool().await?;
+
+        render_table(cache_hit(None, &pool).await?);
+        render_table(bloat(&pool).await?);
+        render_table(blocking(None, &pool).await?);
+        render_table(calls(None, &pool).await?);
+        render_table(extensions(&pool).await?);
+        render_table(table_cache_hit(&pool).await?);
+        render_table(seq_scans(None, &pool).await?);
+        render_table(table_index_scans(None, &pool).await?);
+        render_table(table_indexes_size(None, &pool).await?);
+        render_table(tables(None, &pool).await?);
+        render_table(index_cache_hit(None, &pool).await?);
+        render_table(indexes(&pool).await?);
+        render_table(index_size(&pool).await?);
+        render_table(index_usage(None, &pool).await?);
+        render_table(index_scans(None, &pool).await?);
+        render_table(null_indexes(None, &pool).await?);
+        render_table(locks(&pool).await?);
+        render_table(all_locks(&pool).await?);
+        render_table(long_running_queries(&pool).await?);
+        render_table(mandelbrot(&pool).await?);
+        render_table(outliers(&pool).await?);
+        render_table(records_rank(None, &pool).await?);
+        render_table(table_size(&pool).await?);
+        render_table(total_index_size(&pool).await?);
+        render_table(total_table_size(&pool).await?);
+        render_table(unused_indexes(None, &pool).await?);
+        render_table(duplicate_indexes(&pool).await?);
+        render_table(vacuum_stats(&pool).await?);
+        render_table(buffercache_stats(&pool).await?);
+        render_table(buffercache_usage(&pool).await?);
+        render_table(ssl_used(&pool).await?);
+        render_table(connections(&pool).await?);
+        render_table(db_settings(&pool).await?);
+        render_diagnose_report(diagnose(&pool).await?);
 
         Ok(())
     }

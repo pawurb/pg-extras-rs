@@ -1,0 +1,22 @@
+<table class="w-full font-mono border-collapse border my-5">
+  <thead class="bg-gray-300">
+    {% if query_data.len() > 0 %}
+    {% for (key, _) in query_data[0].as_object().unwrap() %}
+    <th class="p-2 border text-left">{{ key }}</th>
+    {% endfor %}
+  </thead>
+  <tbody>
+    {% for row in query_data %}
+    <tr class="hover:bg-gray-400 hover:text-white">
+      {% for (_, value) in row.as_object().unwrap() %}
+      <td class="p-1 border">{{ value }}</td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+    {% else %}
+    <tr>
+      <td>No data</td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>

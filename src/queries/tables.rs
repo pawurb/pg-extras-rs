@@ -1,7 +1,7 @@
 use crate::{queries::shared::Query, PgStatsVersion};
 use sqlx::{postgres::PgRow, Row};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct Tables {
     pub tablename: String,
     pub schemaname: String,

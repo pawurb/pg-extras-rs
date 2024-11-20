@@ -2,7 +2,7 @@ use crate::{queries::shared::Query, PgStatsVersion};
 use sqlx::postgres::types::Oid;
 use sqlx::{postgres::PgRow, Row};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct NullIndexes {
     pub oid: Oid,
     pub index: String,

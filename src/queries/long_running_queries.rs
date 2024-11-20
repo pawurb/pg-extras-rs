@@ -10,6 +10,20 @@ pub struct LongRunningQueries {
     pub query: String,
 }
 
+impl serde::Serialize for LongRunningQueries {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut state = serializer.serialize_struct("LongRunningQueries", 3)?;
+        state.serialize_field("pid", &self.pid)?;
+        state.serialize_field("duration", &format!("{:?}", self.duration))?;
+        state.serialize_field("query", &self.query)?;
+        state.end()
+    }
+}
+
 impl Query for LongRunningQueries {
     fn new(row: &PgRow) -> Self {
         Self {

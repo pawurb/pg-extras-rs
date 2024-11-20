@@ -1,7 +1,7 @@
 use crate::{queries::shared::Query, PgStatsVersion};
 use sqlx::{postgres::PgRow, Row};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct IndexUsage {
     pub relname: String,
     pub percent_of_times_index_used: String,

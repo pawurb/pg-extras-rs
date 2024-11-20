@@ -3,7 +3,7 @@ use std::env;
 
 use crate::PgStatsVersion;
 
-pub trait Query {
+pub trait Query: serde::Serialize {
     fn new(row: &PgRow) -> Self;
     fn to_row(&self) -> prettytable::Row;
     fn headers() -> prettytable::Row;
@@ -12,6 +12,10 @@ pub trait Query {
         let file_content = Self::read_file(None);
         let desc = file_content.lines().take(1).next().unwrap_or_default();
         extract_desc(desc)
+    }
+
+    fn to_json(&self) -> serde_json::Value {
+        serde_json::to_value(self).unwrap_or_default()
     }
 }
 

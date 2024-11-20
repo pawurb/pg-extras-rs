@@ -13,14 +13,14 @@ pub fn to_bytes(size: &str) -> Result<u64, PgExtrasError> {
     let num: f64 = num
         .trim()
         .parse()
-        .map_err(|_| PgExtrasError::Unknown(size.to_string()))?;
+        .map_err(|_| PgExtrasError::Other(size.to_string()))?;
     let multiplier: i64 = match unit.trim().to_lowercase().as_str() {
         "b" => 1,
         "kb" => 1_000,
         "mb" => 1_000_000,
         "gb" => 1_000_000_000,
         "tb" => 1_000_000_000_000,
-        _ => return Err(PgExtrasError::Unknown(size.to_string())),
+        _ => return Err(PgExtrasError::Other(size.to_string())),
     };
     Ok((num * multiplier as f64) as u64)
 }

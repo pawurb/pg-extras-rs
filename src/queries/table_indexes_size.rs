@@ -1,7 +1,7 @@
 use crate::{queries::shared::Query, PgStatsVersion};
 use sqlx::{postgres::PgRow, Row};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct TableIndexesSize {
     pub table: String,
     pub index_size: String,

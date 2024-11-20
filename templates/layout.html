@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>PgExtras {{ version }}</title>
+</head>
+
+<body class="p-5 text-xs">
+  <link rel="stylesheet" href="/assets/tailwind.min.css">
+  {% if let Some(alert) = alert %}
+  <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+    <p class="font-bold">Alert</p>
+    <p>
+      {{ alert }}
+    </p>
+  </div>
+  {% endif %}
+  {% block content %}<p>Placeholder content</p>{% endblock %}
+</body>
+</html>

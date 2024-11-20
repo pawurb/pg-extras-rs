@@ -3,7 +3,9 @@ use crate::{
     bloat, cache_hit, duplicate_indexes, extensions, null_indexes, outliers, ssl_used,
     unused_indexes, Extensions, PgExtrasError,
 };
+use serde_json::Value;
 use sqlx::types::BigDecimal;
+use sqlx::{Pool, Postgres};
 
 const TABLE_CACHE_HIT_MIN: f32 = 0.985;
 const INDEX_CACHE_HIT_MIN: f32 = 0.985;
@@ -13,7 +15,7 @@ const NULL_MIN_NULL_FRAC_PERCENT: f64 = 50.0; // 50%
 const BLOAT_MIN_VALUE: f64 = 10.0;
 const OUTLIERS_MIN_EXEC_RATIO: f64 = 33.0; // 33%
 
-#[derive(Debug, Hash, Eq, PartialEq)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone, serde::Serialize)]
 pub enum Check {
     TableCacheHit,
     IndexCacheHit,
@@ -25,11 +27,17 @@ pub enum Check {
     Outliers,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct CheckResult {
     pub ok: bool,
     pub message: String,
     pub check: Check,
+}
+
+impl CheckResult {
+    pub fn to_json(&self) -> Value {
+        serde_json::to_value(self).unwrap()
+    }
 }
 
 impl std::fmt::Display for Check {
@@ -50,7 +58,7 @@ impl std::fmt::Display for Check {
     }
 }
 
-pub async fn run_diagnose() -> Result<Vec<CheckResult>, PgExtrasError> {
+pub async fn run_diagnose(pool: &Pool<Postgres>) -> Result<Vec<CheckResult>, PgExtrasError> {
     let mut checks = vec![
         Check::TableCacheHit,
         Check::IndexCacheHit,
@@ -60,7 +68,7 @@ pub async fn run_diagnose() -> Result<Vec<CheckResult>, PgExtrasError> {
         Check::DuplicateIndexes,
     ];
 
-    let extensions_data = extensions().await?;
+    let extensions_data = extensions(pool).await?;
 
     if extension_enabled(&extensions_data, "sslinfo") {
         checks.push(Check::SslUsed);
@@ -72,7 +80,7 @@ pub async fn run_diagnose() -> Result<Vec<CheckResult>, PgExtrasError> {
 
     let mut results = Vec::new();
     for check in checks {
-        results.push(run_check(check).await?);
+        results.push(run_check(check, pool).await?);
     }
 
     Ok(results)
@@ -84,22 +92,22 @@ fn extension_enabled(extensions_data: &[Extensions], extension_name: &str) -> bo
         .any(|e| e.name == extension_name && !e.installed_version.is_empty())
 }
 
-async fn run_check(check: Check) -> Result<CheckResult, PgExtrasError> {
+async fn run_check(check: Check, pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
     match check {
-        Check::TableCacheHit => check_table_cache_hit().await,
-        Check::IndexCacheHit => check_index_cache_hit().await,
-        Check::UnusedIndexes => check_unused_index().await,
-        Check::NullIndexes => check_null_index().await,
-        Check::Bloat => check_bloat().await,
-        Check::DuplicateIndexes => check_duplicate_indexes().await,
-        Check::SslUsed => detect_ssl_used().await,
-        Check::Outliers => check_outliers().await,
+        Check::TableCacheHit => check_table_cache_hit(pool).await,
+        Check::IndexCacheHit => check_index_cache_hit(pool).await,
+        Check::UnusedIndexes => check_unused_index(pool).await,
+        Check::NullIndexes => check_null_index(pool).await,
+        Check::Bloat => check_bloat(pool).await,
+        Check::DuplicateIndexes => check_duplicate_indexes(pool).await,
+        Check::SslUsed => detect_ssl_used(pool).await,
+        Check::Outliers => check_outliers(pool).await,
     }
 }
 
-async fn check_table_cache_hit() -> Result<CheckResult, PgExtrasError> {
+async fn check_table_cache_hit(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
     let min_expected = BigDecimal::try_from(TABLE_CACHE_HIT_MIN).unwrap();
-    let cache_hit = cache_hit(None).await?;
+    let cache_hit = cache_hit(None, pool).await?;
     let table_cache_hit = cache_hit.iter().find(|item| item.name == "table hit rate");
 
     let Some(table_hit_rate) = table_cache_hit else {
@@ -124,9 +132,9 @@ async fn check_table_cache_hit() -> Result<CheckResult, PgExtrasError> {
     })
 }
 
-async fn check_index_cache_hit() -> Result<CheckResult, PgExtrasError> {
+async fn check_index_cache_hit(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
     let min_expected = BigDecimal::try_from(INDEX_CACHE_HIT_MIN).unwrap();
-    let cache_hit = cache_hit(None).await?;
+    let cache_hit = cache_hit(None, pool).await?;
     let index_cache_hit = cache_hit.iter().find(|item| item.name == "index hit rate");
 
     let Some(index_hit_rate) = index_cache_hit else {
@@ -151,8 +159,8 @@ async fn check_index_cache_hit() -> Result<CheckResult, PgExtrasError> {
     })
 }
 
-async fn detect_ssl_used() -> Result<CheckResult, PgExtrasError> {
-    let ssl_results = ssl_used().await?;
+async fn detect_ssl_used(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
+    let ssl_results = ssl_used(pool).await?;
     let Some(ssl_conn) = ssl_results.first() else {
         return Ok(CheckResult {
             ok: false,
@@ -174,8 +182,8 @@ async fn detect_ssl_used() -> Result<CheckResult, PgExtrasError> {
     })
 }
 
-async fn check_unused_index() -> Result<CheckResult, PgExtrasError> {
-    let indexes = unused_indexes(None)
+async fn check_unused_index(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
+    let indexes = unused_indexes(None, pool)
         .await?
         .into_iter()
         .filter(|i| to_bytes(&i.index_size).unwrap_or(0) >= UNUSED_INDEXES_MIN_SIZE_BYTES)
@@ -202,8 +210,8 @@ async fn check_unused_index() -> Result<CheckResult, PgExtrasError> {
     })
 }
 
-async fn check_null_index() -> Result<CheckResult, PgExtrasError> {
-    let indexes = null_indexes(Some(NULL_INDEXES_MIN_SIZE_MB.to_string()))
+async fn check_null_index(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
+    let indexes = null_indexes(Some(NULL_INDEXES_MIN_SIZE_MB.to_string()), pool)
         .await?
         .into_iter()
         .filter(|i| {
@@ -241,8 +249,8 @@ async fn check_null_index() -> Result<CheckResult, PgExtrasError> {
     })
 }
 
-async fn check_bloat() -> Result<CheckResult, PgExtrasError> {
-    let bloat_data = bloat()
+async fn check_bloat(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
+    let bloat_data = bloat(pool)
         .await?
         .into_iter()
         .filter(|b| b.bloat >= BigDecimal::try_from(BLOAT_MIN_VALUE).unwrap())
@@ -269,8 +277,8 @@ async fn check_bloat() -> Result<CheckResult, PgExtrasError> {
     })
 }
 
-async fn check_duplicate_indexes() -> Result<CheckResult, PgExtrasError> {
-    let indexes = duplicate_indexes().await?;
+async fn check_duplicate_indexes(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
+    let indexes = duplicate_indexes(pool).await?;
 
     if indexes.is_empty() {
         return Ok(CheckResult {
@@ -298,8 +306,8 @@ async fn check_duplicate_indexes() -> Result<CheckResult, PgExtrasError> {
     })
 }
 
-async fn check_outliers() -> Result<CheckResult, PgExtrasError> {
-    let queries = outliers()
+async fn check_outliers(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
+    let queries = outliers(pool)
         .await?
         .into_iter()
         .filter(|q| {

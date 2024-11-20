@@ -15,6 +15,25 @@ pub struct AllLocks {
     pub application: String,
 }
 
+impl serde::Serialize for AllLocks {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut state = serializer.serialize_struct("AllLocks", 8)?;
+        state.serialize_field("pid", &self.pid)?;
+        state.serialize_field("relname", &self.relname)?;
+        state.serialize_field("transactionid", &self.transactionid)?;
+        state.serialize_field("granted", &self.granted)?;
+        state.serialize_field("mode", &self.mode)?;
+        state.serialize_field("query_snippet", &self.query_snippet)?;
+        state.serialize_field("age", &format!("{:?}", self.age))?;
+        state.serialize_field("application", &self.application)?;
+        state.end()
+    }
+}
+
 impl Query for AllLocks {
     fn new(row: &PgRow) -> Self {
         Self {

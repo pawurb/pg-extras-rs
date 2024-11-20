@@ -9,6 +9,19 @@ pub struct CacheHit {
     pub ratio: BigDecimal,
 }
 
+impl serde::Serialize for CacheHit {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut state = serializer.serialize_struct("CacheHit", 2)?;
+        state.serialize_field("name", &self.name)?;
+        state.serialize_field("ratio", &format!("{:?}", self.ratio))?;
+        state.end()
+    }
+}
+
 impl Query for CacheHit {
     fn new(row: &PgRow) -> Self {
         Self {

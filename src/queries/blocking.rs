@@ -15,6 +15,28 @@ pub struct Blocking {
     pub blocking_sql_app: String,
 }
 
+impl serde::Serialize for Blocking {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut state = serializer.serialize_struct("Blocking", 8)?;
+        state.serialize_field("blocked_pid", &self.blocked_pid)?;
+        state.serialize_field("blocking_statement", &self.blocking_statement)?;
+        state.serialize_field(
+            "blocking_duration",
+            &format!("{:?}", self.blocking_duration),
+        )?;
+        state.serialize_field("blocking_pid", &self.blocking_pid)?;
+        state.serialize_field("blocked_statement", &self.blocked_statement)?;
+        state.serialize_field("blocked_duration", &format!("{:?}", self.blocked_duration))?;
+        state.serialize_field("blocked_sql_app", &self.blocked_sql_app)?;
+        state.serialize_field("blocking_sql_app", &self.blocking_sql_app)?;
+        state.end()
+    }
+}
+
 impl Query for Blocking {
     fn new(row: &PgRow) -> Self {
         Self {

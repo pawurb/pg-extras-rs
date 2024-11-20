@@ -12,6 +12,18 @@ pub struct Outliers {
     pub query: String,
 }
 
+impl serde::Serialize for Outliers {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut state = serializer.serialize_struct("Outliers", 5)?;
+        state.serialize_field("total_exec_time", &format!("{:?}", self.total_exec_time))?;
+        state.end()
+    }
+}
+
 impl Query for Outliers {
     fn new(row: &PgRow) -> Self {
         Self {

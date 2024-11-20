@@ -1,0 +1,18 @@
+<table class="w-full font-mono border-collapse border my-5">
+  <thead class="bg-gray-300">
+    <tr>
+      <th class="p-2 border text-left">Check</th>
+      <th class="p-2 border text-left">Message</th>
+      <th class="p-2 border text-left">OK</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for check_result in checks_result %}
+      <tr class="{% if check_result.ok %}bg-green-500{% else %}bg-red-500{% endif %}">
+      <td class="p-1 border font-bold">{{ check_result.check }}</td>
+      <td class="p-1 border">{{ check_result.message }}</td>
+      <td class="p-1 border">{{ check_result.ok }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

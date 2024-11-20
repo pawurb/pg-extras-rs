@@ -12,6 +12,22 @@ pub struct Bloat {
     pub waste: String,
 }
 
+impl serde::Serialize for Bloat {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeStruct;
+        let mut state = serializer.serialize_struct("Bloat", 5)?;
+        state.serialize_field("typefield", &self.typefield)?;
+        state.serialize_field("schemaname", &self.schemaname)?;
+        state.serialize_field("object_name", &self.object_name)?;
+        state.serialize_field("bloat", &format!("{}", self.bloat))?;
+        state.serialize_field("waste", &self.waste)?;
+        state.end()
+    }
+}
+
 impl Query for Bloat {
     fn new(row: &PgRow) -> Self {
         Self {

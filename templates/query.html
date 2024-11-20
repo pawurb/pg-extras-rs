@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+{% include "_query_selector.html" %}
+
+<h1 class="font-bold text-xl my-5">
+  {{ query_name }}
+</h1>
+
+{% include "_result.html" %}
+
+{% endblock %}
