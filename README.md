@@ -47,29 +47,35 @@ $ pgextras cache_hit
 +----------------+------------------------+
 ```
 
-## Dependencies
+## Diagnose Report
 
-`calls` and `outliers` queries require [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) extension.
-
-You can check if it is enabled in your database by running:
+The simplest way to start using pg-extras is to execute a `diagnose` method. It runs a set of checks and prints out a report highlighting areas that may require additional investigation:
 
 ```bash
-pgextras extensions
+pgextras diagnose
 ```
 
-You should see the similar line in the output:
+![Diagnose report](pg-extras-diagnose-report.png)
+
+## Web UI
+
+Alternatively, you can use the application via the web UI. You have to enable the `web` feature flag:
 
 ```bash
-| pg_stat_statements  | 1.7  | 1.7 | track execution statistics of all SQL statements executed |
+cargo install pg-extras --features="web"
 ```
 
-`ssl_used` requires `sslinfo` extension, and `buffercache_usage`/`buffercache_usage` queries need `pg_buffercache`. You can enable them all by running this SQL:
+Now you can run:
 
-```sql
-CREATE EXTENSION IF NOT EXISTS sslinfo;
-CREATE EXTENSION IF NOT EXISTS pg_buffercache;
-CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 ```
+pgextras web
+```
+
+To launch the dashboard on `http://localhost:3000` (you can customize the port by setting the `PORT` ENV).
+
+![Web UI](pg-extras-web-ui.png)
+
+Keep reading to learn about methods that `diagnose` uses under the hood.
 
 ## Rust API
 
@@ -112,35 +118,30 @@ cache_hit(Some("other_schema".to_string)).await?;
 
 You can customize the default `public` schema by setting `ENV['PG_EXTRAS_SCHEMA']` value.
 
-## Diagnose Report
+## Dependencies
 
-The simplest way to start using pg-extras is to execute a `diagnose` method. It runs a set of checks and prints out a report highlighting areas that may require additional investigation:
+`calls` and `outliers` queries require [pg_stat_statements](https://www.postgresql.org/docs/current/pgstatstatements.html) extension.
 
-```bash
-pgextras diagnose
-```
-
-![Diagnose report](pg-extras-diagnose-report.png)
-
-## Web UI
-
-Alternatively, you can use the application via the web UI. You have to enable the `web` feature flag:
+You can check if it is enabled in your database by running:
 
 ```bash
-cargo install pg-extras --features="web"
+pgextras extensions
 ```
 
-Now you can run:
+You should see the similar line in the output:
 
+```bash
+| pg_stat_statements  | 1.7  | 1.7 | track execution statistics of all SQL statements executed |
 ```
-pgextras web
+
+`ssl_used` requires `sslinfo` extension, and `buffercache_usage`/`buffercache_usage` queries need `pg_buffercache`. You can enable them all by running this SQL:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS sslinfo;
+CREATE EXTENSION IF NOT EXISTS pg_buffercache;
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 ```
 
-To run the dashboard on `http://localhost:3000` (you can customize the port by setting the `PORT` ENV).
-
-![Web UI](pg-extras-web-ui.png)
-
-Keep reading to learn about methods that `diagnose` uses under the hood.
 
 ## Available methods
 
