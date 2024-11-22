@@ -7,7 +7,7 @@ license = "MIT"
 name = "pg-extras"
 readme = "README.md"
 repository = "https://github.com/pawurb/pg-extras-rs"
-version = "0.7.0"
+version = "0.7.1"
 
 exclude = ["docker-compose.yml.sample", "live_tests.sh"]
 
@@ -46,7 +46,6 @@ lto = true
 [[bin]]
 name = "pgextras"
 path = "bin/main.rs"
-required-features = ["web"]
 
 [[example]]
 name = "db_settings"
@@ -54,6 +53,3 @@ path = "examples/db_settings.rs"
 
 [features]
 web = ["dep:axum", "dep:askama", "dep:askama_axum", "dep:tower-http"]
-
-[default]
-features = ["web"]

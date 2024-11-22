@@ -34,6 +34,9 @@ use sqlx::PgPool;
 pub enum PgSubcommand {
     #[command(about = "Diagnose common database problems")]
     Diagnose(EmptyArgs),
+    #[cfg(feature = "web")]
+    #[command(about = "Start UI web server")]
+    Web(EmptyArgs),
     #[command(about = &AllLocks::description())]
     AllLocks(EmptyArgs),
     #[command(about = &Bloat::description())]
@@ -100,9 +103,6 @@ pub enum PgSubcommand {
     UnusedIndexes(EmptyArgs),
     #[command(about = &VacuumStats::description())]
     VacuumStats(EmptyArgs),
-    #[cfg(feature = "web")]
-    #[command(about = "Start web server")]
-    Web(EmptyArgs),
 }
 
 #[derive(Parser, Debug)]
