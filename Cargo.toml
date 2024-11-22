@@ -7,7 +7,7 @@ license = "MIT"
 name = "pg-extras"
 readme = "README.md"
 repository = "https://github.com/pawurb/pg-extras-rs"
-version = "0.6.3"
+version = "0.7.0"
 
 exclude = ["docker-compose.yml.sample", "live_tests.sh"]
 
@@ -16,7 +16,12 @@ clap = { version = "4.5.20", features = ["derive"] }
 lazy_static = "1.5.0"
 prettytable-rs = "0.10.0"
 semver = "1.0.23"
-sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "postgres", "macros", "bigdecimal"] }
+sqlx = { version = "0.8", features = [
+  "runtime-tokio-rustls",
+  "postgres",
+  "macros",
+  "bigdecimal",
+] }
 
 tokio = { version = "1.40", features = ["full"] }
 unicode-width = "0.2.0"
