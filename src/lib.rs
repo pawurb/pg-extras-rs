@@ -274,7 +274,7 @@ impl fmt::Display for PgExtrasError {
                 "Both $DATABASE_URL and $PG_EXTRAS_DATABASE_URL are not set."
             }
             Self::DbConnectionError(e) => &format!("Cannot connect to database: '{}'", e),
-            Self::Other(e) => &format!("Other pg-extras error: '{}'", e),
+            Self::Other(e) => &e.to_string(),
         };
 
         write!(f, "{}", msg)

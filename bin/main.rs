@@ -35,7 +35,7 @@ pub enum PgSubcommand {
     #[command(about = "Diagnose common database problems")]
     Diagnose(EmptyArgs),
     #[cfg(feature = "web")]
-    #[command(about = "Start UI web server")]
+    #[command(about = "Start dashboard web server")]
     Web(EmptyArgs),
     #[command(about = &AllLocks::description())]
     AllLocks(EmptyArgs),
@@ -244,7 +244,10 @@ async fn start_web_server(pool: PgPool) -> Result<(), PgExtrasError> {
         .await
         .is_err()
     {
-        PgExtrasError::Other(format!("Port {} is already in use", port));
+        return Err(PgExtrasError::Other(format!(
+            "Port {} is already in use",
+            port
+        )));
     }
 
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{port}"))
