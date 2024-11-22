@@ -122,6 +122,24 @@ pgextras diagnose
 
 ![Diagnose report](pg-extras-diagnose-report.png)
 
+## Web UI
+
+Alternatively, you can use the application via the web UI. You have to enable the `web` feature flag:
+
+```bash
+cargo install pg-extras --features="web"
+```
+
+Now you can run:
+
+```
+pgextras web
+```
+
+To run the dashboard on `http://localhost:3000` (you can customize the port by setting the `PORT` ENV).
+
+![Web UI](pg-extras-web-ui.png)
+
 Keep reading to learn about methods that `diagnose` uses under the hood.
 
 ## Available methods
