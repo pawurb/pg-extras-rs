@@ -52,6 +52,7 @@ use sqlx::{postgres::PgPoolOptions, Pool, Postgres, Row};
 extern crate prettytable;
 use prettytable::{Cell, Row as TableRow, Table};
 
+/// Renders a table to stdout for any type that implements the Query trait.
 pub fn render_table<T: Query>(items: Vec<T>) {
     let mut table = Table::new();
     table.add_row(T::headers());
@@ -67,10 +68,12 @@ pub fn render_table<T: Query>(items: Vec<T>) {
     table.printstd();
 }
 
+/// Returns table and index bloat in your database ordered by most wasteful.
 pub async fn bloat(pool: &Pool<Postgres>) -> Result<Vec<Bloat>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Lists queries that are blocking other queries.
 pub async fn blocking(
     limit: Option<String>,
     pool: &Pool<Postgres>,
@@ -78,6 +81,22 @@ pub async fn blocking(
     get_rows(Some(limit_params(limit)), pool).await
 }
 
+/// Creates a new connection pool to PostgreSQL.
+///
+/// Uses either PG_EXTRAS_DATABASE_URL or DATABASE_URL environment variable.
+pub async fn pg_pool() -> Result<Pool<Postgres>, PgExtrasError> {
+    match PgPoolOptions::new()
+        .max_connections(5)
+        .acquire_timeout(Duration::from_secs(10))
+        .connect(db_url()?.as_str())
+        .await
+    {
+        Ok(pool) => Ok(pool),
+        Err(e) => Err(PgExtrasError::DbConnectionError(format!("{}", e))),
+    }
+}
+
+/// Returns statistics about query calls in the database.
 pub async fn calls(
     limit: Option<String>,
     pool: &Pool<Postgres>,
@@ -85,14 +104,17 @@ pub async fn calls(
     get_rows(Some(limit_params(limit)), pool).await
 }
 
+/// Lists all installed PostgreSQL extensions.
 pub async fn extensions(pool: &Pool<Postgres>) -> Result<Vec<Extensions>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Shows cache hit rates for tables.
 pub async fn table_cache_hit(pool: &Pool<Postgres>) -> Result<Vec<TableCacheHit>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Lists all tables in the database with their basic information.
 pub async fn tables(
     schema: Option<String>,
     pool: &Pool<Postgres>,
@@ -100,6 +122,7 @@ pub async fn tables(
     get_rows(Some(schema_params(schema)), pool).await
 }
 
+/// Shows index cache hit rates.
 pub async fn index_cache_hit(
     schema: Option<String>,
     pool: &Pool<Postgres>,
@@ -107,14 +130,17 @@ pub async fn index_cache_hit(
     get_rows(Some(schema_params(schema)), pool).await
 }
 
+/// Lists all indexes in the database.
 pub async fn indexes(pool: &Pool<Postgres>) -> Result<Vec<Indexes>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Shows the size of all indexes, ordered by size.
 pub async fn index_size(pool: &Pool<Postgres>) -> Result<Vec<IndexSize>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Shows statistics about index usage.
 pub async fn index_usage(
     schema: Option<String>,
     pool: &Pool<Postgres>,
@@ -122,6 +148,7 @@ pub async fn index_usage(
     get_rows(Some(schema_params(schema)), pool).await
 }
 
+/// Shows statistics about index scans.
 pub async fn index_scans(
     schema: Option<String>,
     pool: &Pool<Postgres>,
@@ -129,6 +156,7 @@ pub async fn index_scans(
     get_rows(Some(schema_params(schema)), pool).await
 }
 
+/// Shows indexes that contain mostly NULL values.
 pub async fn null_indexes(
     min_relation_size_mb: Option<String>,
     pool: &Pool<Postgres>,
@@ -145,28 +173,34 @@ pub async fn null_indexes(
     get_rows(Some(params), pool).await
 }
 
+/// Shows information about locks in the database.
 pub async fn locks(pool: &Pool<Postgres>) -> Result<Vec<Locks>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Shows detailed information about all locks in the database.
 pub async fn all_locks(pool: &Pool<Postgres>) -> Result<Vec<AllLocks>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Lists currently running queries that have been running for a long time.
 pub async fn long_running_queries(
     pool: &Pool<Postgres>,
 ) -> Result<Vec<LongRunningQueries>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Generates a Mandelbrot set as a test query.
 pub async fn mandelbrot(pool: &Pool<Postgres>) -> Result<Vec<Mandelbrot>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Shows queries with the longest execution time in aggregate.
 pub async fn outliers(pool: &Pool<Postgres>) -> Result<Vec<Outliers>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Shows estimated number of rows in each table, ordered by estimated count.
 pub async fn records_rank(
     schema: Option<String>,
     pool: &Pool<Postgres>,
@@ -174,6 +208,7 @@ pub async fn records_rank(
     get_rows(Some(schema_params(schema)), pool).await
 }
 
+/// Shows statistics about sequential scans performed on tables.
 pub async fn seq_scans(
     schema: Option<String>,
     pool: &Pool<Postgres>,
@@ -181,6 +216,7 @@ pub async fn seq_scans(
     get_rows(Some(schema_params(schema)), pool).await
 }
 
+/// Shows statistics about index scans performed on tables.
 pub async fn table_index_scans(
     schema: Option<String>,
     pool: &Pool<Postgres>,
@@ -188,6 +224,7 @@ pub async fn table_index_scans(
     get_rows(Some(schema_params(schema)), pool).await
 }
 
+/// Shows total size of all indexes for each table.
 pub async fn table_indexes_size(
     schema: Option<String>,
     pool: &Pool<Postgres>,
@@ -195,18 +232,22 @@ pub async fn table_indexes_size(
     get_rows(Some(schema_params(schema)), pool).await
 }
 
+/// Shows disk space used by each table, excluding indexes.
 pub async fn table_size(pool: &Pool<Postgres>) -> Result<Vec<TableSize>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Shows total size of all indexes in the database.
 pub async fn total_index_size(pool: &Pool<Postgres>) -> Result<Vec<TotalIndexSize>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Shows total disk space used by tables and indexes.
 pub async fn total_table_size(pool: &Pool<Postgres>) -> Result<Vec<TotalTableSize>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Lists indexes that haven't been used or are rarely used.
 pub async fn unused_indexes(
     schema: Option<String>,
     pool: &Pool<Postgres>,
@@ -214,36 +255,43 @@ pub async fn unused_indexes(
     get_rows(Some(schema_params(schema)), pool).await
 }
 
+/// Shows indexes that have identical definitions but different names.
 pub async fn duplicate_indexes(
     pool: &Pool<Postgres>,
 ) -> Result<Vec<DuplicateIndexes>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Shows statistics about VACUUM and ANALYZE operations.
 pub async fn vacuum_stats(pool: &Pool<Postgres>) -> Result<Vec<VacuumStats>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Shows statistics about shared buffer cache usage.
 pub async fn buffercache_stats(
     pool: &Pool<Postgres>,
 ) -> Result<Vec<BuffercacheStats>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Shows distribution of buffer cache usage by database objects.
 pub async fn buffercache_usage(
     pool: &Pool<Postgres>,
 ) -> Result<Vec<BuffercacheUsage>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Shows whether SSL is being used for current connections.
 pub async fn ssl_used(pool: &Pool<Postgres>) -> Result<Vec<SslUsed>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Shows information about current database connections and their states.
 pub async fn connections(pool: &Pool<Postgres>) -> Result<Vec<Connections>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Shows cache hit rates for both tables and indexes.
 pub async fn cache_hit(
     schema: Option<String>,
     pool: &Pool<Postgres>,
@@ -251,10 +299,12 @@ pub async fn cache_hit(
     get_rows(Some(schema_params(schema)), pool).await
 }
 
+/// Shows current values of important PostgreSQL settings.
 pub async fn db_settings(pool: &Pool<Postgres>) -> Result<Vec<DbSettings>, PgExtrasError> {
     get_rows(None, pool).await
 }
 
+/// Runs a comprehensive set of diagnostic checks on the database.
 pub async fn diagnose(pool: &Pool<Postgres>) -> Result<Vec<CheckResult>, PgExtrasError> {
     run_diagnose(pool).await
 }
@@ -296,18 +346,6 @@ pub enum PgStatsVersion {
     Legacy,
     Standard,
     Pg17,
-}
-
-pub async fn pg_pool() -> Result<Pool<Postgres>, PgExtrasError> {
-    match PgPoolOptions::new()
-        .max_connections(5)
-        .acquire_timeout(Duration::from_secs(10))
-        .connect(db_url()?.as_str())
-        .await
-    {
-        Ok(pool) => Ok(pool),
-        Err(e) => Err(PgExtrasError::DbConnectionError(format!("{}", e))),
-    }
 }
 
 async fn get_rows<T: Query>(
