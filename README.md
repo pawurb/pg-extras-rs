@@ -82,9 +82,10 @@ Keep reading to learn about methods that `diagnose` uses under the hood.
 You can also run queries using a Rust API to display an ASCCI table with results:
 
 ```rust
-use pg_extras::{render_table, cache_hit}
+use pg_extras::{cache_hit, pg_pool, render_table}
 
-render_table(cache_hit(None).await?);
+let pool = pg_pool().await?;
+render_table(cache_hit(None, &pool).await?);
 
 ```
 ```bash
@@ -101,9 +102,10 @@ render_table(cache_hit(None).await?);
 Alternatively you can work directly with returned structs:
 
 ```rust
-use pg_extras::{render_table, cache_hit, CacheHit}
+use pg_extras::{cache_hit, pg_pool, render_table}
 
-let cache_hit_res = cache_hit(None).await?;
+let pool = pg_pool().await?;
+let cache_hit_res = cache_hit(None, &pool).await?;
 println!("{:?}", cache_hit_res);
 
 // [CacheHit { name: "index hit rate", ratio:  0.9779... }, CacheHit { name: "table hit rate", ratio: 0.9672... }]
@@ -113,10 +115,10 @@ println!("{:?}", cache_hit_res);
 Some methods accept params allowing you to customize queries:
 
 ```rust
-cache_hit(Some("other_schema".to_string)).await?;
+cache_hit(Some("other_schema".to_string), &pool).await?;
 ```
 
-You can customize the default `public` schema by setting `ENV['PG_EXTRAS_SCHEMA']` value.
+You can also customize the default `public` schema by setting `ENV['PG_EXTRAS_SCHEMA']` value.
 
 ## Dependencies
 
@@ -153,7 +155,7 @@ struct CacheHit {
     ratio: Decimal,
 }
 
-cache_hit(schema: Option<String>) -> Result<Vec<CacheHit>, PgExtrasError>
+cache_hit(schema: Option<String>, pool: &Pool<Postgres>) -> Result<Vec<CacheHit>, PgExtrasError>
 
       name      |         ratio
 ----------------+------------------------
@@ -177,7 +179,7 @@ struct IndexCacheHit {
     ratio: String,
 }
 
-index_cache_hit(schema: Option<String>) -> Result<Vec<IndexCacheHit>, PgExtrasError>
+index_cache_hit(schema: Option<String>, pool: &Pool<Postgres>) -> Result<Vec<IndexCacheHit>, PgExtrasError>
 
 | name                  | buffer_hits | block_reads | total_read | ratio             |
 +-----------------------+-------------+-------------+------------+-------------------+
@@ -202,7 +204,7 @@ struct TableCacheHit {
     ratio: String,
 }
 
-table_cache_hit() -> Result<Vec<TableCacheHit>, PgExtrasError>
+table_cache_hit(pool: &Pool<Postgres>) -> Result<Vec<TableCacheHit>, PgExtrasError>
 
 | name                  | buffer_hits | block_reads | total_read | ratio             |
 +-----------------------+-------------+-------------+------------+-------------------+
@@ -226,7 +228,7 @@ struct DbSettings {
     short_desc: String,
 }
 
-db_settings() -> Result<Vec<DbSettings>, PgExtrasError>
+db_settings(pool: &Pool<Postgres>) -> Result<Vec<DbSettings>, PgExtrasError>
 
              name             | setting | unit |
 ------------------------------+---------+------+
@@ -249,7 +251,7 @@ struct SslUsed {
     ssl_used: bool,
 }
 
-ssl_used() -> Result<Vec<SslUsed>, PgExtrasError>
+ssl_used(pool: &Pool<Postgres>) -> Result<Vec<SslUsed>, PgExtrasError>
 
 | ssl_is_used                     |
 +---------------------------------+
@@ -268,7 +270,7 @@ struct IndexUsage {
     rows_in_table: i64,
 }
 
-index_usage(schema: Option<String>) -> Result<Vec<IndexUsage>, PgExtrasError>
+index_usage(schema: Option<String>, pool: &Pool<Postgres>) -> Result<Vec<IndexUsage>, PgExtrasError>
 
        relname       | percent_of_times_index_used | rows_in_table
 ---------------------+-----------------------------+---------------
@@ -296,7 +298,7 @@ struct Locks {
     application: String,
 }
 
-locks() -> Result<Vec<Locks>, PgExtrasError>
+locks(pool: &Pool<Postgres>) -> Result<Vec<Locks>, PgExtrasError>
 
  procpid | relname | transactionid | granted |     query_snippet     | mode             |       age        |   application |
 ---------+---------+---------------+---------+-----------------------+------------------------------------------------------
@@ -327,7 +329,7 @@ struct AllLocks {
     application: String,
 }
 
-all_locks() -> Result<Vec<AllLocks>, PgExtrasError> 
+all_locks(pool: &Pool<Postgres>) -> Result<Vec<AllLocks>, PgExtrasError> 
 
 ```
 
@@ -344,7 +346,7 @@ struct Outliers {
     query: String,
 }
 
-outliers() -> Result<Vec<Outliers>, PgExtrasError>
+outliers(pool: &Pool<Postgres>) -> Result<Vec<Outliers>, PgExtrasError>
 
                    query                 |    exec_time     | prop_exec_time |   ncalls    | sync_io_time
 -----------------------------------------+------------------+----------------+-------------+--------------
@@ -375,7 +377,7 @@ struct Calls {
     sync_io_time: PgInterval,
 }
 
-calls(limit: Option<String>) -> Result<Vec<Calls>, PgExtrasError>
+calls(limit: Option<String>, pool: &Pool<Postgres>) -> Result<Vec<Calls>, PgExtrasError>
 
                    qry                   |    exec_time     | prop_exec_time |   ncalls    | sync_io_time
 -----------------------------------------+------------------+----------------+-------------+--------------
@@ -407,7 +409,7 @@ struct Blocking {
     blocking_sql_app: String,
 }
 
-blocking(limit: Option<String>) -> Result<Vec<Blocking>, PgExtrasError>
+blocking(limit: Option<String>, pool: &Pool<Postgres>) -> Result<Vec<Blocking>, PgExtrasError>
 
  blocked_pid |    blocking_statement    | blocking_duration | blocking_pid |                                        blocked_statement                           | blocked_duration
 -------------+--------------------------+-------------------+--------------+------------------------------------------------------------------------------------+------------------
@@ -426,7 +428,7 @@ struct TotalIndexSize {
     size: String,
 }
 
-total_index_size() -> Result<Vec<TotalIndexSize>, PgExtrasError>
+total_index_size(pool: &Pool<Postgres>) -> Result<Vec<TotalIndexSize>, PgExtrasError>
 
   size
 -------
@@ -445,7 +447,7 @@ This command displays the total size of all indexes on the database, in MB. It i
     schema: String,
 }
 
-index_size() -> Result<Vec<IndexSize>, PgExtrasError> 
+index_size(pool: &Pool<Postgres>) -> Result<Vec<IndexSize>, PgExtrasError> 
 
                              name                              |  size   | schema |
 ---------------------------------------------------------------+-------------------
@@ -473,7 +475,7 @@ struct TableSize {
     schema: String,
 }
 
-table_size() -> Result<Vec<TableSize>, PgExtrasError> 
+table_size(pool: &Pool<Postgres>) -> Result<Vec<TableSize>, PgExtrasError> 
 
                              name                              |  size   | schema |
 ---------------------------------------------------------------+-------------------
@@ -495,7 +497,7 @@ TableIndexesSize {
     index_size: String,
 }
 
-table_indexes_size(schema: Option<String>) -> Result<Vec<TableIndexesSize>, PgExtrasError> 
+table_indexes_size(schema: Option<String>, pool: &Pool<Postgres>) -> Result<Vec<TableIndexesSize>, PgExtrasError> 
 
                              table                             | indexes_size
 ---------------------------------------------------------------+--------------
@@ -517,7 +519,7 @@ struct TotalTableSize {
     size: String,
 }
 
-total_table_size() -> Result<Vec<TotalTableSize>, PgExtrasError>
+total_table_size(pool: &Pool<Postgres>) -> Result<Vec<TotalTableSize>, PgExtrasError>
 
                              name                              |  size
 ---------------------------------------------------------------+---------
@@ -541,7 +543,7 @@ struct UnusedIndexes {
     index_scans: i64,
 }
 
-unused_indexes(schema: Option<String>) -> Result<Vec<UnusedIndexes>, PgExtrasError> 
+unused_indexes(schema: Option<String>, pool: &Pool<Postgres>) -> Result<Vec<UnusedIndexes>, PgExtrasError> 
 
           table      |                       index                | index_size | index_scans
 ---------------------+--------------------------------------------+------------+-------------
@@ -566,7 +568,7 @@ struct DuplicateIndexes {
     idx4: String,
 }
 
-duplicate_indexes() -> Result<Vec<DuplicateIndexes>, PgExtrasError> 
+duplicate_indexes(pool: &Pool<Postgres>) -> Result<Vec<DuplicateIndexes>, PgExtrasError> 
 
 | size       |  idx1        |  idx2          |  idx3    |  idx4     |
 +------------+--------------+----------------+----------+-----------+
@@ -590,7 +592,7 @@ struct NullIndexes {
     schema: String,
 }
 
-null_indexes(min_relation_size_mb: Option<String>) -> Result<Vec<NullIndexes>, PgExtrasError> 
+null_indexes(min_relation_size_mb: Option<String>, pool: &Pool<Postgres>) -> Result<Vec<NullIndexes>, PgExtrasError> 
 
    oid   |         index      | index_size | unique | indexed_column | null_frac | expected_saving
 ---------+--------------------+------------+--------+----------------+-----------+-----------------
@@ -612,7 +614,7 @@ struct SeqScans {
     count: i64,
 }
 
-seq_scans(schema: Option<String>) -> Result<Vec<SeqScans>, PgExtrasError>
+seq_scans(schema: Option<String>, pool: &Pool<Postgres>) -> Result<Vec<SeqScans>, PgExtrasError>
 
                name                |  count
 -----------------------------------+----------
@@ -640,7 +642,7 @@ struct LongRunningQueries {
     query: String,
 }
 
-long_running_queries() -> Result<Vec<LongRunningQueries>, PgExtrasError> 
+long_running_queries(pool: &Pool<Postgres>) -> Result<Vec<LongRunningQueries>, PgExtrasError> 
 
   pid  |    duration     |                                      query
 -------+-----------------+---------------------------------------------------------------------------------------
@@ -660,7 +662,7 @@ struct RecordsRank {
     esiimated_count: i64,
 }
 
-records_rank(schema: Option<String>) -> Result<Vec<RecordsRank>, PgExtrasError> 
+records_rank(schema: Option<String>, pool: &Pool<Postgres>) -> Result<Vec<RecordsRank>, PgExtrasError> 
 
                name                | estimated_count
 -----------------------------------+-----------------
@@ -686,7 +688,7 @@ struct Bloat {
     waste: String,
 }
 
-bloat() -> Result<Vec<Bloat>, PgExtrasError> 
+bloat(pool: &Pool<Postgres>) -> Result<Vec<Bloat>, PgExtrasError> 
 
  type  | schemaname |           object_name         | bloat |   waste
 -------+------------+-------------------------------+-------+----------
@@ -716,7 +718,7 @@ struct VacuumStats {
     expect_autovacuum: String,
 }
 
-vacuum_stats() -> Result<Vec<VacuumStats>, PgExtrasError> 
+vacuum_stats(pool: &Pool<Postgres>) -> Result<Vec<VacuumStats>, PgExtrasError> 
 
  schema |         table         | last_vacuum | last_autovacuum  |    rowcount    | dead_rowcount  | autovacuum_threshold | expect_autovacuum
 --------+-----------------------+-------------+------------------+----------------+----------------+----------------------+-------------------
@@ -740,7 +742,7 @@ struct BuffercacheStats {
     percent_of_relation: Decimal,
 }
 
-buffercache_stats() -> Result<Vec<BuffercacheStats>, PgExtrasError> 
+buffercache_stats(pool: &Pool<Postgres>) -> Result<Vec<BuffercacheStats>, PgExtrasError> 
 ```
 
 This command shows the relations buffered in database share buffer, ordered by percentage taken. It also shows that how much of the whole relation is buffered.
@@ -753,7 +755,7 @@ struct BuffercacheUsage {
     buffers: i64,
 }
 
-buffercache_usage() -> Result<Vec<BuffercacheUsage>, PgExtrasError> 
+buffercache_usage(pool: &Pool<Postgres>) -> Result<Vec<BuffercacheUsage>, PgExtrasError> 
 ```
 
 This command calculates how many blocks from which table are currently cached.
@@ -768,7 +770,7 @@ struct Extensions {
     comment: String,
 }
 
-extensions() -> Result<Vec<Extensions>, PgExtrasError> 
+extensions(pool: &Pool<Postgres>) -> Result<Vec<Extensions>, PgExtrasError> 
 
 ```
 
@@ -783,7 +785,7 @@ struct Connections {
     client_addr: String,
 }
 
-connections() -> Result<Vec<Connections>, PgExtrasError> 
+connections(pool: &Pool<Postgres>) -> Result<Vec<Connections>, PgExtrasError> 
 
 +----------------------------------------------------------------+
 |      Returns the list of all active database connections       |
@@ -805,7 +807,7 @@ struct Mandelbrot {
     array_to_string: String,
 }
 
-mandelbrot() -> Result<Vec<Mandelbrot>, PgExtrasError>
+mandelbrot(pool: &Pool<Postgres>) -> Result<Vec<Mandelbrot>, PgExtrasError>
 
 ```
 
