@@ -109,7 +109,16 @@ pub enum PgSubcommand {
 pub struct EmptyArgs {}
 
 #[tokio::main]
+#[hotpath::main]
 async fn main() {
+    #[cfg(feature = "hotpath")]
+    {
+        use tracing_subscriber::prelude::*;
+        tracing_subscriber::registry()
+            .with(hotpath::sqlx_tracing_layer())
+            .init();
+    }
+
     match execute().await {
         Ok(_) => {}
         Err(e) => {

@@ -58,6 +58,7 @@ impl std::fmt::Display for Check {
     }
 }
 
+#[hotpath::measure]
 pub async fn run_diagnose(pool: &Pool<Postgres>) -> Result<Vec<CheckResult>, PgExtrasError> {
     let mut checks = vec![
         Check::TableCacheHit,
@@ -105,6 +106,7 @@ async fn run_check(check: Check, pool: &Pool<Postgres>) -> Result<CheckResult, P
     }
 }
 
+#[hotpath::measure]
 async fn check_table_cache_hit(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
     let min_expected = BigDecimal::try_from(TABLE_CACHE_HIT_MIN).unwrap();
     let cache_hit = cache_hit(None, pool).await?;
@@ -132,6 +134,7 @@ async fn check_table_cache_hit(pool: &Pool<Postgres>) -> Result<CheckResult, PgE
     })
 }
 
+#[hotpath::measure]
 async fn check_index_cache_hit(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
     let min_expected = BigDecimal::try_from(INDEX_CACHE_HIT_MIN).unwrap();
     let cache_hit = cache_hit(None, pool).await?;
@@ -159,6 +162,7 @@ async fn check_index_cache_hit(pool: &Pool<Postgres>) -> Result<CheckResult, PgE
     })
 }
 
+#[hotpath::measure]
 async fn detect_ssl_used(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
     let ssl_results = ssl_used(pool).await?;
     let Some(ssl_conn) = ssl_results.first() else {
@@ -182,6 +186,7 @@ async fn detect_ssl_used(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasE
     })
 }
 
+#[hotpath::measure]
 async fn check_unused_index(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
     let indexes = unused_indexes(None, pool)
         .await?
@@ -210,6 +215,7 @@ async fn check_unused_index(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtr
     })
 }
 
+#[hotpath::measure]
 async fn check_null_index(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
     let indexes = null_indexes(Some(NULL_INDEXES_MIN_SIZE_MB.to_string()), pool)
         .await?
@@ -249,6 +255,7 @@ async fn check_null_index(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtras
     })
 }
 
+#[hotpath::measure]
 async fn check_bloat(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
     let bloat_data = bloat(pool)
         .await?
@@ -277,6 +284,7 @@ async fn check_bloat(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError
     })
 }
 
+#[hotpath::measure]
 async fn check_duplicate_indexes(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
     let indexes = duplicate_indexes(pool).await?;
 
@@ -306,6 +314,7 @@ async fn check_duplicate_indexes(pool: &Pool<Postgres>) -> Result<CheckResult, P
     })
 }
 
+#[hotpath::measure]
 async fn check_outliers(pool: &Pool<Postgres>) -> Result<CheckResult, PgExtrasError> {
     let queries = outliers(pool)
         .await?

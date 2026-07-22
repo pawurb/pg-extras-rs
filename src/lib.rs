@@ -53,6 +53,7 @@ extern crate prettytable;
 use prettytable::{Cell, Row as TableRow, Table};
 
 /// Renders a table to stdout for any type that implements the Query trait.
+#[hotpath::measure]
 pub fn render_table<T: Query>(items: Vec<T>) {
     let mut table = Table::new();
     table.add_row(T::headers());
@@ -84,6 +85,7 @@ pub async fn blocking(
 /// Creates a new connection pool to PostgreSQL.
 ///
 /// Uses either PG_EXTRAS_DATABASE_URL or DATABASE_URL environment variable.
+#[hotpath::measure]
 pub async fn pg_pool() -> Result<Pool<Postgres>, PgExtrasError> {
     match PgPoolOptions::new()
         .max_connections(5)
@@ -348,6 +350,7 @@ pub enum PgStatsVersion {
     Pg17,
 }
 
+#[hotpath::measure]
 async fn get_rows<T: Query>(
     params: Option<HashMap<String, String>>,
     pool: &Pool<Postgres>,
