@@ -70,8 +70,10 @@ jobs:
       - name: Check
         run: cargo check 
       - name: Fmt
+        if: matrix.rust == 'stable'
         run: cargo fmt --all --check
       - name: Lint
+        if: matrix.rust == 'stable'
         run: cargo clippy --all --all-features -- -D warnings
       - name: Smoke test CLI
         env: 

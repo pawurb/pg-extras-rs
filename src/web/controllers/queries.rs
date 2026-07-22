@@ -218,6 +218,8 @@ async fn get_data(pool: &Pool<Postgres>, query_name: &str) -> Result<Vec<Value>>
             .into_iter()
             .map(|r| r.to_json())
             .collect(),
-        _ => eyre::bail!("Invalid query name: {}", query_name),
+        _ => {
+            eyre::bail!("Invalid query name: {}", query_name);
+        }
     })
 }
